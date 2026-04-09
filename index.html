@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BusinessMind English Training</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #1B2B5E;
+      --navy-dark: #111d45;
+      --navy-light: #263d7a;
+      --green: #5BAF2A;
+      --green-light: #6ec935;
+      --sky: #2FA8D0;
+      --sky-light: #45c0eb;
+      --white: #ffffff;
+      --off-white: #f4f8fc;
+      --muted: #8096b8;
+      --border: rgba(27,43,94,0.12);
+      --border-light: rgba(255,255,255,0.15);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--off-white);
+      color: var(--navy);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 400;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 0 60px;
+      display: flex; justify-content: space-between; align-items: center;
+      height: 72px;
+      background: var(--navy);
+      border-bottom: 3px solid var(--green);
+      box-shadow: 0 4px 24px rgba(27,43,94,0.3);
+      animation: slideDown 0.7s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes slideDown { from{opacity:0;transform:translateY(-100%);} to{opacity:1;transform:translateY(0);} }
+
+    .header-logo-wrap { display:flex; align-items:center; gap:14px; }
+    .header-logo { height: 46px; object-fit: contain; filter: brightness(0) invert(1); transition: transform 0.3s; }
+    .header-logo:hover { transform: scale(1.05); }
+    .header-brand { color: var(--white); font-size: 18px; font-weight: 600; letter-spacing: 0.01em; }
+    .header-brand span { color: var(--green); }
+
+    nav { display: flex; gap: 36px; align-items: center; }
+    nav a { text-decoration: none; color: rgba(255,255,255,0.75); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; transition: color 0.25s; }
+    nav a:hover { color: var(--white); }
+    .nav-cta {
+      color: var(--navy) !important;
+      background: var(--green);
+      padding: 10px 24px;
+      border-radius: 4px;
+      font-weight: 600 !important;
+      transition: background 0.25s, transform 0.2s !important;
+    }
+    .nav-cta:hover { background: var(--green-light) !important; transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+      overflow: hidden;
+      padding-top: 72px;
+    }
+
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 50%, var(--navy-light) 100%);
+    }
+    .hero-bg-pattern {
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 80%, rgba(47,168,208,0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(91,175,42,0.12) 0%, transparent 50%);
+    }
+
+    /* Grid lines décor */
+    .hero-grid {
+      position: absolute; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    canvas#hero-canvas {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+    }
+
+    .hero-left {
+      position: relative; z-index: 2;
+      padding: 80px 60px 80px 80px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: rgba(91,175,42,0.15);
+      border: 1px solid rgba(91,175,42,0.4);
+      color: var(--green-light);
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600;
+      padding: 8px 18px; border-radius: 100px; margin-bottom: 28px;
+      width: fit-content;
+      opacity: 0; animation: fadeUp 0.7s 0.3s ease both;
+    }
+    .hero-badge::before { content:''; width:6px; height:6px; background:var(--green); border-radius:50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.5);opacity:0.5;} }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(46px, 5.5vw, 82px);
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      margin-bottom: 24px;
+      opacity: 0; animation: fadeUp 0.8s 0.5s ease both;
+    }
+    .hero-title .accent { color: var(--sky); }
+    .hero-title .green { color: var(--green); }
+
+    .hero-desc {
+      font-size: 16px; color: rgba(255,255,255,0.7);
+      line-height: 1.75; max-width: 480px; margin-bottom: 44px;
+      opacity: 0; animation: fadeUp 0.8s 0.7s ease both;
+    }
+
+    .hero-actions {
+      display: flex; gap: 14px; align-items: center;
+      opacity: 0; animation: fadeUp 0.8s 0.9s ease both;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(28px);} to{opacity:1;transform:translateY(0);} }
+
+    .btn-primary {
+      padding: 16px 36px;
+      background: var(--green);
+      color: var(--white);
+      border: none; border-radius: 6px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px; font-weight: 600; letter-spacing: 0.04em;
+      cursor: pointer; text-transform: uppercase;
+      transition: background 0.25s, transform 0.2s, box-shadow 0.3s;
+    }
+    .btn-primary:hover {
+      background: var(--green-light);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(91,175,42,0.4);
+    }
+    .btn-outline {
+      padding: 15px 30px;
+      background: transparent;
+      color: var(--white);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-radius: 6px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px; font-weight: 500; letter-spacing: 0.04em;
+      cursor: pointer; text-transform: uppercase;
+      transition: border-color 0.25s, background 0.25s, transform 0.2s;
+    }
+    .btn-outline:hover {
+      border-color: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.08);
+      transform: translateY(-2px);
+    }
+
+    /* Hero right – visual */
+    .hero-right {
+      position: relative; z-index: 2;
+      display: flex; align-items: center; justify-content: center;
+      padding: 80px 60px 80px 40px;
+      opacity: 0; animation: fadeIn 1.2s 0.4s ease both;
+    }
+    @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+
+    .globe-wrap {
+      position: relative;
+      width: 380px; height: 380px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Orbiting rings */
+    .orbit {
+      position: absolute; top: 50%; left: 50%;
+      border-radius: 50%;
+      border: 1px solid rgba(47,168,208,0.25);
+      transform-origin: center;
+    }
+    .orbit-1 {
+      width: 320px; height: 320px;
+      margin: -160px 0 0 -160px;
+      animation: orbit1 18s linear infinite;
+    }
+    .orbit-2 {
+      width: 420px; height: 420px;
+      margin: -210px 0 0 -210px;
+      border-style: dashed;
+      border-color: rgba(91,175,42,0.2);
+      animation: orbit1 30s linear infinite reverse;
+    }
+    .orbit-3 {
+      width: 500px; height: 500px;
+      margin: -250px 0 0 -250px;
+      border-color: rgba(47,168,208,0.1);
+      animation: orbit1 45s linear infinite;
+    }
+    @keyframes orbit1 { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+
+    /* Dot on orbit-1 */
+    .orbit-dot {
+      position: absolute; top: -4px; left: 50%;
+      width: 8px; height: 8px;
+      margin-left: -4px;
+      background: var(--sky); border-radius: 50%;
+      box-shadow: 0 0 12px var(--sky);
+    }
+
+    /* Center logo card */
+    .logo-card {
+      position: relative; z-index: 2;
+      width: 240px; height: 240px;
+      background: var(--white);
+      border-radius: 24px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
+      animation: floatCard 6s ease-in-out infinite;
+    }
+    @keyframes floatCard {
+      0%,100%{transform:translateY(0) rotate(0deg);}
+      33%{transform:translateY(-12px) rotate(1deg);}
+      66%{transform:translateY(-6px) rotate(-0.5deg);}
+    }
+    .logo-card img { width: 180px; object-fit: contain; }
+
+    /* Floating pills around logo */
+    .float-pill {
+      position: absolute;
+      background: rgba(255,255,255,0.95);
+      border-radius: 100px;
+      padding: 10px 18px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 8px 30px rgba(27,43,94,0.15);
+      white-space: nowrap;
+      font-size: 13px; font-weight: 600; color: var(--navy);
+      animation: floatPill 5s ease-in-out infinite;
+    }
+    .float-pill .pill-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .pill-1 { top: 10%; right: -20px; animation-delay: 0s; }
+    .pill-2 { bottom: 15%; left: -30px; animation-delay: 1.5s; }
+    .pill-3 { top: 45%; right: -40px; animation-delay: 3s; }
+    @keyframes floatPill {
+      0%,100%{transform:translateY(0);}
+      50%{transform:translateY(-8px);}
+    }
+    .bg-green { background: var(--green) !important; }
+    .bg-sky { background: var(--sky) !important; }
+    .bg-navy { background: var(--navy) !important; }
+
+    /* ── MARQUEE ── */
+    .marquee-wrap {
+      overflow: hidden;
+      background: var(--navy);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 16px 0;
+    }
+    .marquee-track {
+      display: flex; gap: 0;
+      width: max-content;
+      animation: marquee 22s linear infinite;
+    }
+    @keyframes marquee { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+    .marquee-item {
+      display: flex; align-items: center; gap: 40px;
+      padding: 0 40px;
+      font-size: 12px; letter-spacing: 0.25em; text-transform: uppercase;
+      color: rgba(255,255,255,0.5); font-weight: 600;
+      white-space: nowrap;
+    }
+    .marquee-sep { color: var(--green); font-size: 18px; opacity: 0.8; }
+
+    /* ── STATS ── */
+    .stats-section {
+      background: var(--white);
+      padding: 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      max-width: 1200px; margin: 0 auto;
+    }
+    .stat-item {
+      padding: 48px 40px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-item::before {
+      content: '';
+      position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 0; height: 3px;
+      background: var(--green);
+      transition: width 0.6s ease;
+    }
+    .stat-item:hover::before { width: 60%; }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 56px; font-weight: 900;
+      color: var(--navy);
+      line-height: 1;
+      display: block;
+    }
+    .stat-num .accent { color: var(--green); }
+    .stat-label {
+      font-size: 12px; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--muted);
+      margin-top: 8px; display: block; font-weight: 500;
+    }
+
+    /* ── SECTIONS ── */
+    .section { padding: 110px 80px; max-width: 1400px; margin: 0 auto; }
+    .section-bg { padding: 110px 0; background: var(--white); }
+    .section-inner { max-width: 1400px; margin: 0 auto; padding: 0 80px; }
+
+    .section-tag {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--sky); font-weight: 700; margin-bottom: 16px;
+    }
+    .section-tag::before { content: ''; width: 24px; height: 2px; background: var(--sky); }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 4vw, 60px);
+      font-weight: 900; color: var(--navy);
+      line-height: 1.1; letter-spacing: -0.01em;
+      margin-bottom: 60px;
+    }
+    .section-title span { color: var(--green); }
+
+    /* ── SERVICES GRID ── */
+    .services-wrapper { padding: 110px 0; background: var(--off-white); }
+    .services-inner { max-width: 1400px; margin: 0 auto; padding: 0 80px; }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .service-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 40px 36px;
+      border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 4px;
+      background: linear-gradient(90deg, var(--navy), var(--sky));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    .service-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(27,43,94,0.12); border-color: transparent; }
+    .service-card:hover::before { transform: scaleX(1); }
+
+    .service-icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; margin-bottom: 24px;
+    }
+    .icon-navy { background: rgba(27,43,94,0.08); }
+    .icon-green { background: rgba(91,175,42,0.1); }
+    .icon-sky { background: rgba(47,168,208,0.1); }
+
+    .service-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 48px; font-weight: 900;
+      color: rgba(27,43,94,0.06); line-height: 1;
+      margin-bottom: 12px; display: block;
+      transition: color 0.3s;
+    }
+    .service-card:hover .service-num { color: rgba(27,43,94,0.12); }
+    .service-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 700;
+      color: var(--navy); margin-bottom: 12px; line-height: 1.2;
+    }
+    .service-card p { font-size: 14px; color: var(--muted); line-height: 1.75; }
+    .service-arrow {
+      position: absolute; bottom: 28px; right: 28px;
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--navy); color: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      transform: translate(4px, 4px);
+    }
+    .service-card:hover .service-arrow { opacity: 1; transform: translate(0,0); }
+
+    /* ── TEAM CAROUSEL ── */
+    .team-wrapper { padding: 110px 0; background: var(--navy); }
+    .team-inner { max-width: 1400px; margin: 0 auto; padding: 0 80px; }
+    .team-inner .section-tag { color: rgba(255,255,255,0.5); }
+    .team-inner .section-tag::before { background: rgba(255,255,255,0.3); }
+    .team-inner .section-title { color: var(--white); }
+    .team-inner .section-title span { color: var(--green); }
+
+    .carousel-3d-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 30px 0 50px;
+    }
+    .carousel-3d {
+      position: relative;
+      width: 340px; height: 420px;
+      perspective: 1000px;
+    }
+    .carousel-card {
+      position: absolute; top: 0; left: 0;
+      width: 340px; height: 420px;
+      border-radius: 16px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.12);
+      transition: transform 0.7s cubic-bezier(0.4,0,0.2,1), opacity 0.7s ease, box-shadow 0.5s;
+      cursor: pointer;
+    }
+    .carousel-card.active { transform: translateX(0) translateZ(0) rotateY(0deg) scale(1); opacity:1; z-index:3; box-shadow:0 30px 80px rgba(0,0,0,0.4); }
+    .carousel-card.prev { transform: translateX(-220px) translateZ(-180px) rotateY(30deg) scale(0.82); opacity:0.45; z-index:2; }
+    .carousel-card.next { transform: translateX(220px) translateZ(-180px) rotateY(-30deg) scale(0.82); opacity:0.45; z-index:2; }
+    .carousel-card.hidden { transform: translateX(0) translateZ(-400px) scale(0.6); opacity:0; z-index:1; }
+
+    .carousel-card-inner { position:relative; width:100%; height:100%; background:var(--navy-light); }
+    .carousel-card-inner img { width:100%; height:100%; object-fit:cover; filter:brightness(0.85) contrast(1.05); }
+    .carousel-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 32px 28px 28px;
+      background: linear-gradient(to top, rgba(17,29,69,0.95) 0%, transparent 100%);
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .carousel-name { font-family:'Playfair Display',serif; font-size: 22px; color: var(--white); font-weight: 700; }
+    .carousel-role { font-size: 12px; color: var(--green-light); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; }
+    .carousel-hint { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 8px; }
+
+    .carousel-nav { display:flex; align-items:center; gap:20px; margin-top:32px; }
+    .carousel-btn {
+      width:44px; height:44px; border-radius:50%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--white); font-size: 22px;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; transition: background 0.25s, transform 0.2s;
+    }
+    .carousel-btn:hover { background: var(--green); transform: scale(1.05); }
+    .carousel-dots { display:flex; gap:8px; }
+    .carousel-dot {
+      width:8px; height:8px; border-radius:50%;
+      background: rgba(255,255,255,0.2);
+      cursor:pointer; transition: background 0.25s, transform 0.2s;
+    }
+    .carousel-dot.active { background: var(--green); transform: scale(1.3); }
+
+    /* ── ABOUT ── */
+    #nosotros {
+      display: grid; grid-template-columns: 1fr 1fr;
+      padding: 110px 80px; gap: 80px; align-items: center;
+      max-width: 1400px; margin: 0 auto;
+    }
+    .about-img-wrap { position: relative; height: 480px; }
+    .about-img-main {
+      position: absolute; top: 0; left: 0; right: 40px; bottom: 40px;
+      border-radius: 16px; object-fit: cover;
+      box-shadow: 0 24px 60px rgba(27,43,94,0.15);
+    }
+    .about-img-accent {
+      position: absolute; bottom: 0; right: 0; width: 55%; height: 220px;
+      border-radius: 12px; object-fit: cover;
+      box-shadow: 0 16px 40px rgba(27,43,94,0.2);
+      border: 4px solid var(--white);
+    }
+    .about-badge {
+      position: absolute; top: 24px; left: -20px;
+      background: var(--navy);
+      color: var(--white); padding: 10px 18px;
+      border-radius: 8px; font-size: 11px;
+      letter-spacing: 0.15em; text-transform: uppercase; font-weight: 700;
+      box-shadow: 0 8px 24px rgba(27,43,94,0.3);
+    }
+    .about-text { display:flex; flex-direction:column; gap:20px; }
+    .about-text p { font-size: 16px; color: #4a5c7a; line-height: 1.8; }
+    .about-divider { width: 60px; height: 3px; background: var(--green); border-radius: 2px; }
+
+    /* ── CONTACT ── */
+    .contact-wrapper { padding: 110px 0; background: var(--navy); }
+    .contact-inner { max-width: 760px; margin: 0 auto; padding: 0 80px; }
+    .contact-inner .section-tag { color: rgba(255,255,255,0.5); }
+    .contact-inner .section-tag::before { background: rgba(255,255,255,0.3); }
+    .contact-inner .section-title { color: var(--white); }
+    .contact-intro p { color: rgba(255,255,255,0.65); font-size: 16px; line-height: 1.8; margin-bottom: 16px; }
+    .contact-intro strong { color: var(--white); }
+
+    .calendly-wrap { border-radius: 16px; overflow: hidden; margin-top: 40px; box-shadow: 0 24px 60px rgba(0,0,0,0.3); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--navy-dark);
+      padding: 32px 60px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-logo { height: 40px; object-fit: contain; filter: brightness(0) invert(1) opacity(0.6); }
+    footer p { font-size: 12px; color: rgba(255,255,255,0.3); letter-spacing: 0.05em; }
+
+    /* ── WHATSAPP ── */
+    .whatsapp-btn {
+      position: fixed; bottom: 28px; right: 28px; z-index: 999;
+      background: #25d366; width: 60px; height: 60px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.4);
+      transition: transform 0.3s, box-shadow 0.3s;
+      text-decoration: none;
+      animation: waPulse 2.5s ease-in-out infinite;
+    }
+    .whatsapp-btn:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(37,211,102,0.6); }
+    @keyframes waPulse { 0%,100%{box-shadow:0 4px 20px rgba(37,211,102,0.4);} 50%{box-shadow:0 4px 30px rgba(37,211,102,0.7);} }
+
+    /* ── REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-left { opacity: 0; transform: translateX(-40px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal-left.visible { opacity: 1; transform: translateX(0); }
+    .reveal-right { opacity: 0; transform: translateX(40px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) {
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-left { padding: 80px 40px 40px; }
+      .hero-right { padding: 20px 40px 80px; }
+      .globe-wrap { width: 280px; height: 280px; }
+      .logo-card { width: 180px; height: 180px; }
+      .logo-card img { width: 140px; }
+      .orbit-1 { width: 240px; height: 240px; margin: -120px 0 0 -120px; }
+      .orbit-2 { width: 320px; height: 320px; margin: -160px 0 0 -160px; }
+      .orbit-3 { width: 380px; height: 380px; margin: -190px 0 0 -190px; }
+      .float-pill { display: none; }
+      #nosotros { grid-template-columns: 1fr; padding: 70px 40px; gap: 40px; }
+      .about-img-wrap { height: 280px; }
+      .services-grid { grid-template-columns: 1fr 1fr; }
+      header { padding: 0 30px; }
+    }
+    @media (max-width: 768px) {
+      header { padding: 0 20px; }
+      nav { gap: 14px; }
+      nav a:not(.nav-cta) { display: none; }
+      .hero-left { padding: 60px 24px 40px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .stat-item { border-bottom: 1px solid var(--border); }
+      .stat-item:nth-child(even) { border-right: none; }
+      .section { padding: 70px 24px; }
+      .section-bg { padding: 70px 0; }
+      .section-inner { padding: 0 24px; }
+      .services-grid { grid-template-columns: 1fr; }
+      .services-inner { padding: 0 24px; }
+      .team-inner { padding: 0 24px; }
+      .contact-inner { padding: 0 24px; }
+      footer { flex-direction: column; gap: 12px; text-align: center; padding: 24px; }
+      .hero-actions { flex-direction: column; gap: 12px; }
+      .btn-primary, .btn-outline { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-logo-wrap">
+    <img src="Logotipo_de_BusinessMind_con_flecha_y_globo__1_.png" alt="BusinessMind" class="header-logo">
+    <span class="header-brand">Business<span>Mind</span></span>
+  </div>
+  <nav>
+    <a href="#servicios">Servicios</a>
+    <a href="#equipo">Equipo</a>
+    <a href="#nosotros">Nosotros</a>
+    <a href="#contacto" class="nav-cta">Contacto</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-bg-pattern"></div>
+  <div class="hero-grid"></div>
+  <canvas id="hero-canvas"></canvas>
+
+  <div class="hero-left">
+    <span class="hero-badge">English Training para Profesionales</span>
+    <h1 class="hero-title">
+      Dominá el Inglés<br>
+      <span class="accent">de Negocios</span> que<br>
+      <span class="green">te distingue</span>
+    </h1>
+    <p class="hero-desc">
+      Entrenamiento personalizado en inglés corporativo. Metodología enfocada en resultados reales: reuniones, presentaciones, negociaciones y networking global.
+    </p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="scrollToSection('contacto')">Agendar clase de prueba</button>
+      <button class="btn-outline" onclick="scrollToSection('servicios')">Ver programas →</button>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="globe-wrap">
+      <div class="orbit orbit-1"><div class="orbit-dot"></div></div>
+      <div class="orbit orbit-2"></div>
+      <div class="orbit orbit-3"></div>
+
+      <div class="logo-card">
+        <img src="Logotipo_de_BusinessMind_con_flecha_y_globo__1_.png" alt="BusinessMind English Training">
+      </div>
+
+      <div class="float-pill pill-1">
+        <div class="pill-icon bg-green" style="color:white;">🌍</div>
+        Clases 100% Online
+      </div>
+      <div class="float-pill pill-2">
+        <div class="pill-icon bg-sky" style="color:white;">📈</div>
+        Método Acelerado
+      </div>
+      <div class="float-pill pill-3">
+        <div class="pill-icon bg-navy" style="color:white;">🏆</div>
+        +500 alumnos
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item">BUSINESS ENGLISH <span class="marquee-sep">✦</span> PRESENTACIONES <span class="marquee-sep">✦</span> NEGOCIACIÓN <span class="marquee-sep">✦</span> CERTIFICACIONES <span class="marquee-sep">✦</span> REUNIONES GLOBALES <span class="marquee-sep">✦</span> NETWORKING <span class="marquee-sep">✦</span> LIDERAZGO <span class="marquee-sep">✦</span></div>
+    <div class="marquee-item">BUSINESS ENGLISH <span class="marquee-sep">✦</span> PRESENTACIONES <span class="marquee-sep">✦</span> NEGOCIACIÓN <span class="marquee-sep">✦</span> CERTIFICACIONES <span class="marquee-sep">✦</span> REUNIONES GLOBALES <span class="marquee-sep">✦</span> NETWORKING <span class="marquee-sep">✦</span> LIDERAZGO <span class="marquee-sep">✦</span></div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-item reveal">
+      <span class="stat-num"><span class="accent" data-target="500" data-suffix="+">0</span></span>
+      <span class="stat-label">Alumnos formados</span>
+    </div>
+    <div class="stat-item reveal" style="transition-delay:0.1s">
+      <span class="stat-num"><span class="accent" data-target="8">0</span></span>
+      <span class="stat-label">Años de experiencia</span>
+    </div>
+    <div class="stat-item reveal" style="transition-delay:0.2s">
+      <span class="stat-num"><span class="accent" data-target="96" data-suffix="%">0</span></span>
+      <span class="stat-label">Satisfacción</span>
+    </div>
+    <div class="stat-item reveal" style="transition-delay:0.3s">
+      <span class="stat-num"><span class="accent" data-target="12">0</span></span>
+      <span class="stat-label">Países representados</span>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<div class="services-wrapper" id="servicios">
+  <div class="services-inner">
+    <span class="section-tag reveal">Lo que ofrecemos</span>
+    <h2 class="section-title reveal">Nuestros <span>Programas</span></h2>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-icon icon-navy">🗣️</div>
+        <span class="service-num">01</span>
+        <h3>Business Communication</h3>
+        <p>Domina el lenguaje corporativo para emails, reportes, llamadas y reuniones internacionales con fluidez y precisión.</p>
+        <div class="service-arrow">↗</div>
+      </div>
+      <div class="service-card reveal" style="transition-delay:0.1s">
+        <div class="service-icon icon-green">📊</div>
+        <span class="service-num">02</span>
+        <h3>Presentaciones & Pitching</h3>
+        <p>Aprende a presentar proyectos, defender ideas y convencer stakeholders en inglés con impacto y confianza.</p>
+        <div class="service-arrow">↗</div>
+      </div>
+      <div class="service-card reveal" style="transition-delay:0.2s">
+        <div class="service-icon icon-sky">🤝</div>
+        <span class="service-num">03</span>
+        <h3>Negotiation English</h3>
+        <p>Estrategias lingüísticas para cerrar acuerdos, manejar objeciones y comunicar propuestas de valor en contextos globales.</p>
+        <div class="service-arrow">↗</div>
+      </div>
+      <div class="service-card reveal" style="transition-delay:0.3s">
+        <div class="service-icon icon-navy">🎯</div>
+        <span class="service-num">04</span>
+        <h3>Exec Coaching 1:1</h3>
+        <p>Sesiones personalizadas para ejecutivos y directivos que necesitan llevar su inglés al máximo nivel profesional.</p>
+        <div class="service-arrow">↗</div>
+      </div>
+      <div class="service-card reveal" style="transition-delay:0.4s">
+        <div class="service-icon icon-green">🌐</div>
+        <span class="service-num">05</span>
+        <h3>Corporate Teams</h3>
+        <p>Programas in-company para equipos comerciales, de marketing y operaciones que interactúan con mercados internacionales.</p>
+        <div class="service-arrow">↗</div>
+      </div>
+      <div class="service-card reveal" style="transition-delay:0.5s">
+        <div class="service-icon icon-sky">📝</div>
+        <span class="service-num">06</span>
+        <h3>Certificaciones</h3>
+        <p>Preparación intensiva para TOEIC, IELTS Business, Cambridge y otros exámenes de inglés corporativo reconocidos globalmente.</p>
+        <div class="service-arrow">↗</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TEAM -->
+<div class="team-wrapper" id="equipo">
+  <div class="team-inner">
+    <span class="section-tag reveal">Quiénes somos</span>
+    <h2 class="section-title reveal">Nuestro <span>Equipo</span></h2>
+    <div class="carousel-3d-wrap">
+      <div class="carousel-3d" id="team-carousel">
+        <div class="carousel-card" data-index="0">
+          <div class="carousel-card-inner" style="background:linear-gradient(135deg,#1B2B5E,#2FA8D0);">
+            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:80px;">👩‍💼</div>
+            <div class="carousel-overlay">
+              <span class="carousel-name">Laura Martínez</span>
+              <span class="carousel-role">Lead Business English Coach</span>
+              <span class="carousel-hint">Ver perfil →</span>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-card" data-index="1">
+          <div class="carousel-card-inner" style="background:linear-gradient(135deg,#263d7a,#5BAF2A);">
+            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:80px;">👨‍💼</div>
+            <div class="carousel-overlay">
+              <span class="carousel-name">Carlos Soria</span>
+              <span class="carousel-role">Corporate Training Specialist</span>
+              <span class="carousel-hint">Ver perfil →</span>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-card" data-index="2">
+          <div class="carousel-card-inner" style="background:linear-gradient(135deg,#1B2B5E,#6ec935);">
+            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:80px;">👩‍🏫</div>
+            <div class="carousel-overlay">
+              <span class="carousel-name">Ana Volkova</span>
+              <span class="carousel-role">Executive Communication Coach</span>
+              <span class="carousel-hint">Ver perfil →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" onclick="carouselMove(-1)">&#8249;</button>
+        <div class="carousel-dots" id="carousel-dots"></div>
+        <button class="carousel-btn" onclick="carouselMove(1)">&#8250;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="nosotros">
+  <div class="about-img-wrap reveal-left">
+    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80" alt="Equipo BusinessMind" class="about-img-main">
+    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80" alt="Clase online" class="about-img-accent">
+    <span class="about-badge">Desde 2016</span>
+  </div>
+  <div class="about-text reveal-right">
+    <span class="section-tag">Sobre nosotros</span>
+    <h2 class="section-title">Expertos en Inglés <span>Corporativo</span></h2>
+    <div class="about-divider"></div>
+    <p>Somos un equipo de coaches especializados en inglés de negocios con experiencia en entornos corporativos internacionales. No enseñamos gramática, enseñamos a comunicarse con impacto.</p>
+    <p>Cada programa está diseñado a partir del sector, rol y objetivos específicos del alumno. Porque el inglés que necesita un CEO no es el mismo que necesita un desarrollador o un comercial.</p>
+    <div style="margin-top: 12px;">
+      <button class="btn-primary" style="background:var(--navy);" onclick="scrollToSection('contacto')">Conocé nuestro método</button>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<div class="contact-wrapper" id="contacto">
+  <div class="contact-inner">
+    <span class="section-tag reveal">Hablemos</span>
+    <h2 class="section-title reveal">Agendá tu <span style="color:var(--green)">Clase Gratuita</span></h2>
+    <div class="contact-intro reveal">
+      <p>Primero te conocemos. Evaluamos tu nivel actual, tu industria y tus objetivos profesionales.</p>
+      <p>A partir de ahí, diseñamos un plan de entrenamiento a medida para que en pocas semanas notes un cambio real en tu comunicación en inglés.</p>
+      <p><strong>30 minutos. Sin compromiso. Con foco en resultados.</strong></p>
+    </div>
+    <div class="calendly-wrap reveal">
+      <div
+        class="calendly-inline-widget"
+        data-url="https://calendly.com/businessmind/clase-prueba?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=5BAF2A&text_color=1B2B5E&background_color=ffffff"
+        style="min-width:320px;height:700px;">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <img src="Logotipo_de_BusinessMind_con_flecha_y_globo__1_.png" alt="BusinessMind English Training" class="footer-logo">
+  <p>© 2026 BusinessMind English Training — Todos los derechos reservados</p>
+</footer>
+
+<!-- WHATSAPP -->
+<a href="https://wa.me/5491100000000" target="_blank" class="whatsapp-btn" title="Chateá con nosotros">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="28" height="28">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.17 1.595 5.938L.057 23.929l6.188-1.517A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.817 9.817 0 01-5.003-1.368l-.36-.214-3.722.912.947-3.628-.235-.374A9.818 9.818 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
+  </svg>
+</a>
+
+<!-- Calendly -->
+<link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+<script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+
+<script>
+  // ── PARTÍCULAS HERO ──
+  (function() {
+    const canvas = document.getElementById('hero-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+    const COUNT = 60;
+    const MAX_DIST = 120;
+
+    function resize() {
+      W = canvas.width = canvas.offsetWidth;
+      H = canvas.height = canvas.offsetHeight;
+    }
+
+    function Particle() {
+      this.x = Math.random() * W;
+      this.y = Math.random() * H;
+      this.vx = (Math.random() - 0.5) * 0.4;
+      this.vy = (Math.random() - 0.5) * 0.4;
+      this.r = Math.random() * 1.5 + 0.5;
+    }
+
+    Particle.prototype.update = function() {
+      this.x += this.vx;
+      this.y += this.vy;
+      if (this.x < 0 || this.x > W) this.vx *= -1;
+      if (this.y < 0 || this.y > H) this.vy *= -1;
+    };
+
+    function init() {
+      particles = [];
+      for (let i = 0; i < COUNT; i++) particles.push(new Particle());
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        ctx.beginPath();
+        ctx.arc(particles[i].x, particles[i].y, particles[i].r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(47,168,208,0.4)';
+        ctx.fill();
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MAX_DIST) {
+            const alpha = (1 - dist / MAX_DIST) * 0.15;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(47,168,208,${alpha})`;
+            ctx.lineWidth = 0.6;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', () => { resize(); init(); });
+    resize(); init(); draw();
+  })();
+
+  // ── CARRUSEL ──
+  (function() {
+    const cards = Array.from(document.querySelectorAll('.carousel-card'));
+    const dotsWrap = document.getElementById('carousel-dots');
+    let current = 0;
+
+    function buildDots() {
+      dotsWrap.innerHTML = '';
+      cards.forEach((_, i) => {
+        const d = document.createElement('span');
+        d.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+        d.onclick = () => goTo(i);
+        dotsWrap.appendChild(d);
+      });
+    }
+
+    function update() {
+      cards.forEach((card, i) => {
+        card.classList.remove('active','prev','next','hidden');
+        const diff = (i - current + cards.length) % cards.length;
+        if (diff === 0) card.classList.add('active');
+        else if (diff === 1) card.classList.add('next');
+        else if (diff === cards.length - 1) card.classList.add('prev');
+        else card.classList.add('hidden');
+      });
+      document.querySelectorAll('.carousel-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+      });
+    }
+
+    function goTo(n) { current = (n + cards.length) % cards.length; update(); }
+    window.carouselMove = (dir) => goTo(current + dir);
+
+    setInterval(() => carouselMove(1), 4500);
+    buildDots();
+    update();
+  })();
+
+  // ── SCROLL UTILS ──
+  function scrollToSection(id) {
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // ── SCROLL REVEAL ──
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
+    revealObserver.observe(el);
+  });
+
+  // ── CONTADORES ──
+  function animateCounter(el) {
+    const target = parseInt(el.dataset.target);
+    const suffix = el.dataset.suffix || '';
+    const duration = 1800;
+    const step = 16;
+    const steps = duration / step;
+    let current = 0;
+    const timer = setInterval(() => {
+      current += target / steps;
+      if (current >= target) { current = target; clearInterval(timer); }
+      el.textContent = Math.floor(current) + suffix;
+    }, step);
+  }
+
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !entry.target.dataset.animated) {
+        entry.target.dataset.animated = 'true';
+        animateCounter(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('[data-target]').forEach(el => {
+    counterObserver.observe(el);
+  });
+</script>
+</body>
+</html>
