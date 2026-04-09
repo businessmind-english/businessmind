@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     :root {
       --navy: #1B2B5E;
@@ -378,66 +380,203 @@
     .section-title span { color: var(--green); }
 
     /* ── SERVICES GRID ── */
-    .services-wrapper { padding: 110px 0; background: var(--off-white); }
+    .services-wrapper {
+      padding: 110px 0;
+      background: linear-gradient(180deg, #0b1120 0%, #0f1a2e 60%, var(--navy-dark) 100%);
+      position: relative; overflow: hidden;
+    }
+    .services-wrapper::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(ellipse 80% 40% at 20% 0%, rgba(47,168,208,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 100%, rgba(91,175,42,0.06) 0%, transparent 55%);
+      pointer-events: none;
+    }
+    /* Override section title for dark bg */
+    .services-inner .section-tag { color: rgba(255,255,255,0.45); }
+    .services-inner .section-tag::before { background: rgba(255,255,255,0.25); }
+    .services-inner .section-title { color: var(--white); }
+    .services-inner .section-title span { color: var(--green); }
+
     .services-inner { max-width: 1400px; margin: 0 auto; padding: 0 80px; }
     .services-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      gap: 20px;
     }
+
+    /* Card base */
     .service-card {
-      background: var(--white);
-      border-radius: 16px;
-      padding: 40px 36px;
-      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      border-radius: 20px;
+      padding: 0;
+      border: 1px solid rgba(255,255,255,0.07);
       position: relative; overflow: hidden;
       cursor: pointer;
-      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+      transition: transform 0.4s cubic-bezier(0.22,1,0.36,1),
+                  box-shadow 0.4s ease,
+                  border-color 0.4s ease;
+      backdrop-filter: blur(4px);
     }
+
+    /* Colored glow blob per card (top-right corner) */
+    .service-card::after {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--card-accent, rgba(47,168,208,0.25)) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      pointer-events: none;
+    }
+    .service-card:hover::after { opacity: 1; transform: scale(1.2); }
+
+    /* Top accent line */
     .service-card::before {
       content: '';
-      position: absolute; top: 0; left: 0;
-      width: 100%; height: 4px;
-      background: linear-gradient(90deg, var(--navy), var(--sky));
-      transform: scaleX(0); transform-origin: left;
-      transition: transform 0.4s ease;
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent 0%, var(--card-accent, rgba(47,168,208,0.8)) 50%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
     }
-    .service-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(27,43,94,0.12); border-color: transparent; }
-    .service-card:hover::before { transform: scaleX(1); }
+    .service-card:hover { 
+      transform: translateY(-8px); 
+      box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.13);
+    }
+    .service-card:hover::before { opacity: 1; }
 
+    /* Card inner padding area */
+    .service-card-body {
+      padding: 36px 32px 28px;
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; height: 100%;
+    }
+
+    /* Icon */
     .service-icon {
-      width: 56px; height: 56px; border-radius: 14px;
+      width: 60px; height: 60px; border-radius: 16px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 26px; margin-bottom: 24px;
+      font-size: 26px; margin-bottom: 28px;
+      position: relative;
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
     }
-    .icon-navy { background: rgba(27,43,94,0.08); }
-    .icon-green { background: rgba(91,175,42,0.1); }
-    .icon-sky { background: rgba(47,168,208,0.1); }
+    .service-card:hover .service-icon { transform: scale(1.08) rotate(-3deg); }
+    .service-icon::after {
+      content: '';
+      position: absolute; inset: -6px;
+      border-radius: 22px;
+      background: var(--icon-glow, rgba(47,168,208,0.15));
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .service-card:hover .service-icon::after { opacity: 1; }
 
+    .icon-navy  { background: linear-gradient(135deg, rgba(27,43,94,0.6), rgba(38,61,122,0.8)); border: 1px solid rgba(47,168,208,0.2); }
+    .icon-green { background: linear-gradient(135deg, rgba(91,175,42,0.15), rgba(110,201,53,0.2)); border: 1px solid rgba(91,175,42,0.25); }
+    .icon-sky   { background: linear-gradient(135deg, rgba(47,168,208,0.15), rgba(69,192,235,0.2)); border: 1px solid rgba(47,168,208,0.25); }
+    .icon-gold  { background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(251,191,36,0.2)); border: 1px solid rgba(245,158,11,0.25); }
+    .icon-rose  { background: linear-gradient(135deg, rgba(244,63,94,0.12), rgba(251,113,133,0.18)); border: 1px solid rgba(244,63,94,0.22); }
+    .icon-violet{ background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(167,139,250,0.2)); border: 1px solid rgba(139,92,246,0.25); }
+
+    /* Number badge */
     .service-num {
+      position: absolute; top: 24px; right: 28px;
       font-family: 'Playfair Display', serif;
-      font-size: 48px; font-weight: 900;
-      color: rgba(27,43,94,0.06); line-height: 1;
-      margin-bottom: 12px; display: block;
-      transition: color 0.3s;
+      font-size: 13px; font-weight: 900;
+      letter-spacing: 0.06em;
+      color: rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px; padding: 3px 10px;
+      line-height: 1;
+      transition: color 0.3s, background 0.3s;
     }
-    .service-card:hover .service-num { color: rgba(27,43,94,0.12); }
+    .service-card:hover .service-num {
+      color: rgba(255,255,255,0.45);
+      background: rgba(255,255,255,0.08);
+    }
+
     .service-card h3 {
       font-family: 'Playfair Display', serif;
-      font-size: 22px; font-weight: 700;
-      color: var(--navy); margin-bottom: 12px; line-height: 1.2;
+      font-size: 20px; font-weight: 700;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 12px; line-height: 1.25;
     }
-    .service-card p { font-size: 14px; color: var(--muted); line-height: 1.75; }
+    .service-card p {
+      font-size: 13.5px;
+      color: rgba(255,255,255,0.38);
+      line-height: 1.8;
+      flex: 1;
+    }
+    .service-card:hover p { color: rgba(255,255,255,0.52); transition: color 0.3s; }
+
+    /* Bottom row */
+    .service-card-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .service-tag-label {
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      font-weight: 700;
+      color: var(--card-accent-text, rgba(47,168,208,0.7));
+      display: flex; align-items: center; gap: 6px;
+    }
+    .service-tag-label::before {
+      content: '';
+      width: 16px; height: 1.5px;
+      background: var(--card-accent-text, rgba(47,168,208,0.5));
+    }
     .service-arrow {
-      position: absolute; bottom: 28px; right: 28px;
-      width: 38px; height: 38px; border-radius: 50%;
-      background: var(--navy); color: var(--white);
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.5);
       display: flex; align-items: center; justify-content: center;
-      font-size: 18px; opacity: 0;
-      transition: opacity 0.3s, transform 0.3s;
-      transform: translate(4px, 4px);
+      font-size: 15px;
+      transition: background 0.3s, color 0.3s, transform 0.3s, border-color 0.3s;
     }
-    .service-card:hover .service-arrow { opacity: 1; transform: translate(0,0); }
+    .service-card:hover .service-arrow {
+      background: var(--card-accent, rgba(47,168,208,0.25));
+      border-color: var(--card-accent-text, rgba(47,168,208,0.5));
+      color: white;
+      transform: rotate(45deg);
+    }
+
+    /* Wide card (card 07) */
+    .service-card.wide {
+      grid-column: 1 / -1;
+    }
+    .service-card.wide .service-card-body {
+      flex-direction: row; align-items: center; gap: 32px; flex-wrap: wrap;
+    }
+    .service-card.wide .service-icon { margin-bottom: 0; flex-shrink: 0; }
+    .service-card.wide .wide-text { flex: 1; min-width: 240px; }
+    .service-card.wide .wide-text h3 { font-size: 22px; margin-bottom: 8px; }
+    .service-card.wide .wide-text p { max-width: 640px; }
+    .service-card.wide .service-card-footer { 
+      border-top: none; margin-top: 0; padding-top: 0; flex-shrink: 0;
+    }
+    .service-card.wide .service-num { top: 20px; right: 24px; }
+    .wide-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--green);
+      color: white; padding: 13px 26px;
+      border-radius: 8px; font-size: 13px; font-weight: 600;
+      letter-spacing: 0.04em;
+      transition: background 0.25s, transform 0.2s, box-shadow 0.3s;
+    }
+    .service-card.wide:hover .wide-cta {
+      background: var(--green-light);
+      transform: translateX(3px);
+      box-shadow: 0 8px 30px rgba(91,175,42,0.35);
+    }
 
     /* ── TEAM CAROUSEL ── */
     .team-wrapper { padding: 110px 0; background: var(--navy); }
@@ -453,51 +592,98 @@
     }
     .carousel-3d {
       position: relative;
-      width: 340px; height: 420px;
-      perspective: 1000px;
+      width: 360px; height: 480px;
+      perspective: 1200px;
     }
     .carousel-card {
       position: absolute; top: 0; left: 0;
-      width: 340px; height: 420px;
-      border-radius: 16px; overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.12);
+      width: 360px; height: 480px;
+      border-radius: 20px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
       transition: transform 0.7s cubic-bezier(0.4,0,0.2,1), opacity 0.7s ease, box-shadow 0.5s;
       cursor: pointer;
     }
-    .carousel-card.active { transform: translateX(0) translateZ(0) rotateY(0deg) scale(1); opacity:1; z-index:3; box-shadow:0 30px 80px rgba(0,0,0,0.4); }
-    .carousel-card.prev { transform: translateX(-220px) translateZ(-180px) rotateY(30deg) scale(0.82); opacity:0.45; z-index:2; }
-    .carousel-card.next { transform: translateX(220px) translateZ(-180px) rotateY(-30deg) scale(0.82); opacity:0.45; z-index:2; }
-    .carousel-card.hidden { transform: translateX(0) translateZ(-400px) scale(0.6); opacity:0; z-index:1; }
+    .carousel-card.active  { transform: translateX(0) translateZ(0) rotateY(0deg) scale(1); opacity:1; z-index:3; box-shadow:0 40px 100px rgba(0,0,0,0.5); }
+    .carousel-card.prev    { transform: translateX(-240px) translateZ(-200px) rotateY(32deg) scale(0.80); opacity:0.4; z-index:2; }
+    .carousel-card.next    { transform: translateX(240px) translateZ(-200px) rotateY(-32deg) scale(0.80); opacity:0.4; z-index:2; }
+    .carousel-card.hidden  { transform: translateX(0) translateZ(-500px) scale(0.55); opacity:0; z-index:1; }
 
-    .carousel-card-inner { position:relative; width:100%; height:100%; background:var(--navy-light); }
-    .carousel-card-inner img { width:100%; height:100%; object-fit:cover; filter:brightness(0.85) contrast(1.05); }
+    .carousel-card-inner { position:relative; width:100%; height:100%; }
+    .carousel-card-inner img {
+      width:100%; height:100%; object-fit:cover;
+      display:block;
+      filter: brightness(0.75) contrast(1.08) saturate(0.95);
+      transition: transform 0.6s ease, filter 0.5s ease;
+    }
+    .carousel-card.active .carousel-card-inner img {
+      filter: brightness(0.8) contrast(1.08) saturate(1.0);
+    }
+    .carousel-card.active:hover .carousel-card-inner img {
+      transform: scale(1.03);
+      filter: brightness(0.85) contrast(1.06) saturate(1.05);
+    }
+
+    /* Experience badge */
+    .carousel-badge {
+      position: absolute; top: 20px; right: 20px; z-index: 2;
+      background: rgba(91,175,42,0.9);
+      backdrop-filter: blur(8px);
+      color: white; border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    }
+
     .carousel-overlay {
       position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 32px 28px 28px;
-      background: linear-gradient(to top, rgba(17,29,69,0.95) 0%, transparent 100%);
-      display: flex; flex-direction: column; gap: 4px;
+      padding: 60px 28px 28px;
+      background: linear-gradient(to top, rgba(10,16,35,0.97) 0%, rgba(10,16,35,0.7) 55%, transparent 100%);
+      display: flex; flex-direction: column; gap: 6px;
     }
-    .carousel-name { font-family:'Playfair Display',serif; font-size: 22px; color: var(--white); font-weight: 700; }
-    .carousel-role { font-size: 12px; color: var(--green-light); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; }
-    .carousel-hint { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 8px; }
+    .carousel-name {
+      font-family:'Playfair Display',serif;
+      font-size: 24px; color: var(--white); font-weight: 700;
+      line-height: 1.15;
+    }
+    .carousel-role {
+      font-size: 11px; color: var(--green-light);
+      letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600;
+    }
+    .carousel-bio {
+      font-size: 12.5px; color: rgba(255,255,255,0.45);
+      line-height: 1.6; margin-top: 4px;
+    }
+    .carousel-tags {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
+    }
+    .carousel-tag {
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.5);
+    }
+    .carousel-hint {
+      font-size: 11px; color: rgba(255,255,255,0.25);
+      margin-top: 6px; letter-spacing: 0.05em;
+    }
 
-    .carousel-nav { display:flex; align-items:center; gap:20px; margin-top:32px; }
+    .carousel-nav { display:flex; align-items:center; gap:20px; margin-top:36px; }
     .carousel-btn {
       width:44px; height:44px; border-radius:50%;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
       color: var(--white); font-size: 22px;
       display:flex; align-items:center; justify-content:center;
-      cursor:pointer; transition: background 0.25s, transform 0.2s;
+      cursor:pointer; transition: background 0.25s, transform 0.2s, border-color 0.2s;
     }
-    .carousel-btn:hover { background: var(--green); transform: scale(1.05); }
+    .carousel-btn:hover { background: var(--green); border-color: var(--green); transform: scale(1.08); }
     .carousel-dots { display:flex; gap:8px; }
     .carousel-dot {
-      width:8px; height:8px; border-radius:50%;
-      background: rgba(255,255,255,0.2);
-      cursor:pointer; transition: background 0.25s, transform 0.2s;
+      width:6px; height:6px; border-radius:50%;
+      background: rgba(255,255,255,0.18);
+      cursor:pointer; transition: background 0.25s, transform 0.25s, width 0.3s;
     }
-    .carousel-dot.active { background: var(--green); transform: scale(1.3); }
+    .carousel-dot.active { background: var(--green); transform: scale(1.2); width: 20px; border-radius: 3px; }
 
     /* ── ABOUT ── */
     #nosotros {
@@ -572,7 +758,432 @@
     .reveal-right.visible { opacity: 1; transform: translateX(0); }
 
     /* ── RESPONSIVE ── */
+    /* ── TRADUCCIONES ── */
+    .trad-wrapper {
+      padding: 110px 0;
+      background: linear-gradient(180deg, var(--navy-dark) 0%, var(--navy) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .trad-wrapper::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(circle at 15% 50%, rgba(91,175,42,0.08) 0%, transparent 55%),
+        radial-gradient(circle at 85% 20%, rgba(47,168,208,0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .trad-inner { max-width: 1200px; margin: 0 auto; padding: 0 80px; }
+    .trad-inner .section-tag { color: rgba(255,255,255,0.5); }
+    .trad-inner .section-tag::before { background: rgba(255,255,255,0.3); }
+    .trad-inner .section-title { color: var(--white); margin-bottom: 16px; }
+    .trad-inner .section-title span { color: var(--green); }
+    .trad-subtitle {
+      color: rgba(255,255,255,0.55);
+      font-size: 15px; line-height: 1.7;
+      max-width: 600px;
+      margin-bottom: 52px;
+    }
+
+    /* Top bar with language selectors */
+    .trad-controls-bar {
+      display: flex; gap: 16px; align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .trad-control-group { display: flex; flex-direction: column; gap: 6px; }
+    .trad-control-group label {
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.45); font-weight: 600;
+    }
+    .trad-select {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--white);
+      padding: 10px 36px 10px 14px;
+      border-radius: 8px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px; font-weight: 500;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff66' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      cursor: pointer;
+      transition: border-color 0.25s, background 0.25s;
+    }
+    .trad-select:focus { outline: none; border-color: var(--green); background-color: rgba(255,255,255,0.11); }
+    .trad-select option { background: #1B2B5E; color: white; }
+
+    .trad-swap-btn {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.7);
+      font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.3s, color 0.25s;
+      flex-shrink: 0; margin-bottom: 2px;
+    }
+    .trad-swap-btn:hover { background: var(--green); color: white; transform: rotate(180deg); }
+
+    /* Main two-panel layout */
+    .trad-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .trad-panel {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      transition: border-color 0.3s;
+    }
+    .trad-panel:focus-within { border-color: rgba(91,175,42,0.4); }
+    .trad-panel-header {
+      padding: 14px 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.03);
+    }
+    .trad-panel-lang {
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .trad-panel-lang .flag { font-size: 16px; }
+    .trad-panel-actions { display: flex; gap: 8px; }
+    .trad-panel-btn {
+      padding: 5px 12px; border-radius: 5px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.5);
+      font-size: 11px; font-weight: 500; font-family: 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; letter-spacing: 0.05em;
+      transition: background 0.2s, color 0.2s;
+    }
+    .trad-panel-btn:hover { background: rgba(255,255,255,0.12); color: white; }
+    .trad-panel-btn.active { background: rgba(91,175,42,0.2); color: var(--green-light); border-color: rgba(91,175,42,0.3); }
+
+    .trad-textarea {
+      flex: 1;
+      width: 100%; min-height: 380px;
+      background: transparent;
+      border: none; outline: none; resize: none;
+      color: rgba(255,255,255,0.85);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px; line-height: 1.8;
+      padding: 22px 24px;
+      caret-color: var(--green);
+    }
+    .trad-textarea::placeholder { color: rgba(255,255,255,0.2); }
+    .trad-textarea:disabled { cursor: default; }
+    .trad-result-area {
+      flex: 1; min-height: 380px;
+      padding: 22px 24px;
+      color: rgba(255,255,255,0.85);
+      font-size: 14px; line-height: 1.8;
+      white-space: pre-wrap;
+      overflow-y: auto;
+    }
+    .trad-char-count {
+      padding: 10px 20px;
+      font-size: 11px; color: rgba(255,255,255,0.25);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      letter-spacing: 0.05em;
+    }
+
+    /* Loading state */
+    .trad-loading {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 380px; gap: 20px;
+      padding: 24px;
+    }
+    .trad-spinner {
+      width: 44px; height: 44px;
+      border: 3px solid rgba(91,175,42,0.2);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: trad-spin 0.9s linear infinite;
+    }
+    @keyframes trad-spin { to { transform: rotate(360deg); } }
+    .trad-loading p { color: rgba(255,255,255,0.45); font-size: 14px; text-align: center; }
+    .trad-loading-dots::after {
+      content: '';
+      animation: trad-dots 1.4s infinite;
+    }
+    @keyframes trad-dots {
+      0%{content:''} 33%{content:'.'} 66%{content:'..'} 100%{content:'...'}
+    }
+
+    /* Bottom action bar */
+    .trad-action-bar {
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap;
+      gap: 16px; margin-top: 20px;
+    }
+    .trad-options { display: flex; gap: 12px; flex-wrap: wrap; }
+    .trad-option-chip {
+      display: flex; align-items: center; gap: 7px;
+      padding: 8px 14px; border-radius: 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.55);
+      font-size: 12px; font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .trad-option-chip input { display: none; }
+    .trad-option-chip.selected {
+      background: rgba(91,175,42,0.15);
+      border-color: rgba(91,175,42,0.4);
+      color: var(--green-light);
+    }
+    .trad-translate-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 36px;
+      background: var(--green);
+      color: white;
+      border: none; border-radius: 8px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px; font-weight: 600; letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.2s, box-shadow 0.3s;
+    }
+    .trad-translate-btn:hover:not(:disabled) {
+      background: var(--green-light);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(91,175,42,0.35);
+    }
+    .trad-translate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .trad-translate-btn svg { flex-shrink: 0; }
+
+    /* Tips block */
+    .trad-tips {
+      margin-top: 36px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .trad-tip {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 20px 22px;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .trad-tip-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: rgba(91,175,42,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .trad-tip h4 { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 4px; }
+    .trad-tip p { font-size: 12px; color: rgba(255,255,255,0.35); line-height: 1.6; }
+
+    /* Toast notification */
+    .trad-toast {
+      position: fixed; bottom: 100px; right: 28px; z-index: 9999;
+      background: var(--navy);
+      border: 1px solid rgba(91,175,42,0.4);
+      color: var(--green-light);
+      padding: 12px 20px; border-radius: 8px;
+      font-size: 13px; font-weight: 500;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      transform: translateY(20px); opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+    .trad-toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ── PHOTO DETECTION ── */
+    .trad-photo-row {
+      display: none; align-items: center; gap: 16px;
+      background: rgba(91,175,42,0.06);
+      border: 1px solid rgba(91,175,42,0.18);
+      border-radius: 12px; padding: 14px 16px;
+    }
+    .trad-photo-row.visible { display: flex; }
+    .trad-photo-thumb {
+      width: 72px; height: 72px; border-radius: 10px;
+      object-fit: cover; flex-shrink: 0;
+      border: 2px solid rgba(91,175,42,0.35);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .trad-photo-info { flex: 1; min-width: 0; }
+    .trad-photo-info strong {
+      display: block; font-size: 12px; font-weight: 700;
+      color: rgba(91,175,42,0.9); letter-spacing: 0.08em;
+      margin-bottom: 3px;
+    }
+    .trad-photo-info span { font-size: 11px; color: rgba(255,255,255,0.3); line-height: 1.5; }
+    .trad-photo-dl {
+      padding: 6px 12px; border-radius: 6px;
+      background: rgba(91,175,42,0.12);
+      border: 1px solid rgba(91,175,42,0.25);
+      color: rgba(91,175,42,0.8);
+      font-size: 11px; font-weight: 600;
+      cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
+      white-space: nowrap; flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .trad-photo-dl:hover { background: rgba(91,175,42,0.22); }
+
+    /* Photo in formatted result */
+    .trad-result-header {
+      display: flex; gap: 20px; align-items: flex-start;
+      margin-bottom: 18px;
+    }
+    .trad-result-photo {
+      width: 88px; height: 100px; border-radius: 10px;
+      object-fit: cover; flex-shrink: 0;
+      border: 1.5px solid rgba(255,255,255,0.1);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+    }
+    .trad-result-header-text { flex: 1; min-width: 0; }
+    .trad-input-tabs {
+      display: flex; gap: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.02);
+    }
+    .trad-input-tab {
+      flex: 1; padding: 10px 16px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.07em;
+      color: rgba(255,255,255,0.35);
+      cursor: pointer; border: none; background: none;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+      margin-bottom: -1px;
+    }
+    .trad-input-tab:hover { color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.03); }
+    .trad-input-tab.active { color: var(--green-light); border-bottom-color: var(--green); }
+
+    .trad-upload-zone {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 320px; padding: 40px 28px;
+      border: 2px dashed rgba(255,255,255,0.1);
+      margin: 16px; border-radius: 12px;
+      cursor: pointer;
+      transition: border-color 0.3s, background 0.3s;
+      position: relative;
+    }
+    .trad-upload-zone:hover,
+    .trad-upload-zone.drag-over {
+      border-color: rgba(91,175,42,0.5);
+      background: rgba(91,175,42,0.04);
+    }
+    .trad-upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .trad-upload-icon {
+      width: 64px; height: 64px; border-radius: 16px;
+      background: rgba(91,175,42,0.1);
+      border: 1px solid rgba(91,175,42,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; margin-bottom: 20px;
+      transition: transform 0.3s, background 0.3s;
+    }
+    .trad-upload-zone:hover .trad-upload-icon,
+    .trad-upload-zone.drag-over .trad-upload-icon {
+      transform: scale(1.05) translateY(-2px);
+      background: rgba(91,175,42,0.18);
+    }
+    .trad-upload-title {
+      font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.75);
+      margin-bottom: 6px; text-align: center;
+    }
+    .trad-upload-sub {
+      font-size: 13px; color: rgba(255,255,255,0.3);
+      text-align: center; line-height: 1.6; margin-bottom: 20px;
+    }
+    .trad-upload-formats {
+      display: flex; gap: 8px;
+    }
+    .trad-format-badge {
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    }
+    .trad-format-pdf { background: rgba(220,53,69,0.15); color: #ff8c94; border: 1px solid rgba(220,53,69,0.3); }
+    .trad-format-docx { background: rgba(47,168,208,0.12); color: var(--sky-light); border: 1px solid rgba(47,168,208,0.25); }
+
+    /* Loaded file card */
+    .trad-file-loaded {
+      display: none; flex-direction: column;
+      padding: 20px 22px; gap: 14px;
+      min-height: 320px;
+    }
+    .trad-file-loaded.visible { display: flex; }
+    .trad-file-card {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 16px 18px;
+    }
+    .trad-file-card-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .trad-file-card-icon.pdf-icon { background: rgba(220,53,69,0.15); }
+    .trad-file-card-icon.docx-icon { background: rgba(47,168,208,0.12); }
+    .trad-file-card-info { flex: 1; min-width: 0; }
+    .trad-file-card-name {
+      font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 3px;
+    }
+    .trad-file-card-meta { font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.05em; }
+    .trad-file-remove {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.4);
+      font-size: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, color 0.2s; flex-shrink: 0;
+    }
+    .trad-file-remove:hover { background: rgba(220,53,69,0.2); color: #ff8c94; }
+
+    .trad-file-preview {
+      flex: 1;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px; padding: 16px 18px;
+      font-size: 12px; color: rgba(255,255,255,0.3);
+      line-height: 1.7; overflow-y: auto;
+      max-height: 240px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      white-space: pre-wrap;
+    }
+    .trad-file-preview-label {
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.2); font-weight: 600; margin-bottom: 8px;
+    }
+    .trad-pdf-ready {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 10px; text-align: center;
+      padding: 30px; color: rgba(255,255,255,0.3);
+    }
+    .trad-pdf-ready .check {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(91,175,42,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; color: var(--green-light);
+      margin-bottom: 6px;
+    }
+    .trad-pdf-ready p { font-size: 13px; line-height: 1.6; }
+
     @media (max-width: 1100px) {
+      .trad-panels { grid-template-columns: 1fr; }
+      .trad-tips { grid-template-columns: 1fr; }
+      .trad-inner { padding: 0 40px; }
       .hero { grid-template-columns: 1fr; min-height: auto; }
       .hero-left { padding: 80px 40px 40px; }
       .hero-right { padding: 20px 40px 80px; }
@@ -592,6 +1203,9 @@
       header { padding: 0 20px; }
       nav { gap: 14px; }
       nav a:not(.nav-cta) { display: none; }
+      .trad-inner { padding: 0 24px; }
+      .trad-controls-bar { flex-direction: column; align-items: flex-start; }
+      .trad-action-bar { flex-direction: column; align-items: flex-start; }
       .hero-left { padding: 60px 24px 40px; }
       .stats-grid { grid-template-columns: 1fr 1fr; }
       .stat-item { border-bottom: 1px solid var(--border); }
@@ -607,6 +1221,224 @@
       .hero-actions { flex-direction: column; gap: 12px; }
       .btn-primary, .btn-outline { width: 100%; text-align: center; }
     }
+    /* ── API KEY MODAL ── */
+    .apikey-overlay {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(7,12,24,0.85);
+      backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      opacity: 0; transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .apikey-overlay.open { opacity: 1; pointer-events: all; }
+    .apikey-modal {
+      background: #111d3a;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 40px 44px;
+      max-width: 520px; width: 100%;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+      transform: translateY(20px); transition: transform 0.3s;
+    }
+    .apikey-overlay.open .apikey-modal { transform: translateY(0); }
+    .apikey-modal-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .apikey-modal-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: rgba(91,175,42,0.12);
+      border: 1px solid rgba(91,175,42,0.25);
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
+    }
+    .apikey-modal h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 700; color: white;
+    }
+    .apikey-modal p { font-size: 13.5px; color: rgba(255,255,255,0.45); line-height: 1.75; margin-bottom: 22px; }
+    .apikey-modal p a { color: var(--sky-light); text-decoration: none; }
+    .apikey-modal p a:hover { text-decoration: underline; }
+    .apikey-input-wrap { position: relative; margin-bottom: 20px; }
+    .apikey-input {
+      width: 100%; padding: 13px 50px 13px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      color: white; font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px; letter-spacing: 0.02em;
+      outline: none; transition: border-color 0.25s;
+    }
+    .apikey-input:focus { border-color: rgba(91,175,42,0.5); }
+    .apikey-input::placeholder { color: rgba(255,255,255,0.2); }
+    .apikey-toggle {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,0.35); font-size: 15px;
+      transition: color 0.2s;
+    }
+    .apikey-toggle:hover { color: rgba(255,255,255,0.7); }
+    .apikey-modal-actions { display: flex; gap: 12px; align-items: center; }
+    .apikey-save-btn {
+      flex: 1; padding: 13px 24px;
+      background: var(--green); color: white;
+      border: none; border-radius: 8px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .apikey-save-btn:hover { background: var(--green-light); transform: translateY(-1px); }
+    .apikey-cancel-btn {
+      padding: 13px 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; color: rgba(255,255,255,0.45);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px; cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .apikey-cancel-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+    .apikey-note {
+      display: flex; align-items: flex-start; gap: 8px;
+      background: rgba(91,175,42,0.06);
+      border: 1px solid rgba(91,175,42,0.15);
+      border-radius: 8px; padding: 12px 14px; margin-bottom: 20px;
+      font-size: 12px; color: rgba(255,255,255,0.35); line-height: 1.6;
+    }
+    .apikey-note::before { content: '🔒'; flex-shrink: 0; }
+
+    /* API Key banner */
+    .apikey-banner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 10px; padding: 14px 18px;
+      margin-bottom: 24px;
+    }
+    .apikey-banner-text { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.5; }
+    .apikey-banner-text strong { color: rgba(245,158,11,0.9); }
+    .apikey-banner-btn {
+      flex-shrink: 0; padding: 8px 18px;
+      background: rgba(245,158,11,0.15);
+      border: 1px solid rgba(245,158,11,0.3);
+      border-radius: 6px; color: rgba(245,158,11,0.9);
+      font-size: 12px; font-weight: 600; font-family: 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; letter-spacing: 0.05em;
+      transition: background 0.2s;
+    }
+    .apikey-banner-btn:hover { background: rgba(245,158,11,0.25); }
+    .apikey-configured-badge {
+      display: none; align-items: center; gap: 6px;
+      font-size: 11px; color: rgba(91,175,42,0.8);
+      font-weight: 600; letter-spacing: 0.08em;
+    }
+    .apikey-configured-badge.visible { display: flex; }
+
+    /* Config button */
+    .trad-config-btn {
+      display: flex; align-items: center; gap: 7px;
+      padding: 10px 16px; border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.4);
+      font-size: 12px; font-weight: 600; font-family: 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+    .trad-config-btn:hover { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.75); border-color: rgba(255,255,255,0.2); }
+    .trad-config-btn.configured { color: rgba(91,175,42,0.8); border-color: rgba(91,175,42,0.3); background: rgba(91,175,42,0.06); }
+
+    /* Loading steps */
+    .trad-steps {
+      display: flex; flex-direction: column; gap: 10px; width: 260px;
+    }
+    .trad-step {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 12.5px; color: rgba(255,255,255,0.2);
+      transition: color 0.4s;
+    }
+    .trad-step.active { color: rgba(255,255,255,0.65); }
+    .trad-step.done { color: rgba(91,175,42,0.7); }
+    .trad-step-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      flex-shrink: 0; transition: background 0.4s;
+    }
+    .trad-step.active .trad-step-dot { background: var(--sky); animation: pulse 1.5s infinite; }
+    .trad-step.done .trad-step-dot { background: var(--green); }
+
+    /* Formatted result */
+    .trad-result-area { position: relative; }
+    .trad-result-toolbar {
+      display: flex; gap: 6px; align-items: center;
+    }
+    .trad-view-toggle {
+      display: flex; border-radius: 6px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .trad-view-btn {
+      padding: 4px 11px; font-size: 10px; font-weight: 600;
+      letter-spacing: 0.08em; cursor: pointer;
+      background: transparent; border: none;
+      color: rgba(255,255,255,0.35);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background 0.2s, color 0.2s;
+    }
+    .trad-view-btn.active { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); }
+
+    .trad-formatted {
+      padding: 24px 26px; overflow-y: auto;
+      max-height: 520px; min-height: 380px;
+    }
+    .trad-cv-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 700;
+      color: rgba(255,255,255,0.95); margin-bottom: 4px;
+    }
+    .trad-cv-contact {
+      font-size: 12px; color: rgba(255,255,255,0.35);
+      line-height: 1.7; margin-bottom: 22px;
+    }
+    .trad-cv-section { margin-bottom: 22px; }
+    .trad-cv-section-title {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--sky-light); margin-bottom: 10px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid rgba(47,168,208,0.2);
+    }
+    .trad-cv-job { margin-bottom: 14px; }
+    .trad-cv-job-header {
+      display: flex; justify-content: space-between;
+      align-items: baseline; gap: 12px; flex-wrap: wrap;
+      margin-bottom: 5px;
+    }
+    .trad-cv-job-title {
+      font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.85);
+    }
+    .trad-cv-job-company { font-size: 12.5px; color: var(--green-light); font-weight: 500; }
+    .trad-cv-job-date { font-size: 11px; color: rgba(255,255,255,0.3); white-space: nowrap; }
+    .trad-cv-job-desc {
+      font-size: 12.5px; color: rgba(255,255,255,0.4);
+      line-height: 1.75;
+    }
+    .trad-cv-bullet {
+      display: flex; gap: 8px; margin: 4px 0;
+      font-size: 12.5px; color: rgba(255,255,255,0.4); line-height: 1.7;
+    }
+    .trad-cv-bullet::before {
+      content: '▸'; color: var(--green); flex-shrink: 0; font-size: 10px; margin-top: 4px;
+    }
+    .trad-cv-para {
+      font-size: 13px; color: rgba(255,255,255,0.45);
+      line-height: 1.8; margin-bottom: 8px;
+    }
+    .trad-plain {
+      padding: 22px 26px; overflow-y: auto;
+      max-height: 520px; min-height: 380px;
+      white-space: pre-wrap;
+      font-size: 13px; color: rgba(255,255,255,0.5);
+      line-height: 1.8; display: none;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
   </style>
 </head>
 <body>
@@ -616,6 +1448,7 @@
   <span class="header-brand">Business<span>Mind</span></span>
   <nav>
     <a href="#servicios">Servicios</a>
+    <a href="#traducciones">Traducciones</a>
     <a href="#equipo">Equipo</a>
     <a href="#nosotros">Nosotros</a>
     <a href="#contacto" class="nav-cta">Contacto</a>
@@ -707,51 +1540,395 @@
     <span class="section-tag reveal">Lo que ofrecemos</span>
     <h2 class="section-title reveal">Nuestros <span>Programas</span></h2>
     <div class="services-grid">
-      <div class="service-card reveal">
-        <div class="service-icon icon-navy">🗣️</div>
-        <span class="service-num">01</span>
-        <h3>Business Communication</h3>
-        <p>Domina el lenguaje corporativo para emails, reportes, llamadas y reuniones internacionales con fluidez y precisión.</p>
-        <div class="service-arrow">↗</div>
+
+      <!-- 01 -->
+      <div class="service-card reveal"
+        style="--card-accent:rgba(47,168,208,0.3);--card-accent-text:rgba(47,168,208,0.7);--icon-glow:rgba(47,168,208,0.18);">
+        <div class="service-card-body">
+          <span class="service-num">01</span>
+          <div class="service-icon icon-sky">🗣️</div>
+          <h3>Business Communication</h3>
+          <p>Domina el lenguaje corporativo para emails, reportes, llamadas y reuniones internacionales con fluidez y precisión.</p>
+          <div class="service-card-footer">
+            <span class="service-tag-label">Communication</span>
+            <div class="service-arrow">↗</div>
+          </div>
+        </div>
       </div>
-      <div class="service-card reveal" style="transition-delay:0.1s">
-        <div class="service-icon icon-green">📊</div>
-        <span class="service-num">02</span>
-        <h3>Presentaciones & Pitching</h3>
-        <p>Aprende a presentar proyectos, defender ideas y convencer stakeholders en inglés con impacto y confianza.</p>
-        <div class="service-arrow">↗</div>
+
+      <!-- 02 -->
+      <div class="service-card reveal" style="transition-delay:0.08s;
+        --card-accent:rgba(91,175,42,0.3);--card-accent-text:rgba(91,175,42,0.7);--icon-glow:rgba(91,175,42,0.18);">
+        <div class="service-card-body">
+          <span class="service-num">02</span>
+          <div class="service-icon icon-green">📊</div>
+          <h3>Presentaciones & Pitching</h3>
+          <p>Aprende a presentar proyectos, defender ideas y convencer stakeholders en inglés con impacto y confianza.</p>
+          <div class="service-card-footer">
+            <span class="service-tag-label">Public Speaking</span>
+            <div class="service-arrow">↗</div>
+          </div>
+        </div>
       </div>
-      <div class="service-card reveal" style="transition-delay:0.2s">
-        <div class="service-icon icon-sky">🤝</div>
-        <span class="service-num">03</span>
-        <h3>Negotiation English</h3>
-        <p>Estrategias lingüísticas para cerrar acuerdos, manejar objeciones y comunicar propuestas de valor en contextos globales.</p>
-        <div class="service-arrow">↗</div>
+
+      <!-- 03 -->
+      <div class="service-card reveal" style="transition-delay:0.16s;
+        --card-accent:rgba(245,158,11,0.3);--card-accent-text:rgba(245,158,11,0.7);--icon-glow:rgba(245,158,11,0.18);">
+        <div class="service-card-body">
+          <span class="service-num">03</span>
+          <div class="service-icon icon-gold">🤝</div>
+          <h3>Negotiation English</h3>
+          <p>Estrategias lingüísticas para cerrar acuerdos, manejar objeciones y comunicar propuestas de valor en contextos globales.</p>
+          <div class="service-card-footer">
+            <span class="service-tag-label">Negotiation</span>
+            <div class="service-arrow">↗</div>
+          </div>
+        </div>
       </div>
-      <div class="service-card reveal" style="transition-delay:0.3s">
-        <div class="service-icon icon-navy">🎯</div>
-        <span class="service-num">04</span>
-        <h3>Exec Coaching 1:1</h3>
-        <p>Sesiones personalizadas para ejecutivos y directivos que necesitan llevar su inglés al máximo nivel profesional.</p>
-        <div class="service-arrow">↗</div>
+
+      <!-- 04 -->
+      <div class="service-card reveal" style="transition-delay:0.24s;
+        --card-accent:rgba(139,92,246,0.3);--card-accent-text:rgba(167,139,250,0.7);--icon-glow:rgba(139,92,246,0.18);">
+        <div class="service-card-body">
+          <span class="service-num">04</span>
+          <div class="service-icon icon-violet">🎯</div>
+          <h3>Exec Coaching 1:1</h3>
+          <p>Sesiones personalizadas para ejecutivos y directivos que necesitan llevar su inglés al máximo nivel profesional.</p>
+          <div class="service-card-footer">
+            <span class="service-tag-label">Executive</span>
+            <div class="service-arrow">↗</div>
+          </div>
+        </div>
       </div>
-      <div class="service-card reveal" style="transition-delay:0.4s">
-        <div class="service-icon icon-green">🌐</div>
-        <span class="service-num">05</span>
-        <h3>Corporate Teams</h3>
-        <p>Programas in-company para equipos comerciales, de marketing y operaciones que interactúan con mercados internacionales.</p>
-        <div class="service-arrow">↗</div>
+
+      <!-- 05 -->
+      <div class="service-card reveal" style="transition-delay:0.32s;
+        --card-accent:rgba(6,182,212,0.3);--card-accent-text:rgba(6,182,212,0.7);--icon-glow:rgba(6,182,212,0.18);">
+        <div class="service-card-body">
+          <span class="service-num">05</span>
+          <div class="service-icon icon-sky">🌐</div>
+          <h3>Corporate Teams</h3>
+          <p>Programas in-company para equipos comerciales, de marketing y operaciones que interactúan con mercados internacionales.</p>
+          <div class="service-card-footer">
+            <span class="service-tag-label">Corporate</span>
+            <div class="service-arrow">↗</div>
+          </div>
+        </div>
       </div>
-      <div class="service-card reveal" style="transition-delay:0.5s">
-        <div class="service-icon icon-sky">📝</div>
-        <span class="service-num">06</span>
-        <h3>Certificaciones</h3>
-        <p>Preparación intensiva para TOEIC, IELTS Business, Cambridge y otros exámenes de inglés corporativo reconocidos globalmente.</p>
-        <div class="service-arrow">↗</div>
+
+      <!-- 06 -->
+      <div class="service-card reveal" style="transition-delay:0.40s;
+        --card-accent:rgba(244,63,94,0.3);--card-accent-text:rgba(251,113,133,0.7);--icon-glow:rgba(244,63,94,0.15);">
+        <div class="service-card-body">
+          <span class="service-num">06</span>
+          <div class="service-icon icon-rose">📝</div>
+          <h3>Certificaciones</h3>
+          <p>Preparación intensiva para TOEIC, IELTS Business, Cambridge y otros exámenes de inglés corporativo reconocidos globalmente.</p>
+          <div class="service-card-footer">
+            <span class="service-tag-label">Certification</span>
+            <div class="service-arrow">↗</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 07 Wide -->
+      <div class="service-card wide reveal" style="transition-delay:0.48s;
+        --card-accent:rgba(91,175,42,0.3);--card-accent-text:rgba(91,175,42,0.7);--icon-glow:rgba(91,175,42,0.18);"
+        onclick="document.getElementById('traducciones').scrollIntoView({behavior:'smooth'})">
+        <div class="service-card-body">
+          <span class="service-num">07</span>
+          <div class="service-icon icon-green" style="width:64px;height:64px;font-size:30px;">🌐</div>
+          <div class="wide-text">
+            <h3>Traducciones de CV con IA</h3>
+            <p>Traducción profesional de currículums con inteligencia artificial. Adaptamos tu CV al mercado objetivo preservando el tono ejecutivo, las convenciones del sector y el impacto de tu perfil.</p>
+          </div>
+          <div class="service-card-footer">
+            <span class="wide-cta">Probar herramienta →</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- TRADUCCIONES -->
+<div class="trad-wrapper" id="traducciones">
+  <div class="trad-inner">
+    <span class="section-tag reveal">Servicio premium con IA</span>
+    <h2 class="section-title reveal">Traducción de <span>CV Profesional</span></h2>
+    <p class="trad-subtitle reveal">
+      Subí tu CV en PDF o DOCX, o pegá el texto. La IA lo traduce preservando el tono ejecutivo, la terminología de tu industria y las convenciones del mercado destino.
+    </p>
+
+    <!-- Controls bar -->
+    <div class="trad-controls-bar reveal">
+      <div class="trad-control-group">
+        <label>Idioma de origen</label>
+        <select class="trad-select" id="trad-lang-from">
+          <option value="Español">🇦🇷 Español</option>
+          <option value="English">🇺🇸 English</option>
+          <option value="Português">🇧🇷 Português</option>
+          <option value="Français">🇫🇷 Français</option>
+          <option value="Deutsch">🇩🇪 Deutsch</option>
+        </select>
+      </div>
+      <button class="trad-swap-btn" onclick="swapLanguages()" title="Intercambiar idiomas">⇄</button>
+      <div class="trad-control-group">
+        <label>Idioma destino</label>
+        <select class="trad-select" id="trad-lang-to">
+          <option value="English">🇺🇸 English</option>
+          <option value="Español">🇦🇷 Español</option>
+          <option value="Português">🇧🇷 Português</option>
+          <option value="Français">🇫🇷 Français</option>
+          <option value="Deutsch">🇩🇪 Deutsch</option>
+        </select>
+      </div>
+      <div class="trad-control-group">
+        <label>Industria / Sector</label>
+        <select class="trad-select" id="trad-industry">
+          <option value="general">General / Corporativo</option>
+          <option value="technology">Tecnología & IT</option>
+          <option value="finance">Finanzas & Banca</option>
+          <option value="marketing">Marketing & Comunicación</option>
+          <option value="legal">Legal & Compliance</option>
+          <option value="healthcare">Salud & Farmacéutica</option>
+          <option value="engineering">Ingeniería & Manufactura</option>
+          <option value="consulting">Consultoría & Estrategia</option>
+          <option value="education">Educación & Academia</option>
+          <option value="logistics">Logística & Supply Chain</option>
+        </select>
+      </div>
+      <div class="trad-control-group">
+        <label>Mercado destino</label>
+        <select class="trad-select" id="trad-market">
+          <option value="USA/Canada">🇺🇸 USA / Canada</option>
+          <option value="UK/Ireland">🇬🇧 UK / Ireland</option>
+          <option value="Europe">🇪🇺 Europa</option>
+          <option value="Latin America">🌎 Latinoamérica</option>
+          <option value="Spain">🇪🇸 España</option>
+          <option value="Brazil">🇧🇷 Brasil</option>
+          <option value="International">🌐 Internacional</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Panels -->
+    <div class="trad-panels reveal">
+      <!-- INPUT PANEL -->
+      <div class="trad-panel" id="trad-panel-input">
+        <div class="trad-panel-header">
+          <div class="trad-panel-lang">
+            <span class="flag" id="trad-flag-from">🇦🇷</span>
+            <span id="trad-label-from">Español</span>
+          </div>
+          <div class="trad-panel-actions">
+            <button class="trad-panel-btn" onclick="clearInput()" title="Limpiar">✕ Limpiar</button>
+            <button class="trad-panel-btn" id="btn-paste" onclick="pasteClipboard()" title="Pegar">⌘ Pegar</button>
+          </div>
+        </div>
+
+        <!-- Mode tabs -->
+        <div class="trad-input-tabs">
+          <button class="trad-input-tab active" id="tab-text" onclick="switchInputMode('text')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 10H3M21 6H3M21 14H3M17 18H3"/></svg>
+            Texto
+          </button>
+          <button class="trad-input-tab" id="tab-file" onclick="switchInputMode('file')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Subir archivo
+            <span id="file-tab-badge" style="display:none;background:var(--green);color:white;border-radius:10px;padding:1px 6px;font-size:10px;">1</span>
+          </button>
+        </div>
+
+        <!-- TEXT MODE -->
+        <div id="trad-text-mode">
+          <textarea
+            id="trad-input"
+            class="trad-textarea"
+            placeholder="Pegá aquí el contenido de tu CV...
+
+Podés incluir:
+• Perfil profesional o resumen ejecutivo
+• Experiencia laboral con logros y responsabilidades
+• Educación y certificaciones
+• Competencias técnicas y habilidades
+• Secciones personalizadas
+
+La IA preservará el formato, el tono ejecutivo y los términos técnicos de tu industria."
+            oninput="updateCharCount()"
+            spellcheck="false"></textarea>
+          <div class="trad-char-count" id="trad-char-count">0 caracteres · 0 palabras</div>
+        </div>
+
+        <!-- FILE MODE -->
+        <div id="trad-file-mode" style="display:none;flex-direction:column;flex:1;">
+
+          <!-- Drop zone (shown when no file loaded) -->
+          <div class="trad-upload-zone" id="trad-drop-zone"
+            ondragover="handleDragOver(event)"
+            ondragleave="handleDragLeave(event)"
+            ondrop="handleDrop(event)">
+            <input type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              onchange="handleFileSelect(event)" id="trad-file-input">
+            <div class="trad-upload-icon">📎</div>
+            <p class="trad-upload-title">Arrastrá tu CV aquí</p>
+            <p class="trad-upload-sub">o clickeá para seleccionar desde tu dispositivo</p>
+            <div class="trad-upload-formats">
+              <span class="trad-format-badge trad-format-pdf">PDF</span>
+              <span class="trad-format-badge trad-format-docx">DOCX</span>
+            </div>
+          </div>
+
+          <!-- Loaded file info (shown when file is ready) -->
+          <div class="trad-file-loaded" id="trad-file-loaded">
+            <div class="trad-file-card">
+              <div class="trad-file-card-icon" id="file-card-icon">📄</div>
+              <div class="trad-file-card-info">
+                <div class="trad-file-card-name" id="file-card-name">archivo.pdf</div>
+                <div class="trad-file-card-meta" id="file-card-meta">PDF · 0 KB</div>
+              </div>
+              <button class="trad-file-remove" onclick="removeFile()" title="Quitar archivo">✕</button>
+            </div>
+
+            <!-- Photo detected row -->
+            <div class="trad-photo-row" id="trad-photo-row">
+              <img id="trad-photo-thumb" class="trad-photo-thumb" src="" alt="Foto del CV">
+              <div class="trad-photo-info">
+                <strong>📸 Foto detectada</strong>
+                <span>La foto se incluirá en el resultado traducido y podés descargarla por separado.</span>
+              </div>
+              <button class="trad-photo-dl" onclick="downloadPhoto()">⬇ Guardar foto</button>
+            </div>
+
+            <div>
+              <div class="trad-file-preview-label">Vista previa del contenido</div>
+              <div class="trad-file-preview" id="file-preview-content">
+                <div class="trad-pdf-ready" id="pdf-ready-msg" style="display:none;">
+                  <div class="check">✓</div>
+                  <p>PDF listo para traducir.<br>Claude lo procesará de forma nativa, preservando la estructura y el layout.</p>
+                </div>
+                <div id="docx-preview-text"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OUTPUT PANEL -->
+      <div class="trad-panel" id="trad-panel-output">
+        <div class="trad-panel-header">
+          <div class="trad-panel-lang">
+            <span class="flag" id="trad-flag-to">🇺🇸</span>
+            <span id="trad-label-to">English</span>
+          </div>
+          <div class="trad-panel-actions" id="output-actions" style="display:flex;gap:6px;align-items:center;">
+            <div class="trad-view-toggle" id="view-toggle" style="display:none;">
+              <button class="trad-view-btn active" id="btn-formatted" onclick="setView('formatted')">Formateado</button>
+              <button class="trad-view-btn" id="btn-plain" onclick="setView('plain')">Texto plano</button>
+            </div>
+            <button class="trad-panel-btn" id="btn-copy" onclick="copyResult()" style="display:none;">📋 Copiar</button>
+            <button class="trad-panel-btn" id="btn-download" onclick="downloadResult()" style="display:none;">⬇ Descargar</button>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div id="trad-empty-state" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;padding:40px;text-align:center;gap:18px;">
+          <div style="width:72px;height:72px;border-radius:20px;background:rgba(91,175,42,0.08);border:1px solid rgba(91,175,42,0.15);display:flex;align-items:center;justify-content:center;font-size:30px;">✨</div>
+          <div>
+            <p style="color:rgba(255,255,255,0.5);font-size:15px;font-weight:600;margin-bottom:6px;">Tu traducción aparecerá aquí</p>
+            <p style="color:rgba(255,255,255,0.2);font-size:13px;line-height:1.7;">Cargá tu CV y presioná <strong style="color:rgba(255,255,255,0.35)">Traducir</strong>.<br>El resultado se mostrará formateado por secciones.</p>
+          </div>
+        </div>
+
+        <!-- Loading state with steps -->
+        <div id="trad-loading-state" style="display:none;" class="trad-loading">
+          <div class="trad-spinner"></div>
+          <div class="trad-steps">
+            <div class="trad-step active" id="step-1">
+              <div class="trad-step-dot"></div> Leyendo documento
+            </div>
+            <div class="trad-step" id="step-2">
+              <div class="trad-step-dot"></div> Analizando estructura y secciones
+            </div>
+            <div class="trad-step" id="step-3">
+              <div class="trad-step-dot"></div> Traduciendo con contexto corporativo
+            </div>
+            <div class="trad-step" id="step-4">
+              <div class="trad-step-dot"></div> Ajustando terminología del sector
+            </div>
+            <div class="trad-step" id="step-5">
+              <div class="trad-step-dot"></div> Formateando resultado
+            </div>
+          </div>
+        </div>
+
+        <!-- Formatted result -->
+        <div id="trad-formatted" class="trad-formatted" style="display:none;"></div>
+        <!-- Plain text result -->
+        <div id="trad-plain" class="trad-plain"></div>
+
+        <div class="trad-char-count" id="trad-char-count-out" style="display:none;border-top:1px solid rgba(255,255,255,0.05);"></div>
+      </div>
+    </div>
+
+    <!-- Action bar -->
+    <div class="trad-action-bar reveal">
+      <div class="trad-options">
+        <label class="trad-option-chip selected" id="chip-formal">
+          <input type="checkbox" checked onchange="toggleChip('chip-formal')">
+          💼 Tono ejecutivo
+        </label>
+        <label class="trad-option-chip selected" id="chip-achievements">
+          <input type="checkbox" checked onchange="toggleChip('chip-achievements')">
+          🏆 Destacar logros
+        </label>
+        <label class="trad-option-chip" id="chip-ats">
+          <input type="checkbox" onchange="toggleChip('chip-ats')">
+          🤖 Optimizar para ATS
+        </label>
+        <label class="trad-option-chip" id="chip-brief">
+          <input type="checkbox" onchange="toggleChip('chip-brief')">
+          ✂️ Versión concisa
+        </label>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="trad-translate-btn" id="trad-btn" onclick="translateCV()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+          Traducir CV
+        </button>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="trad-tips reveal">
+      <div class="trad-tip">
+        <div class="trad-tip-icon">🎯</div>
+        <div>
+          <h4>Terminología de industria</h4>
+          <p>La IA adapta los términos técnicos según el sector seleccionado para sonar nativo en el mercado objetivo.</p>
+        </div>
+      </div>
+      <div class="trad-tip">
+        <div class="trad-tip-icon">📊</div>
+        <div>
+          <h4>Logros cuantificados</h4>
+          <p>Se preservan métricas y resultados en el formato adecuado para el mercado destino (ej. USD, GBP, %, KPI).</p>
+        </div>
+      </div>
+      <div class="trad-tip">
+        <div class="trad-tip-icon">🌍</div>
+        <div>
+          <h4>Convenciones locales</h4>
+          <p>El CV se adapta a las convenciones culturales del mercado destino: extensión, orden y estilo esperados.</p>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- TOAST -->
+<div class="trad-toast" id="trad-toast">✓ Copiado al portapapeles</div>
 
 <!-- TEAM -->
 <div class="team-wrapper" id="equipo">
@@ -760,36 +1937,97 @@
     <h2 class="section-title reveal">Nuestro <span>Equipo</span></h2>
     <div class="carousel-3d-wrap">
       <div class="carousel-3d" id="team-carousel">
+
+        <!-- Card 1 -->
         <div class="carousel-card" data-index="0">
-          <div class="carousel-card-inner" style="background:linear-gradient(135deg,#1B2B5E,#2FA8D0);">
-            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:80px;">👩‍💼</div>
+          <div class="carousel-card-inner">
+            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=720&q=85&fit=crop&crop=faces" alt="Laura Martínez" loading="lazy">
+            <span class="carousel-badge">8 años exp.</span>
             <div class="carousel-overlay">
               <span class="carousel-name">Laura Martínez</span>
               <span class="carousel-role">Lead Business English Coach</span>
-              <span class="carousel-hint">Ver perfil →</span>
+              <p class="carousel-bio">Especialista en comunicación ejecutiva para Fortune 500 y empresas de tecnología.</p>
+              <div class="carousel-tags">
+                <span class="carousel-tag">C-Suite Communication</span>
+                <span class="carousel-tag">Tech Industry</span>
+                <span class="carousel-tag">IELTS</span>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Card 2 -->
         <div class="carousel-card" data-index="1">
-          <div class="carousel-card-inner" style="background:linear-gradient(135deg,#263d7a,#5BAF2A);">
-            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:80px;">👨‍💼</div>
+          <div class="carousel-card-inner">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=720&q=85&fit=crop&crop=faces" alt="Carlos Soria" loading="lazy">
+            <span class="carousel-badge">12 años exp.</span>
             <div class="carousel-overlay">
               <span class="carousel-name">Carlos Soria</span>
               <span class="carousel-role">Corporate Training Specialist</span>
-              <span class="carousel-hint">Ver perfil →</span>
+              <p class="carousel-bio">Ex-Director Regional en multinacional. Diseña programas in-company para equipos globales.</p>
+              <div class="carousel-tags">
+                <span class="carousel-tag">Corporate Teams</span>
+                <span class="carousel-tag">Finanzas</span>
+                <span class="carousel-tag">Leadership</span>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Card 3 -->
         <div class="carousel-card" data-index="2">
-          <div class="carousel-card-inner" style="background:linear-gradient(135deg,#1B2B5E,#6ec935);">
-            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:80px;">👩‍🏫</div>
+          <div class="carousel-card-inner">
+            <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=720&q=85&fit=crop&crop=faces" alt="Ana Volkova" loading="lazy">
+            <span class="carousel-badge">10 años exp.</span>
             <div class="carousel-overlay">
               <span class="carousel-name">Ana Volkova</span>
               <span class="carousel-role">Executive Communication Coach</span>
-              <span class="carousel-hint">Ver perfil →</span>
+              <p class="carousel-bio">Lingüista aplicada con foco en negociación internacional y presentaciones de alto impacto.</p>
+              <div class="carousel-tags">
+                <span class="carousel-tag">Negotiation</span>
+                <span class="carousel-tag">Pitching</span>
+                <span class="carousel-tag">Cambridge CELTA</span>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Card 4 -->
+        <div class="carousel-card" data-index="3">
+          <div class="carousel-card-inner">
+            <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=720&q=85&fit=crop&crop=faces" alt="Martín Delgado" loading="lazy">
+            <span class="carousel-badge">7 años exp.</span>
+            <div class="carousel-overlay">
+              <span class="carousel-name">Martín Delgado</span>
+              <span class="carousel-role">Presentations & Pitching Expert</span>
+              <p class="carousel-bio">Formado en Londres y NYC. Especialista en storytelling corporativo y pitch de inversión.</p>
+              <div class="carousel-tags">
+                <span class="carousel-tag">Investor Pitch</span>
+                <span class="carousel-tag">Storytelling</span>
+                <span class="carousel-tag">Startups</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="carousel-card" data-index="4">
+          <div class="carousel-card-inner">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=720&q=85&fit=crop&crop=faces" alt="Sofía Weiss" loading="lazy">
+            <span class="carousel-badge">9 años exp.</span>
+            <div class="carousel-overlay">
+              <span class="carousel-name">Sofía Weiss</span>
+              <span class="carousel-role">Negotiation & Deal-Making Coach</span>
+              <p class="carousel-bio">MBA Wharton. Especialista en inglés para cierres comerciales y contratos internacionales.</p>
+              <div class="carousel-tags">
+                <span class="carousel-tag">Deals & Contracts</span>
+                <span class="carousel-tag">Legal English</span>
+                <span class="carousel-tag">TOEIC</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
       <div class="carousel-nav">
         <button class="carousel-btn" onclick="carouselMove(-1)">&#8249;</button>
@@ -1029,6 +2267,1005 @@
     if (h) h.src = d;
     if (f) f.src = d;
   })();
+</script>
+<script>
+  /* ══════════════════════════════════════════
+     TRADUCCIONES — BusinessMind English Training
+     Motor: Google Translate (sin API key, sin CORS)
+     PDF: PDF.js client-side text extraction
+  ══════════════════════════════════════════ */
+
+  // PDF.js worker
+  if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+
+  let uploadedFile     = null;  // { type, name, size, text, photoDataUrl? }
+  let currentInputMode = 'text';
+  let plainTextResult  = '';
+
+  const langFlags = { 'Español':'🇦🇷','English':'🇺🇸','Português':'🇧🇷','Français':'🇫🇷','Deutsch':'🇩🇪' };
+  const langCodes  = { 'Español':'es','English':'en','Português':'pt','Français':'fr','Deutsch':'de' };
+  const industryLabels = {
+    general:'General / Corporativo', technology:'Technology & IT',
+    finance:'Finance & Banking',      marketing:'Marketing & Communications',
+    legal:'Legal & Compliance',       healthcare:'Healthcare & Pharma',
+    engineering:'Engineering & Mfg', consulting:'Consulting & Strategy',
+    education:'Education & Academia', logistics:'Logistics & Supply Chain'
+  };
+
+  /* ── Language labels ── */
+  function updateLangLabels() {
+    const from = document.getElementById('trad-lang-from').value;
+    const to   = document.getElementById('trad-lang-to').value;
+    document.getElementById('trad-flag-from').textContent  = langFlags[from] || '🌐';
+    document.getElementById('trad-label-from').textContent = from;
+    document.getElementById('trad-flag-to').textContent    = langFlags[to]   || '🌐';
+    document.getElementById('trad-label-to').textContent   = to;
+  }
+  document.getElementById('trad-lang-from').addEventListener('change', updateLangLabels);
+  document.getElementById('trad-lang-to').addEventListener('change', updateLangLabels);
+
+  function swapLanguages() {
+    const f = document.getElementById('trad-lang-from');
+    const t = document.getElementById('trad-lang-to');
+    [f.value, t.value] = [t.value, f.value];
+    updateLangLabels();
+  }
+
+  /* ── Input mode ── */
+  function switchInputMode(mode) {
+    currentInputMode = mode;
+    document.getElementById('tab-text').classList.toggle('active', mode === 'text');
+    document.getElementById('tab-file').classList.toggle('active', mode === 'file');
+    document.getElementById('trad-text-mode').style.display          = mode === 'text' ? 'flex' : 'none';
+    document.getElementById('trad-text-mode').style.flexDirection     = 'column';
+    document.getElementById('trad-file-mode').style.display          = mode === 'file' ? 'flex' : 'none';
+    document.getElementById('btn-paste').style.display               = mode === 'text' ? '' : 'none';
+  }
+
+  /* ── Char count ── */
+  function updateCharCount() {
+    const text = document.getElementById('trad-input').value;
+    document.getElementById('trad-char-count').textContent =
+      `${text.length.toLocaleString()} caracteres · ${text.trim() ? text.trim().split(/\s+/).length.toLocaleString() : 0} palabras`;
+  }
+  function updateResultCount(text) {
+    const el = document.getElementById('trad-char-count-out');
+    el.textContent = `${text.length.toLocaleString()} caracteres · ${text.trim() ? text.trim().split(/\s+/).length.toLocaleString() : 0} palabras`;
+    el.style.display = 'block';
+  }
+
+  async function pasteClipboard() {
+    try { document.getElementById('trad-input').value = await navigator.clipboard.readText(); updateCharCount(); }
+    catch { document.getElementById('trad-input').focus(); }
+  }
+
+  function clearInput() {
+    if (currentInputMode === 'text') { document.getElementById('trad-input').value = ''; updateCharCount(); }
+    else { removeFile(); }
+    resetOutput();
+  }
+
+  /* ══ PDF TEXT EXTRACTION ══ */
+  async function extractPDFText(arrayBuffer) {
+    const pdf      = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const numPages = pdf.numPages;
+    const pageTexts = [];
+
+    for (let p = 1; p <= numPages; p++) {
+      const page    = await pdf.getPage(p);
+      const content = await page.getTextContent();
+      // Reconstruct lines preserving vertical position
+      const items = content.items;
+      let lines = [];
+      let lastY  = null;
+      let line   = '';
+
+      for (const item of items) {
+        const y = item.transform ? Math.round(item.transform[5]) : 0;
+        if (lastY !== null && Math.abs(y - lastY) > 5 && line.trim()) {
+          lines.push(line.trim());
+          line = '';
+        }
+        line  += (line && !line.endsWith(' ') ? ' ' : '') + item.str;
+        lastY  = y;
+      }
+      if (line.trim()) lines.push(line.trim());
+      pageTexts.push(lines.join('\n'));
+    }
+    return pageTexts.join('\n\n');
+  }
+
+  /* ══ PHOTO EXTRACTION ══ */
+
+  // Extract images from a PDF page using PDF.js operator list
+  async function extractImagesFromPDF(arrayBuffer) {
+    try {
+      const pdf    = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+      const images = [];
+
+      for (let pn = 1; pn <= Math.min(pdf.numPages, 2); pn++) {
+        const page   = await pdf.getPage(pn);
+        const opList = await page.getOperatorList();
+        const OPS    = pdfjsLib.OPS;
+
+        for (let i = 0; i < opList.fnArray.length; i++) {
+          const fn = opList.fnArray[i];
+          if (fn !== OPS.paintImageXObject && fn !== OPS.paintImageXObjectRepeat) continue;
+
+          const imgId = opList.argsArray[i][0];
+          try {
+            const imgData = await new Promise((resolve, reject) => {
+              const t = setTimeout(() => reject('timeout'), 3000);
+              page.objs.get(imgId, d => { clearTimeout(t); resolve(d); });
+            });
+
+            if (!imgData || !imgData.width || imgData.width < 40 || imgData.height < 40) continue;
+
+            const canvas = document.createElement('canvas');
+            canvas.width  = imgData.width;
+            canvas.height = imgData.height;
+            const ctx = canvas.getContext('2d');
+            const imd = ctx.createImageData(imgData.width, imgData.height);
+            const src = imgData.data;
+
+            if (src && src.length === imgData.width * imgData.height * 4) {
+              imd.data.set(src);
+            } else if (src && src.length === imgData.width * imgData.height * 3) {
+              for (let px = 0, dp = 0; px < src.length; px += 3, dp += 4) {
+                imd.data[dp]=src[px]; imd.data[dp+1]=src[px+1]; imd.data[dp+2]=src[px+2]; imd.data[dp+3]=255;
+              }
+            } else if (src && src.length === imgData.width * imgData.height) {
+              for (let px = 0, dp = 0; px < src.length; px++, dp += 4) {
+                imd.data[dp]=src[px]; imd.data[dp+1]=src[px]; imd.data[dp+2]=src[px]; imd.data[dp+3]=255;
+              }
+            } else { continue; }
+
+            ctx.putImageData(imd, 0, 0);
+            images.push({ dataUrl: canvas.toDataURL('image/jpeg', 0.88), w: imgData.width, h: imgData.height, area: imgData.width * imgData.height });
+          } catch(e) { /* skip */ }
+        }
+        if (images.length) break;
+      }
+
+      // Pick the largest image that looks like a headshot (roughly portrait/square ratio)
+      const portraits = images.filter(img => {
+        const ratio = img.w / img.h;
+        return ratio > 0.4 && ratio < 1.8 && img.area > 5000;
+      });
+      portraits.sort((a, b) => b.area - a.area);
+      return portraits.length ? portraits[0].dataUrl : null;
+
+    } catch(e) { return null; }
+  }
+
+  // Extract first image from DOCX using mammoth
+  async function extractImageFromDOCX(arrayBuffer) {
+    return new Promise((resolve) => {
+      let firstPhoto = null;
+      mammoth.convertToHtml({
+        arrayBuffer,
+        convertImage: mammoth.images.imgElement(image => {
+          return image.read('base64').then(data => {
+            if (!firstPhoto && (image.contentType || '').startsWith('image/')) {
+              firstPhoto = `data:${image.contentType};base64,${data}`;
+            }
+            return { src: '' };
+          });
+        })
+      }).then(() => resolve(firstPhoto)).catch(() => resolve(null));
+    });
+  }
+
+  function showPhotoRow(dataUrl) {
+    if (!dataUrl) return;
+    const thumb = document.getElementById('trad-photo-thumb');
+    if (thumb) { thumb.src = dataUrl; }
+    const row = document.getElementById('trad-photo-row');
+    if (row) row.classList.add('visible');
+  }
+
+  function hidePhotoRow() {
+    const row = document.getElementById('trad-photo-row');
+    if (row) row.classList.remove('visible');
+    const thumb = document.getElementById('trad-photo-thumb');
+    if (thumb) thumb.src = '';
+  }
+
+  function downloadPhoto() {
+    if (!uploadedFile?.photoDataUrl) return;
+    const a = document.createElement('a');
+    a.href = uploadedFile.photoDataUrl;
+    const ext = uploadedFile.photoDataUrl.includes('png') ? 'png' : 'jpg';
+    a.download = (uploadedFile.name.replace(/\.(pdf|docx)$/i, '') || 'CV') + '_foto.' + ext;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    showToast('⬇ Descargando foto...');
+  }
+
+  /* ── File upload ── */
+  function handleDragOver(e)   { e.preventDefault(); document.getElementById('trad-drop-zone').classList.add('drag-over'); }
+  function handleDragLeave()   { document.getElementById('trad-drop-zone').classList.remove('drag-over'); }
+  function handleDrop(e)       { e.preventDefault(); document.getElementById('trad-drop-zone').classList.remove('drag-over'); if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]); }
+  function handleFileSelect(e) { if (e.target.files[0]) processFile(e.target.files[0]); }
+
+  async function processFile(file) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['pdf','docx'].includes(ext)) { showToast('⚠ Solo PDF o DOCX'); return; }
+    if (file.size > 15 * 1024 * 1024)  { showToast('⚠ Archivo mayor a 15 MB'); return; }
+
+    const zone = document.getElementById('trad-drop-zone');
+    zone.style.opacity = '0.5'; zone.style.pointerEvents = 'none';
+    showToast('⏳ Extrayendo texto e imágenes...');
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      let extractedText = '';
+      let photoDataUrl  = null;
+
+      if (ext === 'pdf') {
+        if (typeof pdfjsLib === 'undefined') throw new Error('PDF.js no cargó. Revisá tu conexión.');
+        // Extract text and photo in parallel
+        [extractedText, photoDataUrl] = await Promise.all([
+          extractPDFText(arrayBuffer.slice(0)),
+          extractImagesFromPDF(arrayBuffer.slice(0))
+        ]);
+      } else {
+        // DOCX: extract text and images
+        const buf = arrayBuffer.slice(0);
+        [extractedText, photoDataUrl] = await Promise.all([
+          mammoth.extractRawText({ arrayBuffer: buf }).then(r => r.value.trim()),
+          extractImageFromDOCX(arrayBuffer.slice(0))
+        ]);
+      }
+
+      if (!extractedText || extractedText.length < 20) {
+        throw new Error('No se pudo extraer texto. El PDF puede ser una imagen escaneada.');
+      }
+
+      uploadedFile = { type: ext, name: file.name, size: file.size, text: extractedText, photoDataUrl };
+      showFileCard(file, ext);
+
+      // Show photo if found
+      if (photoDataUrl) {
+        showPhotoRow(photoDataUrl);
+        showToast(`✓ Texto extraído + foto detectada`);
+      } else {
+        hidePhotoRow();
+        showToast(`✓ Texto extraído: ${extractedText.split(/\s+/).length.toLocaleString()} palabras`);
+      }
+
+      // Text preview
+      document.getElementById('pdf-ready-msg').style.display  = 'none';
+      document.getElementById('docx-preview-text').textContent =
+        extractedText.slice(0, 700) + (extractedText.length > 700 ? '\n…' : '');
+
+      document.getElementById('trad-input').value = extractedText;
+      updateCharCount();
+      document.getElementById('file-tab-badge').style.display = 'inline';
+
+    } catch(err) {
+      showToast('⚠ ' + err.message);
+      uploadedFile = null;
+    } finally {
+      zone.style.opacity = ''; zone.style.pointerEvents = '';
+    }
+  }
+
+  function showFileCard(file, type) {
+    const sz = file.size > 1048576 ? `${(file.size/1048576).toFixed(1)} MB` : `${Math.round(file.size/1024)} KB`;
+    document.getElementById('file-card-icon').textContent  = type === 'pdf' ? '📕' : '📘';
+    document.getElementById('file-card-icon').className    = `trad-file-card-icon ${type}-icon`;
+    document.getElementById('file-card-name').textContent  = file.name;
+    document.getElementById('file-card-meta').textContent  = `${type.toUpperCase()} · ${sz}`;
+    document.getElementById('trad-drop-zone').style.display = 'none';
+    document.getElementById('trad-file-loaded').classList.add('visible');
+  }
+
+  function removeFile() {
+    uploadedFile = null;
+    document.getElementById('trad-drop-zone').style.display  = '';
+    document.getElementById('trad-file-loaded').classList.remove('visible');
+    document.getElementById('trad-file-input').value         = '';
+    document.getElementById('file-tab-badge').style.display  = 'none';
+    document.getElementById('pdf-ready-msg').style.display   = 'none';
+    document.getElementById('docx-preview-text').textContent  = '';
+    hidePhotoRow();
+    resetOutput();
+  }
+
+  /* ══ GOOGLE TRANSLATE ENGINE ══ */
+
+  // Split text into safe chunks (≤ 4800 chars), breaking only at line boundaries
+  function splitChunks(text, maxLen = 4800) {
+    const lines  = text.split('\n');
+    const chunks = [];
+    let   current = '';
+    for (const line of lines) {
+      const candidate = current ? current + '\n' + line : line;
+      if (candidate.length > maxLen && current) {
+        chunks.push(current);
+        current = line;
+      } else {
+        current = candidate;
+      }
+    }
+    if (current) chunks.push(current);
+    return chunks;
+  }
+
+  // Single chunk translation via Google Translate (no key, no CORS issues)
+  async function gtTranslateChunk(text, sl, tl) {
+    const url      = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&q=${encodeURIComponent(text)}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Google Translate error ${response.status}`);
+    const data = await response.json();
+    // data[0] = [[translated_chunk, original, ...], ...]
+    return data[0].map(item => item[0]).join('');
+  }
+
+  // Translate full text, updating progress UI
+  async function translateFullText(text, sourceLang, targetLang) {
+    const sl     = langCodes[sourceLang] || 'auto';
+    const tl     = langCodes[targetLang] || 'en';
+    const chunks = splitChunks(text);
+    const results = [];
+
+    for (let i = 0; i < chunks.length; i++) {
+      // Update step 3 label with progress
+      const stepEl = document.getElementById('step-3');
+      if (stepEl) stepEl.textContent = `▸ Traduciendo (${i + 1}/${chunks.length})…`;
+      const translated = await gtTranslateChunk(chunks[i], sl, tl);
+      results.push(translated);
+      // Small delay between chunks to be respectful
+      if (i < chunks.length - 1) await new Promise(r => setTimeout(r, 120));
+    }
+    return results.join('\n');
+  }
+
+  /* ── Output helpers ── */
+  function resetOutput() {
+    document.getElementById('trad-empty-state').style.display    = 'flex';
+    document.getElementById('trad-loading-state').style.display  = 'none';
+    document.getElementById('trad-formatted').style.display      = 'none';
+    document.getElementById('trad-plain').style.display          = 'none';
+    document.getElementById('trad-char-count-out').style.display = 'none';
+    document.getElementById('btn-copy').style.display            = 'none';
+    document.getElementById('btn-download').style.display        = 'none';
+    document.getElementById('view-toggle').style.display         = 'none';
+    plainTextResult = '';
+  }
+
+  function toggleChip(id) { document.getElementById(id).classList.toggle('selected'); }
+
+  function showToast(msg) {
+    const t = document.getElementById('trad-toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function setView(view) {
+    document.getElementById('btn-formatted').classList.toggle('active', view === 'formatted');
+    document.getElementById('btn-plain').classList.toggle('active', view === 'plain');
+    document.getElementById('trad-formatted').style.display = view === 'formatted' ? 'block' : 'none';
+    document.getElementById('trad-plain').style.display     = view === 'plain'     ? 'block' : 'none';
+  }
+
+  function copyResult() {
+    navigator.clipboard.writeText(plainTextResult).then(() => showToast('✓ Copiado al portapapeles'));
+  }
+
+  function downloadResult() {
+    const langTo = document.getElementById('trad-lang-to').value.replace(/\s/g,'_');
+    const fname  = uploadedFile
+      ? uploadedFile.name.replace(/\.(pdf|docx)$/i, '') + `_${langTo}.txt`
+      : `CV_Traducido_${langTo}.txt`;
+    const blob = new Blob([plainTextResult], { type: 'text/plain;charset=utf-8' });
+    const a    = document.createElement('a');
+    a.href     = URL.createObjectURL(blob);
+    a.download = fname;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    showToast('⬇ Descargando ' + fname);
+  }
+
+  /* ── Loading steps ── */
+  let stepTimer = null;
+  function startLoadingSteps() {
+    const steps = ['step-1','step-2','step-3','step-4','step-5'];
+    let i = 0;
+    steps.forEach(s => { const el = document.getElementById(s); el.classList.remove('active','done'); el.style.transition=''; });
+    // Reset step-3 label
+    const s3 = document.getElementById('step-3');
+    if (s3) { s3.innerHTML = '<div class="trad-step-dot"></div> Traduciendo con Google Translate'; }
+    document.getElementById('step-1').classList.add('active');
+    stepTimer = setInterval(() => {
+      if (i < 1) { // Only auto-advance steps 1→2; step 3+ driven by translate progress
+        document.getElementById(steps[i]).classList.remove('active');
+        document.getElementById(steps[i]).classList.add('done');
+        i++;
+        document.getElementById(steps[i]).classList.add('active');
+      }
+    }, 1200);
+  }
+  function advanceSteps(fromStep) {
+    clearInterval(stepTimer);
+    const steps = ['step-1','step-2','step-3','step-4','step-5'];
+    for (let i = 0; i < fromStep; i++) {
+      document.getElementById(steps[i]).classList.remove('active');
+      document.getElementById(steps[i]).classList.add('done');
+    }
+    if (fromStep < steps.length) document.getElementById(steps[fromStep]).classList.add('active');
+  }
+  function stopLoadingSteps() {
+    clearInterval(stepTimer);
+    ['step-1','step-2','step-3','step-4','step-5'].forEach(s => {
+      const el = document.getElementById(s);
+      el.classList.remove('active'); el.classList.add('done');
+    });
+  }
+
+  /* ── CV Formatter ── */
+  function renderFormattedCV(text) {
+    const lines = text.split('\n');
+    const frag  = document.createDocumentFragment();
+    let i = 0, currentSectionEl = null;
+
+    const photo = uploadedFile?.photoDataUrl || null;
+
+    while (i < lines.length && !lines[i].trim()) i++;
+    const firstLine = lines[i]?.trim() || '';
+
+    if (firstLine && firstLine.length < 60 && !firstLine.includes(':') && !/^[•\-\*·]/.test(firstLine) && !isSectionHeader(firstLine)) {
+      // Build header row: photo (if any) + name + contact
+      const headerDiv = document.createElement('div');
+      headerDiv.className = photo ? 'trad-result-header' : '';
+
+      if (photo) {
+        const photoEl = document.createElement('img');
+        photoEl.className = 'trad-result-photo';
+        photoEl.src = photo;
+        photoEl.alt = 'Foto CV';
+        headerDiv.appendChild(photoEl);
+      }
+
+      const headerText = document.createElement('div');
+      headerText.className = photo ? 'trad-result-header-text' : '';
+
+      const nameEl = document.createElement('div');
+      nameEl.className = 'trad-cv-name'; nameEl.textContent = firstLine;
+      headerText.appendChild(nameEl);
+      i++;
+
+      const contactLines = [];
+      while (i < lines.length && lines[i].trim() && lines[i].trim().length < 100 && !isSectionHeader(lines[i].trim())) {
+        contactLines.push(lines[i].trim()); i++;
+      }
+      if (contactLines.length) {
+        const c = document.createElement('div');
+        c.className = 'trad-cv-contact'; c.textContent = contactLines.join('  ·  ');
+        headerText.appendChild(c);
+      }
+
+      headerDiv.appendChild(headerText);
+      frag.appendChild(headerDiv);
+    }
+
+    while (i < lines.length) {
+      const line = lines[i].trim(); i++;
+      if (!line) continue;
+      if (isSectionHeader(line)) {
+        const s = createSection(cleanHeader(line)); currentSectionEl = s; frag.appendChild(s); continue;
+      }
+      if (/^[•\-\*·▸►]\s/.test(line)) {
+        const b = document.createElement('div'); b.className = 'trad-cv-bullet'; b.textContent = line.replace(/^[•\-\*·▸►]\s+/,'');
+        (currentSectionEl || frag).appendChild(b); continue;
+      }
+      if ((line.match(/\|/g)||[]).length >= 1) {
+        const parts = line.split(/\s*\|\s*/);
+        const j = document.createElement('div'); j.className = 'trad-cv-job';
+        const h = document.createElement('div'); h.className = 'trad-cv-job-header';
+        if (parts[0]) { const t=document.createElement('span'); t.className='trad-cv-job-title';   t.textContent=parts[0]; h.appendChild(t); }
+        if (parts[1]) { const c=document.createElement('span'); c.className='trad-cv-job-company'; c.textContent=parts[1]; h.appendChild(c); }
+        if (parts[2]) { const d=document.createElement('span'); d.className='trad-cv-job-date';    d.textContent=parts[2]; h.appendChild(d); }
+        j.appendChild(h); (currentSectionEl || frag).appendChild(j); continue;
+      }
+      const p = document.createElement('div'); p.className = 'trad-cv-para'; p.textContent = line;
+      (currentSectionEl || frag).appendChild(p);
+    }
+    const container = document.getElementById('trad-formatted');
+    container.innerHTML = ''; container.appendChild(frag);
+  }
+
+  function isSectionHeader(line) {
+    if (!line || line.length > 65) return false;
+    if (line === line.toUpperCase() && /[A-Z]{2,}/.test(line) && !/^[•\-\*·]/.test(line)) return true;
+    if (/^#{1,3}\s/.test(line)) return true;
+    if (line.endsWith(':') && line.length < 45 && !/[a-z]{4}/.test(line)) return true;
+    return false;
+  }
+  function cleanHeader(line) { return line.replace(/^#+\s*/,'').replace(/\*\*/g,'').replace(/:$/,'').trim(); }
+  function createSection(title) {
+    const s = document.createElement('div'); s.className = 'trad-cv-section';
+    const t = document.createElement('div'); t.className = 'trad-cv-section-title'; t.textContent = title;
+    s.appendChild(t); return s;
+  }
+
+  /* ══ MAIN TRANSLATE FUNCTION ══ */
+  async function translateCV() {
+    const langFrom = document.getElementById('trad-lang-from').value;
+    const langTo   = document.getElementById('trad-lang-to').value;
+
+    // Get the input text (from textarea or loaded file)
+    const inputText = (currentInputMode === 'file' && uploadedFile?.text)
+      ? uploadedFile.text
+      : document.getElementById('trad-input').value.trim();
+
+    if (!inputText) {
+      showToast(currentInputMode === 'file' ? '⚠ Subí un archivo primero' : '⚠ Ingresá el contenido de tu CV');
+      return;
+    }
+    if (langFrom === langTo) { showToast('⚠ Idioma origen y destino son iguales'); return; }
+
+    const btn = document.getElementById('trad-btn');
+    btn.disabled = true;
+    document.getElementById('trad-empty-state').style.display   = 'none';
+    document.getElementById('trad-formatted').style.display     = 'none';
+    document.getElementById('trad-plain').style.display         = 'none';
+    document.getElementById('trad-loading-state').style.display = 'flex';
+    document.getElementById('btn-copy').style.display           = 'none';
+    document.getElementById('btn-download').style.display       = 'none';
+    document.getElementById('view-toggle').style.display        = 'none';
+    document.getElementById('trad-char-count-out').style.display = 'none';
+    startLoadingSteps();
+
+    try {
+      // Step 2: analyzing
+      await new Promise(r => setTimeout(r, 800));
+      advanceSteps(2);
+
+      // Step 3: translate (progress tracked inside translateFullText)
+      const translated = await translateFullText(inputText, langFrom, langTo);
+      plainTextResult  = translated;
+
+      // Step 4 & 5
+      advanceSteps(3);
+      await new Promise(r => setTimeout(r, 400));
+      advanceSteps(4);
+
+      stopLoadingSteps();
+      document.getElementById('trad-loading-state').style.display = 'none';
+
+      renderFormattedCV(translated);
+      document.getElementById('trad-formatted').style.display = 'block';
+      document.getElementById('trad-plain').textContent       = translated;
+      document.getElementById('btn-copy').style.display       = 'inline-flex';
+      document.getElementById('btn-download').style.display   = 'inline-flex';
+      document.getElementById('view-toggle').style.display    = 'flex';
+      setView('formatted');
+      updateResultCount(translated);
+
+    } catch (err) {
+      stopLoadingSteps();
+      document.getElementById('trad-loading-state').style.display = 'none';
+      document.getElementById('trad-formatted').innerHTML =
+        `<div style="padding:28px 26px;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+            <div style="width:40px;height:40px;border-radius:50%;background:rgba(244,63,94,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">⚠</div>
+            <p style="color:#ff8c94;font-weight:600;font-size:14px;">No se pudo completar la traducción</p>
+          </div>
+          <p style="color:rgba(255,255,255,0.4);font-size:13px;line-height:1.7;margin-bottom:12px;">${err.message}</p>
+          <p style="color:rgba(255,255,255,0.25);font-size:12px;">Verificá tu conexión a internet e intentá de nuevo.</p>
+        </div>`;
+      document.getElementById('trad-formatted').style.display = 'block';
+    } finally {
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+
+  const langFlags = { 'Español':'🇦🇷','English':'🇺🇸','Português':'🇧🇷','Français':'🇫🇷','Deutsch':'🇩🇪' };
+  const industryLabels = {
+    general:'General / Corporativo', technology:'Technology & IT',
+    finance:'Finance & Banking', marketing:'Marketing & Communications',
+    legal:'Legal & Compliance', healthcare:'Healthcare & Pharma',
+    engineering:'Engineering & Manufacturing', consulting:'Consulting & Strategy',
+    education:'Education & Academia', logistics:'Logistics & Supply Chain'
+  };
+
+  /* ── Language labels ── */
+  function updateLangLabels() {
+    const from = document.getElementById('trad-lang-from').value;
+    const to   = document.getElementById('trad-lang-to').value;
+    document.getElementById('trad-flag-from').textContent  = langFlags[from] || '🌐';
+    document.getElementById('trad-label-from').textContent = from;
+    document.getElementById('trad-flag-to').textContent    = langFlags[to]   || '🌐';
+    document.getElementById('trad-label-to').textContent   = to;
+  }
+  document.getElementById('trad-lang-from').addEventListener('change', updateLangLabels);
+  document.getElementById('trad-lang-to').addEventListener('change', updateLangLabels);
+
+  function swapLanguages() {
+    const f = document.getElementById('trad-lang-from');
+    const t = document.getElementById('trad-lang-to');
+    [f.value, t.value] = [t.value, f.value];
+    updateLangLabels();
+  }
+
+  /* ── Input mode ── */
+  function switchInputMode(mode) {
+    currentInputMode = mode;
+    document.getElementById('tab-text').classList.toggle('active', mode === 'text');
+    document.getElementById('tab-file').classList.toggle('active', mode === 'file');
+    document.getElementById('trad-text-mode').style.display = mode === 'text' ? 'flex' : 'none';
+    document.getElementById('trad-text-mode').style.flexDirection = 'column';
+    document.getElementById('trad-file-mode').style.display = mode === 'file' ? 'flex' : 'none';
+    document.getElementById('btn-paste').style.display = mode === 'text' ? '' : 'none';
+  }
+
+  /* ── Char count ── */
+  function updateCharCount() {
+    const text = document.getElementById('trad-input').value;
+    document.getElementById('trad-char-count').textContent =
+      `${text.length.toLocaleString()} caracteres · ${text.trim() ? text.trim().split(/\s+/).length.toLocaleString() : 0} palabras`;
+  }
+  function updateResultCount(text) {
+    const el = document.getElementById('trad-char-count-out');
+    el.textContent = `${text.length.toLocaleString()} caracteres · ${text.trim() ? text.trim().split(/\s+/).length.toLocaleString() : 0} palabras`;
+    el.style.display = 'block';
+  }
+
+  async function pasteClipboard() {
+    try {
+      document.getElementById('trad-input').value = await navigator.clipboard.readText();
+      updateCharCount();
+    } catch { document.getElementById('trad-input').focus(); }
+  }
+
+  function clearInput() {
+    if (currentInputMode === 'text') {
+      document.getElementById('trad-input').value = ''; updateCharCount();
+    } else { removeFile(); }
+    resetOutput();
+  }
+
+  /* ── File upload ── */
+  function handleDragOver(e)  { e.preventDefault(); document.getElementById('trad-drop-zone').classList.add('drag-over'); }
+  function handleDragLeave()  { document.getElementById('trad-drop-zone').classList.remove('drag-over'); }
+  function handleDrop(e)      { e.preventDefault(); document.getElementById('trad-drop-zone').classList.remove('drag-over'); if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]); }
+  function handleFileSelect(e){ if (e.target.files[0]) processFile(e.target.files[0]); }
+
+  async function processFile(file) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['pdf','docx'].includes(ext)) { showToast('⚠ Solo PDF o DOCX'); return; }
+    if (file.size > 12 * 1024 * 1024) { showToast('⚠ Archivo mayor a 12 MB'); return; }
+    const zone = document.getElementById('trad-drop-zone');
+    zone.style.opacity = '0.5'; zone.style.pointerEvents = 'none';
+    showToast('⏳ Procesando archivo...');
+    try {
+      if (ext === 'pdf') {
+        const base64 = await fileToBase64(file);
+        uploadedFile = { type:'pdf', name:file.name, size:file.size, base64 };
+        showFileCard(file, 'pdf');
+        document.getElementById('pdf-ready-msg').style.display = 'flex';
+        document.getElementById('docx-preview-text').textContent = '';
+      } else {
+        const buf    = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer: buf });
+        const text   = result.value.trim();
+        uploadedFile = { type:'docx', name:file.name, size:file.size, text };
+        showFileCard(file, 'docx');
+        document.getElementById('pdf-ready-msg').style.display = 'none';
+        document.getElementById('docx-preview-text').textContent = text.slice(0, 600) + (text.length > 600 ? '\n…' : '');
+        document.getElementById('trad-input').value = text;
+        updateCharCount();
+      }
+      document.getElementById('file-tab-badge').style.display = 'inline';
+      showToast('✓ Archivo cargado');
+    } catch(err) {
+      showToast('⚠ Error al procesar: ' + err.message);
+      uploadedFile = null;
+    } finally {
+      zone.style.opacity = ''; zone.style.pointerEvents = '';
+    }
+  }
+
+  function fileToBase64(file) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload  = () => res(r.result.split(',')[1]);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+  }
+
+  function showFileCard(file, type) {
+    const sz = file.size > 1048576 ? `${(file.size/1048576).toFixed(1)} MB` : `${Math.round(file.size/1024)} KB`;
+    document.getElementById('file-card-icon').textContent  = type === 'pdf' ? '📕' : '📘';
+    document.getElementById('file-card-icon').className    = `trad-file-card-icon ${type}-icon`;
+    document.getElementById('file-card-name').textContent  = file.name;
+    document.getElementById('file-card-meta').textContent  = `${type.toUpperCase()} · ${sz}`;
+    document.getElementById('trad-drop-zone').style.display = 'none';
+    document.getElementById('trad-file-loaded').classList.add('visible');
+  }
+
+  function removeFile() {
+    uploadedFile = null;
+    document.getElementById('trad-drop-zone').style.display = '';
+    document.getElementById('trad-file-loaded').classList.remove('visible');
+    document.getElementById('trad-file-input').value        = '';
+    document.getElementById('file-tab-badge').style.display = 'none';
+    document.getElementById('pdf-ready-msg').style.display  = 'none';
+    document.getElementById('docx-preview-text').textContent = '';
+    resetOutput();
+  }
+
+  /* ── Output state ── */
+  function resetOutput() {
+    document.getElementById('trad-empty-state').style.display    = 'flex';
+    document.getElementById('trad-loading-state').style.display  = 'none';
+    document.getElementById('trad-formatted').style.display      = 'none';
+    document.getElementById('trad-plain').style.display          = 'none';
+    document.getElementById('trad-char-count-out').style.display = 'none';
+    document.getElementById('btn-copy').style.display            = 'none';
+    document.getElementById('btn-download').style.display        = 'none';
+    document.getElementById('view-toggle').style.display         = 'none';
+    plainTextResult = '';
+  }
+
+  function toggleChip(id) { document.getElementById(id).classList.toggle('selected'); }
+
+  function showToast(msg) {
+    const t = document.getElementById('trad-toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  /* ── Result views ── */
+  function setView(view) {
+    document.getElementById('btn-formatted').classList.toggle('active', view === 'formatted');
+    document.getElementById('btn-plain').classList.toggle('active', view === 'plain');
+    document.getElementById('trad-formatted').style.display = view === 'formatted' ? 'block' : 'none';
+    document.getElementById('trad-plain').style.display     = view === 'plain'     ? 'block' : 'none';
+  }
+
+  function copyResult() {
+    navigator.clipboard.writeText(plainTextResult).then(() => showToast('✓ Copiado al portapapeles'));
+  }
+
+  function downloadResult() {
+    const langTo = document.getElementById('trad-lang-to').value.replace(/\s/g,'_');
+    const blob   = new Blob([plainTextResult], { type:'text/plain;charset=utf-8' });
+    const a      = document.createElement('a');
+    a.href       = URL.createObjectURL(blob);
+    a.download   = `CV_Traducido_${langTo}.txt`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('⬇ Descargando CV traducido...');
+  }
+
+  /* ── Loading steps ── */
+  let stepTimer = null;
+  function startLoadingSteps() {
+    const steps = ['step-1','step-2','step-3','step-4','step-5'];
+    let i = 0;
+    steps.forEach(s => { const el = document.getElementById(s); el.classList.remove('active','done'); });
+    document.getElementById('step-1').classList.add('active');
+    stepTimer = setInterval(() => {
+      if (i < steps.length - 1) {
+        document.getElementById(steps[i]).classList.remove('active');
+        document.getElementById(steps[i]).classList.add('done');
+        i++;
+        document.getElementById(steps[i]).classList.add('active');
+      }
+    }, 1800);
+  }
+  function stopLoadingSteps() {
+    clearInterval(stepTimer);
+    ['step-1','step-2','step-3','step-4','step-5'].forEach(s => {
+      document.getElementById(s).classList.remove('active');
+      document.getElementById(s).classList.add('done');
+    });
+  }
+
+  /* ── CV Formatter ── */
+  function renderFormattedCV(text) {
+    const lines = text.split('\n');
+    const frag  = document.createDocumentFragment();
+    let i = 0;
+
+    while (i < lines.length && !lines[i].trim()) i++;
+    const firstLine = lines[i]?.trim() || '';
+    if (firstLine && firstLine.length < 50 && !firstLine.includes(':') && !/^\s*[-•*]/.test(firstLine)) {
+      const nameEl = document.createElement('div');
+      nameEl.className = 'trad-cv-name';
+      nameEl.textContent = firstLine;
+      frag.appendChild(nameEl);
+      i++;
+      const contactLines = [];
+      while (i < lines.length && lines[i].trim() && lines[i].trim().length < 80 && !isSectionHeader(lines[i].trim())) {
+        contactLines.push(lines[i].trim()); i++;
+      }
+      if (contactLines.length) {
+        const contactEl = document.createElement('div');
+        contactEl.className = 'trad-cv-contact';
+        contactEl.textContent = contactLines.join('  ·  ');
+        frag.appendChild(contactEl);
+      }
+    }
+
+    let currentSectionEl = null;
+    while (i < lines.length) {
+      const line = lines[i].trim(); i++;
+      if (!line) continue;
+
+      if (isSectionHeader(line)) {
+        const section = createSection(cleanHeader(line));
+        currentSectionEl = section;
+        frag.appendChild(section); continue;
+      }
+      if (/^[•\-\*·▸►]\s/.test(line)) {
+        const bullet = document.createElement('div');
+        bullet.className = 'trad-cv-bullet';
+        bullet.textContent = line.replace(/^[•\-\*·▸►]\s+/, '');
+        (currentSectionEl || frag).appendChild(bullet); continue;
+      }
+      if ((line.match(/\|/g)||[]).length >= 1 || looksLikeJobEntry(line)) {
+        const parts = line.split(/\s*\|\s*/);
+        const jobEl = document.createElement('div'); jobEl.className = 'trad-cv-job';
+        const hdr   = document.createElement('div'); hdr.className = 'trad-cv-job-header';
+        if (parts[0]) { const t=document.createElement('span'); t.className='trad-cv-job-title';   t.textContent=parts[0]; hdr.appendChild(t); }
+        if (parts[1]) { const c=document.createElement('span'); c.className='trad-cv-job-company'; c.textContent=parts[1]; hdr.appendChild(c); }
+        if (parts[2]) { const d=document.createElement('span'); d.className='trad-cv-job-date';    d.textContent=parts[2]; hdr.appendChild(d); }
+        jobEl.appendChild(hdr);
+        (currentSectionEl || frag).appendChild(jobEl); continue;
+      }
+      const para = document.createElement('div');
+      para.className = 'trad-cv-para'; para.textContent = line;
+      (currentSectionEl || frag).appendChild(para);
+    }
+
+    const container = document.getElementById('trad-formatted');
+    container.innerHTML = ''; container.appendChild(frag);
+  }
+
+  function isSectionHeader(line) {
+    if (!line || line.length > 60) return false;
+    if (line === line.toUpperCase() && /[A-Z]/.test(line) && !/^[•\-\*·▸►]/.test(line)) return true;
+    if (/^#{1,3}\s/.test(line)) return true;
+    if (line.endsWith(':') && line.length < 40) return true;
+    if (/^\*\*[A-Z]/.test(line) && line.length < 50) return true;
+    return false;
+  }
+  function cleanHeader(line) { return line.replace(/^#+\s+/,'').replace(/\*\*/g,'').replace(/:$/,'').trim(); }
+  function looksLikeJobEntry(line) { return /\b(20\d{2}|19\d{2})\b/.test(line) && line.length < 120; }
+  function createSection(title) {
+    const s = document.createElement('div'); s.className = 'trad-cv-section';
+    const t = document.createElement('div'); t.className = 'trad-cv-section-title'; t.textContent = title;
+    s.appendChild(t); return s;
+  }
+
+  /* ── Main translate ── */
+  async function translateCV() {
+    const langFrom = document.getElementById('trad-lang-from').value;
+    const langTo   = document.getElementById('trad-lang-to').value;
+    const industry = document.getElementById('trad-industry').value;
+    const market   = document.getElementById('trad-market').value;
+    const isFormal = document.getElementById('chip-formal').classList.contains('selected');
+    const isAchiev = document.getElementById('chip-achievements').classList.contains('selected');
+    const isATS    = document.getElementById('chip-ats').classList.contains('selected');
+    const isBrief  = document.getElementById('chip-brief').classList.contains('selected');
+
+    const hasText = currentInputMode === 'text' && document.getElementById('trad-input').value.trim();
+    const hasFile = currentInputMode === 'file' && uploadedFile;
+    if (!hasText && !hasFile) {
+      showToast(currentInputMode === 'file' ? '⚠ Subí un archivo primero' : '⚠ Ingresá el contenido de tu CV');
+      return;
+    }
+    if (langFrom === langTo) { showToast('⚠ Idioma origen y destino son iguales'); return; }
+
+    const btn = document.getElementById('trad-btn');
+    btn.disabled = true;
+    document.getElementById('trad-empty-state').style.display   = 'none';
+    document.getElementById('trad-formatted').style.display     = 'none';
+    document.getElementById('trad-plain').style.display         = 'none';
+    document.getElementById('trad-loading-state').style.display = 'flex';
+    document.getElementById('btn-copy').style.display           = 'none';
+    document.getElementById('btn-download').style.display       = 'none';
+    document.getElementById('view-toggle').style.display        = 'none';
+    document.getElementById('trad-char-count-out').style.display = 'none';
+    startLoadingSteps();
+
+    const instructions = [];
+    if (isFormal) instructions.push('Use sophisticated executive-level corporate language appropriate for C-suite and senior profiles');
+    if (isAchiev) instructions.push('Emphasize quantifiable achievements using strong action verbs (led, drove, delivered, scaled, optimized, spearheaded)');
+    if (isATS)    instructions.push('Optimize vocabulary for ATS systems by incorporating industry-standard keywords naturally');
+    if (isBrief)  instructions.push('Be concise and impact-focused, eliminating redundancies while preserving all key information');
+
+    const industryCtx = industryLabels[industry] || industry;
+    const systemPrompt = `You are an elite CV and executive resume translator with deep expertise in the ${industryCtx} sector and the ${market} job market.
+
+Your translation standards:
+- Produce sophisticated, native-sounding ${langTo} that reads as if originally written in that language
+- Use exact terminology, conventions, and phrasing that hiring managers in ${market} expect
+- Preserve all section structure, hierarchy, and formatting markers from the original
+- Adapt job titles to their most impactful ${market} equivalent
+- Convert date formats, currencies and metrics to ${market} standards
+- Section headers must follow ${market} resume conventions
+
+Formatting rules — CRITICAL:
+- Use ## to mark major section headers (e.g., ## PROFESSIONAL SUMMARY)
+- For job entries use: Job Title | Company Name | Start Date – End Date
+- Use • for bullet points
+- Return ONLY the translated CV — no preamble, no commentary
+
+Additional preferences: ${instructions.length ? instructions.join('; ') : 'None'}`;
+
+    try {
+      let messageContent;
+      if (currentInputMode === 'file' && uploadedFile?.type === 'pdf') {
+        messageContent = [
+          { type:'document', source:{ type:'base64', media_type:'application/pdf', data: uploadedFile.base64 } },
+          { type:'text', text:`Translate this CV from ${langFrom} to ${langTo}. Sector: ${industryCtx}. Target market: ${market}. Apply all formatting rules.` }
+        ];
+      } else {
+        const inputText = (currentInputMode === 'file' && uploadedFile?.text)
+          ? uploadedFile.text
+          : document.getElementById('trad-input').value.trim();
+        messageContent = `Translate the following CV from ${langFrom} to ${langTo}:\n\n${inputText}`;
+      }
+
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 4000,
+          system: systemPrompt,
+          messages: [{ role:'user', content: messageContent }]
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error?.message || `Error ${response.status}`);
+      }
+
+      const data      = await response.json();
+      const translated = data.content.map(b => b.type === 'text' ? b.text : '').join('').trim();
+      plainTextResult  = translated;
+
+      stopLoadingSteps();
+      document.getElementById('trad-loading-state').style.display = 'none';
+      renderFormattedCV(translated);
+      document.getElementById('trad-formatted').style.display = 'block';
+      document.getElementById('trad-plain').textContent = translated;
+      document.getElementById('btn-copy').style.display     = 'inline-flex';
+      document.getElementById('btn-download').style.display = 'inline-flex';
+      document.getElementById('view-toggle').style.display  = 'flex';
+      setView('formatted');
+      updateResultCount(translated);
+
+    } catch (err) {
+      stopLoadingSteps();
+      document.getElementById('trad-loading-state').style.display = 'none';
+      document.getElementById('trad-formatted').innerHTML =
+        `<div style="padding:28px 26px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:rgba(244,63,94,0.15);display:flex;align-items:center;justify-content:center;font-size:16px;">⚠</div>
+            <p style="color:#ff8c94;font-weight:600;font-size:14px;">No se pudo completar la traducción</p>
+          </div>
+          <p style="color:rgba(255,255,255,0.35);font-size:13px;line-height:1.7;">${err.message}</p>
+        </div>`;
+      document.getElementById('trad-formatted').style.display = 'block';
+    } finally {
+      btn.disabled = false;
+    }
+  }
 </script>
 </body>
 </html>
