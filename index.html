@@ -5768,6 +5768,31 @@ ${innerHtml}
   /* ══ MAIN TRANSLATE FUNCTION ══ */
 
 
+
+<!-- Fallback definitions (overwritten by Firebase module when loaded) -->
+<script>
+  // These are overwritten by the Firebase module, but serve as fallback
+  if (typeof window.openAuthModal === 'undefined') {
+    window.openAuthModal  = function() { document.getElementById('auth-modal-overlay').classList.add('open'); };
+    window.closeAuthModal = function() { document.getElementById('auth-modal-overlay').classList.remove('open'); };
+    window.switchAuthTab  = function(tab) {
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+      document.getElementById('auth-form-login').style.display    = tab === 'login'    ? 'block' : 'none';
+      document.getElementById('auth-form-register').style.display = tab === 'register' ? 'block' : 'none';
+    };
+    window.signInWithGoogle = function() { window.openAuthModal(); };
+    window.signInWithEmail  = function() {
+      var email = document.getElementById('login-email').value.trim();
+      var pass  = document.getElementById('login-password').value;
+      if (!email || !pass) { document.getElementById('auth-error-msg').textContent = 'Completá todos los campos'; return; }
+      document.getElementById('auth-error-msg').textContent = 'Firebase no disponible. Recargá la página.';
+    };
+    window.registerWithEmail = window.signInWithEmail;
+    window.signOut = function() {};
+  }
+</script>
+
 <!-- ══════════════════════════════════════════
      FIREBASE AUTH + DASHBOARD JS
 ══════════════════════════════════════════ -->
@@ -5795,13 +5820,21 @@ ${innerHtml}
   const DEMO_MODE = firebaseConfig.apiKey === "TU_API_KEY";
 
   if (!DEMO_MODE) {
-    app      = initializeApp(firebaseConfig);
-    auth     = getAuth(app);
-    provider = new GoogleAuthProvider();
-    onAuthStateChanged(auth, user => {
-      if (user) showDashboard(user);
-      else      hideDashboard();
-    });
+    try {
+      app = initializeApp(firebaseConfig);
+    } catch(e) {
+      // Firebase app may already be initialized (e.g. duplicate load)
+      const apps = window._firebaseApps || [];
+      if (apps.length > 0) { app = apps[0]; }
+    }
+    if (app) {
+      auth     = getAuth(app);
+      provider = new GoogleAuthProvider();
+      onAuthStateChanged(auth, user => {
+        if (user) showDashboard(user);
+        else      hideDashboard();
+      });
+    }
   }
 
   window.openAuthModal  = () => document.getElementById('auth-modal-overlay').classList.add('open');
