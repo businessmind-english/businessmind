@@ -2845,9 +2845,6 @@
       </div>
     </div>
 
-  </div>
-</div>
-
 <!-- ══════════════════════════════════════════
      SEND FILE MODAL (Google Drive link)
 ══════════════════════════════════════════ -->
@@ -6112,7 +6109,7 @@ ${innerHtml}
 ══════════════════════════════════════════ -->
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getAuth, GoogleAuthProvider, signInWithPopup,
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
            createUserWithEmailAndPassword, signInWithEmailAndPassword,
            onAuthStateChanged, updateProfile,
            signOut as fbSignOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
@@ -6166,17 +6163,29 @@ ${innerHtml}
   function setError(msg) { document.getElementById('auth-error-msg').textContent = msg; }
   function clearError()  { document.getElementById('auth-error-msg').textContent = ''; }
 
+  // Handle redirect result on page load (captures Calendar token after redirect)
+  (async () => {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500)); // wait for auth init
+      if (!auth) return;
+      const result = await getRedirectResult(auth);
+      if (result) {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        if (credential?.accessToken) {
+          window._gCalToken = credential.accessToken;
+          console.log('Calendar token captured from redirect ✅');
+        }
+        await saveUserProfile(result.user);
+      }
+    } catch(e) { console.warn('Redirect result:', e.message); }
+  })();
+
   window.signInWithGoogle = async () => {
     clearError();
     if (DEMO_MODE) { demoLogin({ name: 'Usuario Demo', email: 'demo@businessmind.com', photo: null }); return; }
     try {
-      const result = await signInWithPopup(auth, provider);
-      // Store access token for Calendar API
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      if (credential?.accessToken) window._gCalToken = credential.accessToken;
-      await saveUserProfile(result.user);
-      showDashboard(result.user);
-      window.closeAuthModal();
+      await signInWithRedirect(auth, provider);
+      // Page will redirect to Google and come back — token captured above
     } catch(e) { setError(friendlyError(e.code)); }
   };
 
