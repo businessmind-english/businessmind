@@ -6163,30 +6163,24 @@ ${innerHtml}
   function setError(msg) { document.getElementById('auth-error-msg').textContent = msg; }
   function clearError()  { document.getElementById('auth-error-msg').textContent = ''; }
 
-  // Handle redirect result on page load (captures Calendar token after redirect)
-  (async () => {
-    try {
-      await new Promise(resolve => setTimeout(resolve, 500)); // wait for auth init
-      if (!auth) return;
-      const result = await getRedirectResult(auth);
-      if (result) {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        if (credential?.accessToken) {
-          window._gCalToken = credential.accessToken;
-          console.log('Calendar token captured from redirect ✅');
-        }
-        await saveUserProfile(result.user);
-      }
-    } catch(e) { console.warn('Redirect result:', e.message); }
-  })();
-
   window.signInWithGoogle = async () => {
     clearError();
     if (DEMO_MODE) { demoLogin({ name: 'Usuario Demo', email: 'demo@businessmind.com', photo: null }); return; }
     try {
-      await signInWithRedirect(auth, provider);
-      // Page will redirect to Google and come back — token captured above
-    } catch(e) { setError(friendlyError(e.code)); }
+      const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      if (credential?.accessToken) window._gCalToken = credential.accessToken;
+      await saveUserProfile(result.user);
+      showDashboard(result.user);
+      window.closeAuthModal();
+    } catch(e) {
+      if (e.code === 'auth/popup-blocked' || e.message?.includes('Cross-Origin')) {
+        // Fallback to redirect
+        await signInWithRedirect(auth, provider);
+      } else {
+        setError(friendlyError(e.code));
+      }
+    }
   };
 
   window.signInWithEmail = async () => {
@@ -6536,13 +6530,27 @@ ${innerHtml}
     if (!body) return;
     body.innerHTML = '<div class="admin-loading">Cargando clases...</div>';
 
-    // 1. Auto-process: mark past pending classes as done and update student counter
+    // Auto-process past pending classes
     await autoProcessPastClasses();
 
-    // 2. Load from Firestore
+    // Load from Firestore first
     let classes = await loadClassesFromFirestore();
 
-    // 3. Try to sync from Google Calendar if token available
+    // Try Calendar sync
+    if (!window._gCalToken) {
+      // Try to get token via re-auth silently
+      try {
+        const { getAuth, GoogleAuthProvider, signInWithPopup } 
+          = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+        const silentProvider = new GoogleAuthProvider();
+        silentProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+        silentProvider.setCustomParameters({ prompt: 'none' });
+        const result = await signInWithPopup(auth, silentProvider);
+        const cred = GoogleAuthProvider.credentialFromResult(result);
+        if (cred?.accessToken) window._gCalToken = cred.accessToken;
+      } catch(e) { console.warn('Silent auth:', e.message); }
+    }
+
     if (window._gCalToken) {
       const calClasses = await fetchCalendarEvents();
       if (calClasses.length) {
@@ -6550,7 +6558,10 @@ ${innerHtml}
         classes = await loadClassesFromFirestore();
       }
     } else {
-      body.innerHTML += ''; // keep going with Firestore data
+      const info = document.createElement('div');
+      info.style.cssText = 'padding:12px 20px;font-size:11px;color:rgba(255,255,255,0.4);border-bottom:1px solid rgba(47,168,208,0.1);';
+      info.innerHTML = '⚠️ Para sincronizar con Google Calendar, cerrá sesión y volvé a entrar con Google para autorizar el acceso.';
+      body.before(info);
     }
 
     renderClasesTable(classes, body);
