@@ -2016,6 +2016,172 @@
     .btn-auth-submit:hover { background: var(--green-light); transform: translateY(-1px); }
     .auth-error { color: #ff8c94; font-size: 12px; text-align: center; margin-top: 12px; min-height: 18px; }
 
+    /* ══ CLASES TAB ══ */
+    .clase-row {
+      display: grid;
+      grid-template-columns: 48px 1fr auto auto auto;
+      align-items: center; gap: 12px;
+      padding: 14px 20px;
+      border-bottom: 1px solid rgba(47,168,208,0.1);
+      transition: background 0.15s;
+    }
+    .clase-row:last-child { border-bottom: none; }
+    .clase-row:hover { background: rgba(255,255,255,0.02); }
+    .clase-status-dot {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .clase-status-dot.done    { background: rgba(91,175,42,0.15);  border: 1px solid rgba(91,175,42,0.3); }
+    .clase-status-dot.pending { background: rgba(47,168,208,0.12); border: 1px solid rgba(47,168,208,0.25); }
+    .clase-status-dot.missed  { background: rgba(255,107,122,0.1); border: 1px solid rgba(255,107,122,0.2); }
+    .clase-info { min-width: 0; }
+    .clase-title { font-size: 13px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .clase-meta  { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+    .clase-student { font-size: 12px; color: var(--sky-light); white-space: nowrap; }
+    .clase-badge {
+      padding: 3px 10px; border-radius: 100px; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+    }
+    .clase-badge.done    { background: rgba(91,175,42,0.15);  color: var(--green-light); border: 1px solid rgba(91,175,42,0.3); }
+    .clase-badge.pending { background: rgba(47,168,208,0.1);  color: var(--sky-light);   border: 1px solid rgba(47,168,208,0.25); }
+    .clase-badge.missed  { background: rgba(255,107,122,0.08);color: #ff8c94;            border: 1px solid rgba(255,107,122,0.2); }
+    .clase-action-btn {
+      padding: 5px 12px; border-radius: 7px; font-size: 11px; font-weight: 700;
+      cursor: pointer; border: 1px solid rgba(91,175,42,0.3);
+      background: rgba(91,175,42,0.1); color: var(--green-light);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background 0.2s;
+    }
+    .clase-action-btn:hover { background: rgba(91,175,42,0.22); }
+
+    /* Add class modal */
+    #add-class-modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 2500;
+      background: rgba(10,15,40,0.88); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    #add-class-modal-overlay.open { display: flex; }
+    .add-class-modal {
+      background: linear-gradient(160deg, #111d45 0%, #1B2B5E 100%);
+      border: 1px solid rgba(47,168,208,0.25); border-radius: 20px;
+      width: 100%; max-width: 460px; padding: 28px 28px 24px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    }
+    .add-class-modal h3 { font-family:'Playfair Display',serif; font-size:18px; font-weight:900; color:white; margin-bottom:20px; }
+    .acm-field { margin-bottom: 14px; }
+    .acm-field label { display:block; font-size:11px; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px; }
+    .acm-field input, .acm-field select {
+      width:100%; padding:10px 14px; border-radius:9px;
+      background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
+      color:white; font-family:'Plus Jakarta Sans',sans-serif; font-size:13px;
+    }
+    .acm-field input:focus, .acm-field select:focus { outline:none; border-color:var(--sky); }
+    .acm-field select option { background:#1B2B5E; }
+    .acm-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
+    .acm-btn-cancel { padding:10px 20px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.6); border-radius:9px; cursor:pointer; font-size:13px; font-family:'Plus Jakarta Sans',sans-serif; }
+    .acm-btn-save   { padding:10px 22px; background:var(--green); border:none; color:white; border-radius:9px; cursor:pointer; font-size:13px; font-weight:700; font-family:'Plus Jakarta Sans',sans-serif; }
+
+    /* ══ PLACEMENT TEST MODAL ══ */
+    #placement-overlay {
+      display: none; position: fixed; inset: 0; z-index: 3000;
+      background: rgba(10,15,40,0.92); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    #placement-overlay.open { display: flex; }
+    .placement-modal {
+      background: linear-gradient(160deg, #111d45 0%, #1B2B5E 100%);
+      border: 1px solid rgba(47,168,208,0.25);
+      border-radius: 24px; width: 100%; max-width: 680px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+      padding: 0;
+    }
+    .pt-header {
+      padding: 28px 32px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: sticky; top: 0; z-index: 2;
+      background: linear-gradient(160deg, #111d45 0%, #1B2B5E 100%);
+    }
+    .pt-header h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: white; margin-bottom: 4px; }
+    .pt-header h2 span { color: var(--sky); }
+    .pt-header p { font-size: 12px; color: rgba(255,255,255,0.45); }
+    .pt-progress-bar-wrap { margin-top: 14px; background: rgba(255,255,255,0.08); border-radius: 100px; height: 6px; overflow: hidden; }
+    .pt-progress-bar { height: 100%; background: linear-gradient(90deg, var(--green), var(--sky)); border-radius: 100px; transition: width 0.4s ease; }
+    .pt-progress-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 6px; text-align: right; }
+
+    .pt-body { padding: 28px 32px; }
+    .pt-section-title {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--sky); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+    }
+    .pt-section-title::after { content:''; flex:1; height:1px; background: rgba(47,168,208,0.2); }
+
+    .pt-question { margin-bottom: 24px; }
+    .pt-question-text { font-size: 14px; color: rgba(255,255,255,0.9); font-weight: 500; margin-bottom: 12px; line-height: 1.6; }
+    .pt-options { display: flex; flex-direction: column; gap: 8px; }
+    .pt-option {
+      padding: 11px 16px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.8); font-size: 13px;
+      cursor: pointer; transition: all 0.2s; text-align: left;
+    }
+    .pt-option:hover { border-color: rgba(47,168,208,0.5); background: rgba(47,168,208,0.08); color: white; }
+    .pt-option.selected { border-color: var(--sky); background: rgba(47,168,208,0.15); color: white; font-weight: 600; }
+    .pt-option.correct { border-color: var(--green); background: rgba(91,175,42,0.15); color: var(--green-light); }
+    .pt-option.wrong { border-color: #ff6b7a; background: rgba(255,107,122,0.1); color: #ff8c94; }
+
+    .pt-footer {
+      padding: 20px 32px 28px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .pt-btn-next {
+      padding: 12px 28px; background: var(--green); color: white; border: none;
+      border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .pt-btn-next:hover { background: var(--green-light); transform: translateY(-1px); }
+    .pt-btn-next:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .pt-btn-skip { background: none; border: none; color: rgba(255,255,255,0.3); font-size: 12px; cursor: pointer; padding: 8px; }
+    .pt-btn-skip:hover { color: rgba(255,255,255,0.6); }
+
+    /* Result screen */
+    .pt-result { padding: 40px 32px; text-align: center; }
+    .pt-result-level {
+      font-family: 'Playfair Display', serif;
+      font-size: 64px; font-weight: 900;
+      background: linear-gradient(135deg, var(--green), var(--sky));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      line-height: 1; margin-bottom: 8px;
+    }
+    .pt-result-title { font-size: 18px; font-weight: 700; color: white; margin-bottom: 6px; }
+    .pt-result-desc { font-size: 13px; color: rgba(255,255,255,0.5); max-width: 400px; margin: 0 auto 28px; line-height: 1.7; }
+    .pt-result-scores { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 28px; }
+    .pt-result-score-item {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px; padding: 14px;
+    }
+    .pt-result-score-item .score-val { font-family:'Playfair Display',serif; font-size:26px; font-weight:900; color:white; }
+    .pt-result-score-item .score-lbl { font-size:10px; color: rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.1em; margin-top:2px; }
+    .pt-result-btn {
+      padding: 14px 36px; background: var(--green); color: white; border: none;
+      border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .pt-result-btn:hover { background: var(--green-light); transform: translateY(-2px); }
+
+    /* Admin: placement badge in table */
+    .pt-badge {
+      display: inline-block; padding: 2px 10px; border-radius: 100px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+      background: rgba(47,168,208,0.15); color: var(--sky-light);
+      border: 1px solid rgba(47,168,208,0.3);
+    }
+
     /* ══ ADMIN DASHBOARD ══ */
     #admin-dashboard {
       display: none; position: fixed; inset: 0; z-index: 1500;
@@ -2616,6 +2782,7 @@
       <button class="admin-tab-btn active" onclick="switchAdminTab('alumnos')">👥 Alumnos</button>
       <button class="admin-tab-btn" onclick="switchAdminTab('archivos')">📎 Archivos enviados</button>
       <button class="admin-tab-btn" onclick="switchAdminTab('performance')">📈 Performance</button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('clases')">📅 Clases</button>
     </div>
 
     <!-- Tabla alumnos (tab: alumnos) -->
@@ -2659,8 +2826,24 @@
       </div>
     </div>
 
-  </div>
-</div>
+    <!-- Clases / Calendar (tab: clases) -->
+    <div id="admin-tab-clases" style="display:none;">
+      <div class="admin-table-wrap" style="margin-bottom:20px;">
+        <div class="admin-table-head" style="flex-wrap:wrap;gap:10px;">
+          <span class="admin-table-title">📅 Clases programadas desde Google Calendar</span>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <button onclick="loadCalendarClasses()" style="padding:8px 18px;background:rgba(47,168,208,0.15);border:1px solid rgba(47,168,208,0.3);color:var(--sky-light);border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;">🔄 Sincronizar Calendar</button>
+            <button onclick="openAddClassModal()" style="padding:8px 18px;background:var(--green);border:none;color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;">+ Agregar clase manual</button>
+          </div>
+        </div>
+        <div style="padding:12px 20px;border-bottom:1px solid rgba(47,168,208,0.1);font-size:11px;color:rgba(255,255,255,0.35);">
+          Las clases pasadas con duración ≥ 30 min se marcan automáticamente como realizadas. El contador del alumno se actualiza solo.
+        </div>
+        <div id="admin-clases-body">
+          <div class="admin-loading">Hacé click en "Sincronizar Calendar" para cargar las clases...</div>
+        </div>
+      </div>
+    </div>
 
 <!-- ══════════════════════════════════════════
      SEND FILE MODAL (Google Drive link)
@@ -2830,6 +3013,44 @@
       <button class="sfm-btn-cancel" onclick="closePerfModal()">Cancelar</button>
       <button class="sfm-btn-send" onclick="savePerfData()">Guardar performance →</button>
     </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ADD CLASS MODAL
+══════════════════════════════════════════ -->
+<div id="add-class-modal-overlay" onclick="if(event.target===this)closeAddClassModal()">
+  <div class="add-class-modal">
+    <h3>📅 Agregar clase</h3>
+    <div class="acm-field">
+      <label>Alumno</label>
+      <select id="acm-student"></select>
+    </div>
+    <div class="acm-field">
+      <label>Título / tema</label>
+      <input type="text" id="acm-title" placeholder="Ej: Clase de Grammar — Condicionales">
+    </div>
+    <div class="acm-field">
+      <label>Fecha y hora de inicio</label>
+      <input type="datetime-local" id="acm-start">
+    </div>
+    <div class="acm-field">
+      <label>Duración (minutos)</label>
+      <input type="number" id="acm-duration" value="60" min="15" max="180">
+    </div>
+    <div class="acm-footer">
+      <button class="acm-btn-cancel" onclick="closeAddClassModal()">Cancelar</button>
+      <button class="acm-btn-save" onclick="saveManualClass()">Guardar clase →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PLACEMENT TEST MODAL
+══════════════════════════════════════════ -->
+<div id="placement-overlay">
+  <div class="placement-modal" id="placement-modal">
+    <!-- contenido generado por JS -->
   </div>
 </div>
 
@@ -5920,6 +6141,7 @@ ${innerHtml}
     if (app) {
       auth     = getAuth(app);
       provider = new GoogleAuthProvider();
+      provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
       onAuthStateChanged(auth, user => {
         if (user) showDashboard(user);
         else      hideDashboard();
@@ -5946,7 +6168,10 @@ ${innerHtml}
     if (DEMO_MODE) { demoLogin({ name: 'Usuario Demo', email: 'demo@businessmind.com', photo: null }); return; }
     try {
       const result = await signInWithPopup(auth, provider);
-      await saveUserProfile(result.user); // guardar/actualizar perfil
+      // Store access token for Calendar API
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      if (credential?.accessToken) window._gCalToken = credential.accessToken;
+      await saveUserProfile(result.user);
       showDashboard(result.user);
       window.closeAuthModal();
     } catch(e) { setError(friendlyError(e.code)); }
@@ -6037,6 +6262,8 @@ ${innerHtml}
           if (typeof loadStudentFiles === 'function') loadStudentFiles(uid);
           if (typeof loadStudentPerformance === 'function') loadStudentPerformance(uid);
         }, 300);
+        // Verificar si ya hizo el examen de nivelación
+        checkAndShowPlacement(user);
       }
     }
   }
@@ -6063,7 +6290,481 @@ ${innerHtml}
     return map[code] || 'Ocurrió un error. Intentá de nuevo.';
   }
 
-  // ── ADMIN: cargar alumnos desde Firebase Auth ──
+  // ══════════════════════════════════════════
+  //  PLACEMENT TEST
+  // ══════════════════════════════════════════
+
+  const PT_QUESTIONS = [
+    // ── GRAMMAR (10 questions) ──
+    { section:'Grammar', q:'Choose the correct sentence:', opts:['She don\'t like coffee.','She doesn\'t likes coffee.','She doesn\'t like coffee.','She not like coffee.'], ans:2, level:'A1' },
+    { section:'Grammar', q:'Which is correct? "Yesterday I _____ to the market."', opts:['go','goes','went','have gone'], ans:2, level:'A1' },
+    { section:'Grammar', q:'Complete: "If it rains tomorrow, we _____ stay home."', opts:['will','would','can','shall'], ans:0, level:'A2' },
+    { section:'Grammar', q:'"By the time she arrived, they _____ already eaten." Choose the correct form.', opts:['have','had','did','were'], ans:1, level:'B1' },
+    { section:'Grammar', q:'Which sentence uses the passive voice correctly?', opts:['The cake was eat by Tom.','The cake was eaten by Tom.','The cake were eaten by Tom.','Tom was eat the cake.'], ans:1, level:'B1' },
+    { section:'Grammar', q:'"She suggested that he _____ the report." (formal subjunctive)', opts:['writes','write','wrote','would write'], ans:1, level:'B2' },
+    { section:'Grammar', q:'"Had I known earlier, I _____ differently." Complete correctly.', opts:['would act','acted','would have acted','had acted'], ans:2, level:'B2' },
+    { section:'Grammar', q:'Which is a correct cleft sentence?', opts:['It was John who broke it.','It was John which broke it.','It was John that it broke.','It is John who it broke.'], ans:0, level:'C1' },
+    { section:'Grammar', q:'"The findings, _____ were unexpected, changed the hypothesis." Choose the correct relative clause.', opts:['that','which','who','what'], ans:1, level:'C1' },
+    { section:'Grammar', q:'Identify the correct inversion: "Not only _____ late, but he also forgot his notes."', opts:['he arrived','arrived he','did he arrive','he did arrive'], ans:2, level:'C1' },
+
+    // ── VOCABULARY (8 questions) ──
+    { section:'Vocabulary', q:'What does "ambitious" mean?', opts:['Lazy','Having strong desire to succeed','Friendly','Confused'], ans:1, level:'A2' },
+    { section:'Vocabulary', q:'Choose the word that best completes: "The weather was _____ — sunny but with a cool breeze."', opts:['dreadful','pleasant','fierce','gloomy'], ans:1, level:'A2' },
+    { section:'Vocabulary', q:'"The project was put on _____." (= delayed/stopped for now)', opts:['hold','sale','track','show'], ans:0, level:'B1' },
+    { section:'Vocabulary', q:'Which word is a synonym of "meticulous"?', opts:['Careless','Thorough','Rapid','Vague'], ans:1, level:'B2' },
+    { section:'Vocabulary', q:'The prefix "mis-" in "misinterpret" means:', opts:['Again','Wrongly','Before','Against'], ans:1, level:'B1' },
+    { section:'Vocabulary', q:'"She has a _____ for detail that makes her an excellent editor." (natural talent)', opts:['flair','lack','grasp','blur'], ans:0, level:'B2' },
+    { section:'Vocabulary', q:'Which best describes "rhetoric"?', opts:['A type of sport','The art of persuasive speaking or writing','A musical genre','A scientific method'], ans:1, level:'C1' },
+    { section:'Vocabulary', q:'"The policy was _____ — it produced results nobody intended." (producing unexpected/bad effects)', opts:['counterproductive','productive','conducive','proactive'], ans:0, level:'C1' },
+
+    // ── READING COMPREHENSION (2 short texts) ──
+    { section:'Reading', q:'Read: "Despite the heavy rain, the outdoor concert continued. The audience, undeterred by the weather, cheered enthusiastically."\n\nWhat can we infer about the audience?', opts:['They were angry about the rain.','They left because of the rain.','They enjoyed the concert regardless of the rain.','They were surprised the concert continued.'], ans:2, level:'B1' },
+    { section:'Reading', q:'Read: "The proliferation of social media has fundamentally altered the way information is disseminated, enabling instantaneous global communication while simultaneously raising concerns about misinformation."\n\nWhat is the main idea?', opts:['Social media is only used for entertainment.','Social media has changed how information spreads, with both benefits and risks.','Misinformation did not exist before social media.','Global communication was faster before social media.'], ans:1, level:'B2' },
+  ];
+
+  const PT_LEVEL_MAP = [
+    { min: 0,  max: 5,  level: 'A1', desc: 'Principiante. Podés entender y usar expresiones cotidianas básicas.' },
+    { min: 6,  max: 9,  level: 'A2', desc: 'Básico. Podés comunicarte en situaciones simples y familiares.' },
+    { min: 10, max: 13, level: 'B1', desc: 'Intermedio. Manejás temas cotidianos y laborales con cierta fluidez.' },
+    { min: 14, max: 16, level: 'B2', desc: 'Intermedio-alto. Te expresás con claridad y podés argumentar opiniones.' },
+    { min: 17, max: 18, level: 'C1', desc: 'Avanzado. Usás el idioma con flexibilidad y precisión en contextos complejos.' },
+    { min: 19, max: 20, level: 'C2', desc: 'Maestría. Dominio casi nativo del idioma en todos los contextos.' },
+  ];
+
+  let ptCurrentQ = 0;
+  let ptAnswers  = [];
+  let ptCurrentUid = null;
+  let ptCurrentUser = null;
+
+  function getScoreBySection(answers) {
+    const sections = { Grammar: { total: 0, correct: 0 }, Vocabulary: { total: 0, correct: 0 }, Reading: { total: 0, correct: 0 } };
+    PT_QUESTIONS.forEach((q, i) => {
+      sections[q.section].total++;
+      if (answers[i] === q.ans) sections[q.section].correct++;
+    });
+    return sections;
+  }
+
+  function getTotalScore(answers) {
+    return PT_QUESTIONS.filter((q, i) => answers[i] === q.ans).length;
+  }
+
+  function getLevelFromScore(score) {
+    return PT_LEVEL_MAP.find(l => score >= l.min && score <= l.max) || PT_LEVEL_MAP[0];
+  }
+
+  window.openPlacementTest = function(uid, user) {
+    ptCurrentQ = 0;
+    ptAnswers = new Array(PT_QUESTIONS.length).fill(null);
+    ptCurrentUid = uid;
+    ptCurrentUser = user;
+    renderPTQuestion();
+    document.getElementById('placement-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closePlacementTest = function() {
+    document.getElementById('placement-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  function renderPTQuestion() {
+    const modal = document.getElementById('placement-modal');
+    const q = PT_QUESTIONS[ptCurrentQ];
+    const total = PT_QUESTIONS.length;
+    const pct = Math.round((ptCurrentQ / total) * 100);
+    const sections = [...new Set(PT_QUESTIONS.map(x => x.section))];
+    const currentSection = q.section;
+
+    modal.innerHTML = `
+      <div class="pt-header">
+        <h2>Examen de <span>Nivelación</span> 📋</h2>
+        <p>Respondé con honestidad — esto nos ayuda a personalizar tu aprendizaje</p>
+        <div class="pt-progress-bar-wrap">
+          <div class="pt-progress-bar" style="width:${pct}%"></div>
+        </div>
+        <div class="pt-progress-label">Pregunta ${ptCurrentQ + 1} de ${total}</div>
+      </div>
+      <div class="pt-body">
+        <div class="pt-section-title">${currentSection === 'Grammar' ? '📐' : currentSection === 'Vocabulary' ? '📚' : '📖'} ${currentSection}</div>
+        <div class="pt-question">
+          <div class="pt-question-text" style="white-space:pre-line;">${q.q}</div>
+          <div class="pt-options" id="pt-opts">
+            ${q.opts.map((opt, i) => `
+              <button class="pt-option" onclick="selectPTOption(${i})" id="pt-opt-${i}">${String.fromCharCode(65+i)}. ${opt}</button>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="pt-footer">
+        <button class="pt-btn-skip" onclick="skipPTQuestion()">Saltar pregunta</button>
+        <button class="pt-btn-next" id="pt-btn-next" onclick="nextPTQuestion()" disabled>
+          ${ptCurrentQ < total - 1 ? 'Siguiente →' : 'Ver resultados →'}
+        </button>
+      </div>
+    `;
+    // Restore selection if navigated back
+    if (ptAnswers[ptCurrentQ] !== null) {
+      highlightPTOption(ptAnswers[ptCurrentQ]);
+      document.getElementById('pt-btn-next').disabled = false;
+    }
+  }
+
+  window.selectPTOption = function(i) {
+    ptAnswers[ptCurrentQ] = i;
+    highlightPTOption(i);
+    document.getElementById('pt-btn-next').disabled = false;
+  };
+
+  function highlightPTOption(selected) {
+    document.querySelectorAll('.pt-option').forEach((el, i) => {
+      el.classList.toggle('selected', i === selected);
+    });
+  }
+
+  window.skipPTQuestion = function() {
+    ptAnswers[ptCurrentQ] = null;
+    nextPTQuestion();
+  };
+
+  window.nextPTQuestion = function() {
+    if (ptCurrentQ < PT_QUESTIONS.length - 1) {
+      ptCurrentQ++;
+      renderPTQuestion();
+    } else {
+      showPTResults();
+    }
+  };
+
+  async function showPTResults() {
+    const score    = getTotalScore(ptAnswers);
+    const levelObj = getLevelFromScore(score);
+    const sections = getScoreBySection(ptAnswers);
+    const modal    = document.getElementById('placement-modal');
+
+    modal.innerHTML = `
+      <div class="pt-result">
+        <div style="font-size:48px;margin-bottom:12px;">🎓</div>
+        <div class="pt-result-level">${levelObj.level}</div>
+        <div class="pt-result-title">Tu nivel es <strong>${levelObj.level}</strong></div>
+        <div class="pt-result-desc">${levelObj.desc}</div>
+        <div class="pt-result-scores">
+          <div class="pt-result-score-item">
+            <div class="score-val">${sections.Grammar.correct}/${sections.Grammar.total}</div>
+            <div class="score-lbl">Grammar</div>
+          </div>
+          <div class="pt-result-score-item">
+            <div class="score-val">${sections.Vocabulary.correct}/${sections.Vocabulary.total}</div>
+            <div class="score-lbl">Vocabulary</div>
+          </div>
+          <div class="pt-result-score-item">
+            <div class="score-val">${sections.Reading.correct}/${sections.Reading.total}</div>
+            <div class="score-lbl">Reading</div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:24px;">Puntaje total: ${score} / ${PT_QUESTIONS.length}</div>
+        <button class="pt-result-btn" onclick="closePlacementTest()">Ir a mi dashboard →</button>
+      </div>
+    `;
+
+    // Save to Firestore
+    if (!DEMO_MODE && ptCurrentUid) {
+      try {
+        const { getFirestore, doc, setDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        const db = getFirestore(app);
+        await setDoc(doc(db, 'placement', ptCurrentUid), {
+          uid:         ptCurrentUid,
+          level:       levelObj.level,
+          score:       score,
+          total:       PT_QUESTIONS.length,
+          grammarScore:    `${sections.Grammar.correct}/${sections.Grammar.total}`,
+          vocabScore:      `${sections.Vocabulary.correct}/${sections.Vocabulary.total}`,
+          readingScore:    `${sections.Reading.correct}/${sections.Reading.total}`,
+          completedAt:     serverTimestamp(),
+        }, { merge: true });
+        // Also update performance document with detected level
+        await setDoc(doc(db, 'performance', ptCurrentUid), {
+          level: levelObj.level,
+          placementScore: score,
+        }, { merge: true });
+        // Update user profile with level
+        await setDoc(doc(db, 'users', ptCurrentUid), {
+          placementLevel: levelObj.level,
+          placementDone:  true,
+        }, { merge: true });
+      } catch(e) { console.warn('Placement save error:', e.message); }
+    }
+  }
+
+  // Show placement test to new students (first login, no placement done)
+  async function checkAndShowPlacement(user) {
+    if (DEMO_MODE || !user.uid) return;
+    try {
+      const { getFirestore, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const db   = getFirestore(app);
+      const snap = await getDoc(doc(db, 'placement', user.uid));
+      if (!snap.exists()) {
+        // First time — show placement test after a small delay
+        setTimeout(() => openPlacementTest(user.uid, user), 800);
+      }
+    } catch(e) { console.warn('checkPlacement:', e.message); }
+  }
+
+  // ══ END PLACEMENT TEST ══
+
+  // ══════════════════════════════════════════
+  //  CLASES — Google Calendar + Auto-tracking
+  // ══════════════════════════════════════════
+
+  const MIN_CLASS_MINUTES = 30; // clases válidas ≥ 30 min
+
+  // Load classes: first from Firestore (manual + synced), then try Calendar API
+  window.loadCalendarClasses = async () => {
+    const body = document.getElementById('admin-clases-body');
+    if (!body) return;
+    body.innerHTML = '<div class="admin-loading">Cargando clases...</div>';
+
+    // 1. Auto-process: mark past pending classes as done and update student counter
+    await autoProcessPastClasses();
+
+    // 2. Load from Firestore
+    let classes = await loadClassesFromFirestore();
+
+    // 3. Try to sync from Google Calendar if token available
+    if (window._gCalToken) {
+      const calClasses = await fetchCalendarEvents();
+      if (calClasses.length) {
+        await syncCalendarClassesToFirestore(calClasses);
+        classes = await loadClassesFromFirestore();
+      }
+    } else {
+      body.innerHTML += ''; // keep going with Firestore data
+    }
+
+    renderClasesTable(classes, body);
+  };
+
+  async function loadClassesFromFirestore() {
+    if (DEMO_MODE) return demoClaases();
+    try {
+      const { getFirestore, collection, getDocs, orderBy, query }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const db   = getFirestore(app);
+      const snap = await getDocs(query(collection(db, 'classes'), orderBy('startTime', 'desc')));
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch(e) { console.warn('loadClasses:', e.message); return []; }
+  }
+
+  async function fetchCalendarEvents() {
+    try {
+      const now      = new Date();
+      const past30   = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000); // 60 días atrás
+      const future14 = new Date(now.getTime() + 14  * 24 * 60 * 60 * 1000); // 14 días adelante
+      const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events?` +
+        `timeMin=${past30.toISOString()}&timeMax=${future14.toISOString()}` +
+        `&singleEvents=true&orderBy=startTime&maxResults=100` +
+        `&q=meet`;
+      const res  = await fetch(url, { headers: { Authorization: `Bearer ${window._gCalToken}` } });
+      if (!res.ok) { console.warn('Calendar API error:', res.status); return []; }
+      const data = await res.json();
+      return (data.items || [])
+        .filter(ev => ev.hangoutLink || ev.conferenceData) // solo eventos con Meet
+        .map(ev => {
+          const start    = new Date(ev.start?.dateTime || ev.start?.date);
+          const end      = new Date(ev.end?.dateTime   || ev.end?.date);
+          const duration = Math.round((end - start) / 60000);
+          const attendeeEmails = (ev.attendees || [])
+            .filter(a => !a.self && !a.organizer)
+            .map(a => a.email);
+          return {
+            calendarId:  ev.id,
+            title:       ev.summary || 'Clase',
+            startTime:   start,
+            endTime:     end,
+            durationMin: duration,
+            studentEmail: attendeeEmails[0] || null,
+            meetLink:    ev.hangoutLink || '',
+            source:      'calendar',
+          };
+        });
+    } catch(e) { console.warn('fetchCalendar:', e.message); return []; }
+  }
+
+  async function syncCalendarClassesToFirestore(calClasses) {
+    if (DEMO_MODE) return;
+    try {
+      const { getFirestore, collection, doc, setDoc, getDocs, query, where }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const db = getFirestore(app);
+      for (const cls of calClasses) {
+        if (!cls.calendarId) continue;
+        // Match student by email
+        let studentUid = null; let studentName = null;
+        if (cls.studentEmail) {
+          const found = allUsers.find(u => u.email === cls.studentEmail);
+          if (found) { studentUid = found.id; studentName = found.name || found.email; }
+        }
+        await setDoc(doc(db, 'classes', 'cal_' + cls.calendarId), {
+          calendarId:   cls.calendarId,
+          title:        cls.title,
+          startTime:    cls.startTime,
+          endTime:      cls.endTime,
+          durationMin:  cls.durationMin,
+          studentEmail: cls.studentEmail || '',
+          studentUid:   studentUid || '',
+          studentName:  studentName || cls.studentEmail || '—',
+          meetLink:     cls.meetLink,
+          source:       'calendar',
+          status:       computeClassStatus(cls.startTime, cls.endTime, cls.durationMin),
+        }, { merge: true });
+      }
+    } catch(e) { console.warn('syncCalendar:', e.message); }
+  }
+
+  function computeClassStatus(startTime, endTime, durationMin) {
+    const now = new Date();
+    const end = endTime instanceof Date ? endTime : new Date(endTime?.seconds ? endTime.seconds * 1000 : endTime);
+    const dur = durationMin || 0;
+    if (end > now) return 'pending';
+    if (dur >= MIN_CLASS_MINUTES) return 'done';
+    return 'missed';
+  }
+
+  async function autoProcessPastClasses() {
+    if (DEMO_MODE) return;
+    try {
+      const { getFirestore, collection, getDocs, doc, updateDoc, getDoc, setDoc, serverTimestamp, query, where }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const db   = getFirestore(app);
+      const now  = new Date();
+      const snap = await getDocs(query(collection(db, 'classes'), where('status', '==', 'pending')));
+      for (const docSnap of snap.docs) {
+        const cls = docSnap.data();
+        const end = cls.endTime instanceof Date ? cls.endTime
+          : new Date(cls.endTime?.seconds ? cls.endTime.seconds * 1000 : cls.endTime);
+        if (end > now) continue; // still in future
+        const newStatus = (cls.durationMin || 0) >= MIN_CLASS_MINUTES ? 'done' : 'missed';
+        await updateDoc(doc(db, 'classes', docSnap.id), { status: newStatus, processedAt: serverTimestamp() });
+        // If done and has student → increment classes counter
+        if (newStatus === 'done' && cls.studentUid) {
+          const perfRef  = doc(db, 'performance', cls.studentUid);
+          const perfSnap = await getDoc(perfRef);
+          const current  = perfSnap.exists() ? (perfSnap.data().classes || 0) : 0;
+          await setDoc(perfRef, { classes: current + 1 }, { merge: true });
+        }
+      }
+    } catch(e) { console.warn('autoProcess:', e.message); }
+  }
+
+  function renderClasesTable(classes, body) {
+    if (!classes.length) {
+      body.innerHTML = '<div class="admin-empty">No hay clases registradas.<br><span style="font-size:11px;color:var(--muted);">Sincronizá con Google Calendar o agregá una clase manualmente.</span></div>';
+      return;
+    }
+    const rows = classes.map(cls => {
+      const start = cls.startTime instanceof Date ? cls.startTime
+        : new Date(cls.startTime?.seconds ? cls.startTime.seconds * 1000 : cls.startTime);
+      const dateStr = start.toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'numeric' });
+      const timeStr = start.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
+      const status  = cls.status || computeClassStatus(cls.startTime, cls.endTime, cls.durationMin);
+      const icons   = { done:'✅', pending:'🕐', missed:'❌' };
+      const labels  = { done:'Realizada', pending:'Programada', missed:'No realizada' };
+      const actionBtn = status === 'pending'
+        ? `<button class="clase-action-btn" onclick="markClassDone('${cls.id}','${cls.studentUid||''}')">✅ Marcar realizada</button>`
+        : '';
+      return `<div class="clase-row">
+        <div class="clase-status-dot ${status}">${icons[status]||'📅'}</div>
+        <div class="clase-info">
+          <div class="clase-title">${cls.title || 'Clase'}</div>
+          <div class="clase-meta">${dateStr} · ${timeStr} · ${cls.durationMin || '?'} min${cls.meetLink ? ' · <a href="'+cls.meetLink+'" target="_blank" style="color:var(--sky-light);">Meet</a>' : ''}</div>
+        </div>
+        <div class="clase-student">${cls.studentName || cls.studentEmail || '—'}</div>
+        <span class="clase-badge ${status}">${labels[status]||status}</span>
+        ${actionBtn}
+      </div>`;
+    }).join('');
+    body.innerHTML = rows;
+  }
+
+  window.markClassDone = async (classId, studentUid) => {
+    if (!classId) return;
+    try {
+      const { getFirestore, doc, updateDoc, getDoc, setDoc, serverTimestamp }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const db = getFirestore(app);
+      await updateDoc(doc(db, 'classes', classId), { status: 'done', processedAt: serverTimestamp() });
+      if (studentUid) {
+        const perfRef  = doc(db, 'performance', studentUid);
+        const perfSnap = await getDoc(perfRef);
+        const current  = perfSnap.exists() ? (perfSnap.data().classes || 0) : 0;
+        await setDoc(perfRef, { classes: current + 1 }, { merge: true });
+      }
+      loadCalendarClasses();
+    } catch(e) { alert('Error: ' + e.message); }
+  };
+
+  // Add class modal
+  window.openAddClassModal = () => {
+    // Populate student selector
+    const sel = document.getElementById('acm-student');
+    sel.innerHTML = '<option value="">— Seleccionar alumno —</option>' +
+      allUsers.map(u => `<option value="${u.id}" data-name="${u.name||u.email}">${u.name || u.email}</option>`).join('');
+    // Default datetime to now
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.getElementById('acm-start').value = now.toISOString().slice(0,16);
+    document.getElementById('acm-title').value = '';
+    document.getElementById('acm-duration').value = '60';
+    document.getElementById('add-class-modal-overlay').classList.add('open');
+  };
+
+  window.closeAddClassModal = () => {
+    document.getElementById('add-class-modal-overlay').classList.remove('open');
+  };
+
+  window.saveManualClass = async () => {
+    const studentSel  = document.getElementById('acm-student');
+    const studentUid  = studentSel.value;
+    const studentName = studentSel.options[studentSel.selectedIndex]?.dataset?.name || '';
+    const title       = document.getElementById('acm-title').value.trim() || 'Clase';
+    const startVal    = document.getElementById('acm-start').value;
+    const duration    = parseInt(document.getElementById('acm-duration').value) || 60;
+    if (!startVal) { alert('Ingresá la fecha y hora'); return; }
+    const startTime = new Date(startVal);
+    const endTime   = new Date(startTime.getTime() + duration * 60000);
+    const status    = computeClassStatus(startTime, endTime, duration);
+    if (DEMO_MODE) { closeAddClassModal(); loadCalendarClasses(); return; }
+    try {
+      const { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc, setDoc }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const db = getFirestore(app);
+      await addDoc(collection(db, 'classes'), {
+        title, startTime, endTime, durationMin: duration,
+        studentUid, studentName, studentEmail: '',
+        source: 'manual', status, createdAt: serverTimestamp(),
+      });
+      // If class already done and has student → increment counter
+      if (status === 'done' && studentUid) {
+        const perfRef  = doc(db, 'performance', studentUid);
+        const perfSnap = await getDoc(perfRef);
+        const current  = perfSnap.exists() ? (perfSnap.data().classes || 0) : 0;
+        await setDoc(perfRef, { classes: current + 1 }, { merge: true });
+      }
+      closeAddClassModal();
+      loadCalendarClasses();
+    } catch(e) { alert('Error al guardar: ' + e.message); }
+  };
+
+  function demoClaases() {
+    const now = new Date();
+    return [
+      { id:'d1', title:'Clase de Grammar — Conditionals', startTime: new Date(now - 2*86400000), endTime: new Date(now - 2*86400000 + 3600000), durationMin:60, studentName:'Paradise Choll', status:'done' },
+      { id:'d2', title:'Clase de Vocabulary — Business', startTime: new Date(now - 7*86400000), endTime: new Date(now - 7*86400000 + 3600000), durationMin:60, studentName:'Santiago Silberstein', status:'done' },
+      { id:'d3', title:'Clase de Speaking Practice',     startTime: new Date(now + 2*86400000), endTime: new Date(now + 2*86400000 + 3600000), durationMin:60, studentName:'Paradise Choll', status:'pending' },
+    ];
+  }
+
+  // ══ END CLASES SYSTEM ══
   let allUsers = [];
 
   window.loadAdminData = async () => {
@@ -6111,10 +6812,12 @@ ${innerHtml}
       const initials = (u.name || u.email || '?')[0].toUpperCase();
       const date = u.registeredAt?.toDate ? u.registeredAt.toDate().toLocaleDateString('es-AR') : '—';
       const provider = u.provider === 'google.com' ? '🔵 Google' : '📧 Email';
+      const lvl = u.placementLevel ? `<span class="pt-badge">${u.placementLevel}</span>` : `<span style="color:var(--muted);font-size:11px;">Sin test</span>`;
       return `<tr>
         <td><div class="tbl-name"><div class="tbl-avatar">${u.photo ? `<img src="${u.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : initials}</div><div><div style="font-weight:600;color:var(--navy);">${u.name || '—'}</div><div style="font-size:11px;color:var(--muted);">${u.email}</div></div></div></td>
         <td>${provider}</td>
         <td><span class="tbl-badge ${u.status === 'active' ? 'active' : 'inactive'}">${u.status === 'active' ? 'Activo' : 'Inactivo'}</span></td>
+        <td>${lvl}</td>
         <td style="color:var(--muted);font-size:12px;">${date}</td>
         <td style="color:var(--muted);font-size:12px;">${u.lastLogin?.toDate ? u.lastLogin.toDate().toLocaleDateString('es-AR') : '—'}</td>
         <td>
@@ -6129,7 +6832,7 @@ ${innerHtml}
     document.getElementById('admin-table-body').innerHTML = `
       <table class="admin-tbl">
         <thead><tr>
-          <th>Alumno</th><th>Método</th><th>Estado</th><th>Registro</th><th>Último acceso</th><th>Acciones</th>
+          <th>Alumno</th><th>Método</th><th>Estado</th><th>Nivel</th><th>Registro</th><th>Último acceso</th><th>Acciones</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>`;
@@ -6162,13 +6865,18 @@ ${innerHtml}
   };
 
   window.switchAdminTab = (tab) => {
-    const tabs = ['alumnos','archivos','performance'];
+    const tabs = ['alumnos','archivos','performance','clases'];
     document.querySelectorAll('.admin-tab-btn').forEach((b,i) => {
       b.classList.toggle('active', tabs[i] === tab);
     });
     document.getElementById('admin-tab-alumnos').style.display      = tab === 'alumnos'     ? '' : 'none';
     document.getElementById('admin-tab-archivos').style.display     = tab === 'archivos'    ? '' : 'none';
     document.getElementById('admin-tab-performance').style.display  = tab === 'performance' ? '' : 'none';
+    document.getElementById('admin-tab-clases').style.display       = tab === 'clases'      ? '' : 'none';
+    if (tab === 'performance') renderPerfStudentList();
+    if (tab === 'archivos')    loadAdminFiles();
+    if (tab === 'clases')      loadCalendarClasses();
+  };
     if (tab === 'archivos')    loadAllSentFiles();
     if (tab === 'performance') renderPerfStudentList();
   };
@@ -6406,7 +7114,26 @@ ${innerHtml}
       try {
         const { getFirestore, doc, getDoc }
           = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-        const snap = await getDoc(doc(getFirestore(app), 'performance', uid));
+        const db = getFirestore(app);
+        const snap = await getDoc(doc(db, 'performance', uid));
+        // Load placement data too
+        const ptSnap = await getDoc(doc(db, 'placement', uid));
+        if (ptSnap.exists()) {
+          const pt = ptSnap.data();
+          // Show placement banner in modal header area
+          const existing = document.getElementById('pt-info-banner');
+          if (!existing) {
+            const banner = document.createElement('div');
+            banner.id = 'pt-info-banner';
+            banner.style.cssText = 'background:rgba(47,168,208,0.1);border:1px solid rgba(47,168,208,0.25);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:rgba(255,255,255,0.7);display:flex;gap:16px;align-items:center;flex-wrap:wrap;';
+            banner.innerHTML = `<span style="font-size:18px;">📋</span><span><strong style="color:var(--sky);">Examen de nivelación:</strong> Nivel detectado <strong style="color:white;">${pt.level}</strong> · Puntaje ${pt.score}/${pt.total} · Grammar ${pt.grammarScore} · Vocab ${pt.vocabScore} · Reading ${pt.readingScore}</span>`;
+            const perfBody = document.querySelector('.perf-modal-body');
+            if (perfBody) perfBody.insertBefore(banner, perfBody.firstChild);
+          }
+          // Pre-fill level if not set
+          const lvEl = document.getElementById('ps-level');
+          if (lvEl && !lvEl.value && pt.level) lvEl.value = pt.level;
+        }
         if (snap.exists()) {
           const d = snap.data();
           ['speaking','writing','listening','grammar'].forEach(s => {
