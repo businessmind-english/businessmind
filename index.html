@@ -3045,6 +3045,9 @@
   </div>
 </div>
 
+  </div><!-- /.admin-body -->
+</div><!-- /#admin-dashboard -->
+
 <!-- ══════════════════════════════════════════
      PLACEMENT TEST MODAL
 ══════════════════════════════════════════ -->
@@ -6285,15 +6288,19 @@ ${innerHtml}
 
   function friendlyError(code) {
     const map = {
-      'auth/user-not-found':        'No existe una cuenta con ese email',
-      'auth/wrong-password':        'Contraseña incorrecta',
-      'auth/email-already-in-use':  'Ese email ya está registrado',
-      'auth/invalid-email':         'El email no es válido',
-      'auth/weak-password':         'La contraseña es muy débil',
-      'auth/popup-closed-by-user':  'Cerraste la ventana de Google',
-      'auth/network-request-failed':'Error de conexión',
+      'auth/user-not-found':             'No existe una cuenta con ese email',
+      'auth/wrong-password':             'Contraseña incorrecta',
+      'auth/invalid-credential':         'Email o contraseña incorrectos',
+      'auth/invalid-login-credentials':  'Email o contraseña incorrectos',
+      'auth/email-already-in-use':       'Ese email ya está registrado',
+      'auth/invalid-email':              'El email no es válido',
+      'auth/weak-password':              'La contraseña debe tener al menos 6 caracteres',
+      'auth/popup-closed-by-user':       'Cerraste la ventana de Google',
+      'auth/network-request-failed':     'Error de conexión. Verificá tu internet',
+      'auth/too-many-requests':          'Demasiados intentos. Esperá unos minutos',
+      'auth/user-disabled':              'Esta cuenta fue deshabilitada. Contactá al administrador',
     };
-    return map[code] || 'Ocurrió un error. Intentá de nuevo.';
+    return map[code] || 'Ocurrió un error (código: ' + code + ')';
   }
 
   // ══════════════════════════════════════════
@@ -7328,8 +7335,11 @@ ${innerHtml}
     }
   }
   // Intentar al abrir el modal
-  const origOpen = window.openAuthModal;
-  window.openAuthModal = () => { syncAuthLogo(); origOpen(); };
+  window.openAuthModal = () => {
+    syncAuthLogo();
+    const overlay = document.getElementById('auth-modal-overlay');
+    if (overlay) { overlay.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  };
   // También al cargar por si ya tiene src
   window.addEventListener('load', syncAuthLogo);
 </script>
@@ -7439,3 +7449,4 @@ service firebase.storage {
   </div>
 </div>
 </body>
+</html>
