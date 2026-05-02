@@ -2463,6 +2463,8 @@
     .tbl-action-btn.file:hover  { background:rgba(47,168,208,0.2); }
     .tbl-action-btn.perf  { color:var(--green); border-color:rgba(91,175,42,0.3); background:rgba(91,175,42,0.08); }
     .tbl-action-btn.perf:hover  { background:rgba(91,175,42,0.2); }
+    .tbl-action-btn.del   { color:#e05555; border-color:rgba(220,50,50,0.3); background:rgba(220,50,50,0.08); }
+    .tbl-action-btn.del:hover   { background:rgba(220,50,50,0.22); }
 
     /* ══════════════════════════════════════════
        STUDENT – Files & Performance from Firestore
@@ -3126,11 +3128,8 @@
 
     <p class="auth-error" id="auth-error-msg"></p>
 
-    <!-- Acceso admin discreto -->
     <div style="text-align:center; margin-top:16px;">
-      <button onclick="signInWithGoogle()" style="background:none;border:none;color:rgba(255,255,255,0.18);font-size:11px;cursor:pointer;font-family:inherit;letter-spacing:0.05em;transition:color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.4)'" onmouseout="this.style.color='rgba(255,255,255,0.18)'">
-        acceso administrador
-      </button>
+      <button onclick="signInWithGoogle()" style="background:none;border:none;color:rgba(255,255,255,0.18);font-size:11px;cursor:pointer;font-family:inherit;letter-spacing:0.05em;transition:color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.4)'" onmouseout="this.style.color='rgba(255,255,255,0.18)'">acceso administrador</button>
     </div>
   </div>
 </div>
@@ -6874,6 +6873,7 @@ ${innerHtml}
           <div class="tbl-actions">
             <button class="tbl-action-btn file" onclick="openSendFileModal('${u.id}','${(u.name||u.email).replace(/'/g,'&apos;')}')">📎 Archivo</button>
             <button class="tbl-action-btn perf" onclick="openPerfModal('${u.id}','${(u.name||u.email).replace(/'/g,'&apos;')}')">📈 Performance</button>
+            <button class="tbl-action-btn del" onclick="confirmDeleteAlumno('${u.id}','${(u.name||u.email).replace(/'/g,'&apos;')}')">🗑️ Eliminar</button>
           </div>
         </td>
       </tr>`;
@@ -6905,6 +6905,36 @@ ${innerHtml}
       document.getElementById('kpi-bar-total').style.width  = '80%';
       document.getElementById('kpi-bar-active').style.width = Math.round(active/total*100) + '%';
       document.getElementById('kpi-bar-google').style.width = Math.round(google/total*100) + '%';
+    }
+  }
+
+  window.confirmDeleteAlumno = (uid, name) => {
+    if (!confirm(`¿Eliminar a ${name} del sistema?
+
+Esto borrará su registro en Firestore.
+Su cuenta de autenticación seguirá existiendo en Firebase Auth.`)) return;
+    deleteAlumno(uid, name);
+  };
+
+  async function deleteAlumno(uid, name) {
+    try {
+      const { getFirestore, doc, deleteDoc, collection, getDocs, query, where } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const db = getFirestore(app);
+
+      // Borrar perfil de usuario
+      await deleteDoc(doc(db, 'users', uid));
+
+      // Borrar archivos enviados al alumno
+      const filesSnap = await getDocs(query(collection(db, 'student_files'), where('studentUid', '==', uid)));
+      for (const d of filesSnap.docs) await deleteDoc(d.ref);
+
+      // Borrar performance
+      try { await deleteDoc(doc(db, 'performance', uid)); } catch(e) {}
+
+      showToast(`✅ ${name} eliminado correctamente`);
+      loadAdminUsers(); // recargar tabla
+    } catch(e) {
+      showToast('❌ Error al eliminar: ' + e.message);
     }
   }
 
