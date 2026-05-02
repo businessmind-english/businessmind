@@ -2226,7 +2226,7 @@
     .admin-welcome p { color: rgba(255,255,255,0.5); font-size:13px; }
 
     /* Admin KPIs */
-    .admin-kpis { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 32px; }
+    .admin-kpis { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 20px; }
     .admin-kpi {
       background: rgba(255,255,255,0.05); border: 1px solid rgba(47,168,208,0.18);
       border-radius: 16px; padding: 22px 24px; position: relative; overflow: hidden;
@@ -2237,7 +2237,53 @@
     .admin-kpi-value { font-family:'Playfair Display',serif; font-size:34px; font-weight:900; color:white; line-height:1; }
     .admin-kpi-value span { color: var(--sky); }
     .admin-kpi-label { font-size:11px; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.12em; margin-top:6px; }
+    .admin-kpi-sub { font-size:11px; color:rgba(255,255,255,0.3); margin-top:4px; }
+    .admin-kpi-sub.up { color:var(--green-light); }
+    .admin-kpi-sub.warn { color:#f59e0b; }
     .admin-kpi-bar { position:absolute; bottom:0; left:0; height:3px; background: linear-gradient(90deg, var(--green), var(--sky)); border-radius:0 0 16px 16px; }
+
+    /* Second KPI row — engagement */
+    .admin-kpis-row2 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
+    .admin-kpi2 {
+      background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+      border-radius:14px; padding:16px 20px; position:relative; overflow:hidden;
+    }
+    .admin-kpi2-label { font-size:10px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:8px; }
+    .admin-kpi2-value { font-size:26px; font-weight:700; color:white; font-family:'Playfair Display',serif; line-height:1; }
+    .admin-kpi2-sub { font-size:11px; color:rgba(255,255,255,0.3); margin-top:4px; }
+    .admin-kpi2-sub.up { color:var(--green-light); }
+    .admin-kpi2-sub.warn { color:#f59e0b; }
+    .admin-kpi2-bar { height:4px; background:rgba(255,255,255,0.07); border-radius:4px; margin-top:10px; overflow:hidden; }
+    .admin-kpi2-fill { height:100%; border-radius:4px; transition:width 1s ease; }
+
+    /* Third row — breakdown panels */
+    .admin-metrics-row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:20px; }
+    .admin-metric-panel {
+      background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+      border-radius:14px; padding:18px 20px;
+    }
+    .admin-metric-panel-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:rgba(255,255,255,0.5); margin-bottom:14px; }
+    .amp-row { display:flex; align-items:center; justify-content:space-between; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:12px; }
+    .amp-row:last-child { border-bottom:none; }
+    .amp-name { color:rgba(255,255,255,0.7); display:flex; align-items:center; gap:8px; }
+    .amp-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .amp-badge {
+      font-size:10px; font-weight:700; padding:2px 9px; border-radius:100px;
+    }
+    .amp-badge.green { background:rgba(91,175,42,0.15); color:var(--green-light); border:1px solid rgba(91,175,42,0.25); }
+    .amp-badge.amber { background:rgba(245,158,11,0.15); color:#f59e0b; border:1px solid rgba(245,158,11,0.25); }
+    .amp-badge.red   { background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.25); }
+    .amp-badge.sky   { background:rgba(47,168,208,0.15); color:var(--sky-light); border:1px solid rgba(47,168,208,0.25); }
+    .amp-badge.purple{ background:rgba(139,92,246,0.15); color:#a78bfa; border:1px solid rgba(139,92,246,0.25); }
+    .amp-bar-wrap { width:70px; height:5px; background:rgba(255,255,255,0.07); border-radius:4px; overflow:hidden; }
+    .amp-bar-fill { height:100%; border-radius:4px; background:var(--sky); }
+
+    /* Alerts strip */
+    .admin-alerts { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:4px 0; margin-bottom:24px; }
+    .admin-alert-row { display:flex; align-items:center; justify-content:space-between; padding:11px 20px; border-bottom:1px solid rgba(255,255,255,0.04); font-size:12px; color:rgba(255,255,255,0.65); gap:12px; }
+    .admin-alert-row:last-child { border-bottom:none; }
+    .admin-alert-row strong { color:white; }
+    .admin-section-title { font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin:0 0 10px; }
 
     /* Admin tabs */
     .admin-tabs { display:flex; gap:4px; margin-bottom:28px; background:rgba(255,255,255,0.05); padding:4px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); width:fit-content; }
@@ -2801,32 +2847,105 @@
       <p id="admin-date-label">Gestioná alumnos, cursos y registros en tiempo real</p>
     </div>
 
-    <!-- KPIs -->
+    <!-- KPIs Row 1: negocio -->
+    <div class="admin-section-title">📊 Métricas de negocio</div>
     <div class="admin-kpis">
       <div class="admin-kpi">
         <div class="admin-kpi-icon">👥</div>
         <div class="admin-kpi-value"><span id="kpi-total">—</span></div>
         <div class="admin-kpi-label">Alumnos registrados</div>
+        <div class="admin-kpi-sub" id="kpi-sub-total">—</div>
         <div class="admin-kpi-bar" id="kpi-bar-total" style="width:0%"></div>
+      </div>
+      <div class="admin-kpi">
+        <div class="admin-kpi-icon">📅</div>
+        <div class="admin-kpi-value"><span id="kpi-clases-mes">—</span></div>
+        <div class="admin-kpi-label">Clases este mes</div>
+        <div class="admin-kpi-sub" id="kpi-sub-clases">Online · Presencial</div>
+        <div class="admin-kpi-bar" id="kpi-bar-clases" style="width:0%;background:var(--sky)"></div>
       </div>
       <div class="admin-kpi">
         <div class="admin-kpi-icon">✅</div>
         <div class="admin-kpi-value"><span id="kpi-active">—</span></div>
         <div class="admin-kpi-label">Activos este mes</div>
+        <div class="admin-kpi-sub up" id="kpi-sub-active">—</div>
         <div class="admin-kpi-bar" id="kpi-bar-active" style="width:0%;background:var(--green)"></div>
       </div>
       <div class="admin-kpi">
         <div class="admin-kpi-icon">📅</div>
         <div class="admin-kpi-value"><span id="kpi-new">—</span></div>
         <div class="admin-kpi-label">Nuevos esta semana</div>
+        <div class="admin-kpi-sub" id="kpi-sub-new">—</div>
         <div class="admin-kpi-bar" id="kpi-bar-new" style="width:0%;background:var(--sky)"></div>
       </div>
-      <div class="admin-kpi">
-        <div class="admin-kpi-icon">🌍</div>
-        <div class="admin-kpi-value"><span id="kpi-google">—</span></div>
-        <div class="admin-kpi-label">Login con Google</div>
-        <div class="admin-kpi-bar" id="kpi-bar-google" style="width:0%;background:var(--sky)"></div>
+    </div>
+
+    <!-- KPIs Row 2: engagement -->
+    <div class="admin-section-title">🎯 Engagement</div>
+    <div class="admin-kpis-row2" style="grid-template-columns:repeat(3,1fr);">
+      <div class="admin-kpi2">
+        <div class="admin-kpi2-label">Asistencia promedio</div>
+        <div class="admin-kpi2-value" id="kpi2-asistencia">—</div>
+        <div class="admin-kpi2-sub up" id="kpi2-sub-asistencia">Calculando...</div>
+        <div class="admin-kpi2-bar"><div class="admin-kpi2-fill" id="kpi2-fill-asistencia" style="width:0%;background:var(--green)"></div></div>
       </div>
+      <div class="admin-kpi2">
+        <div class="admin-kpi2-label">Homeworks entregados</div>
+        <div class="admin-kpi2-value" id="kpi2-hw">—</div>
+        <div class="admin-kpi2-sub warn" id="kpi2-sub-hw">Cargando...</div>
+        <div class="admin-kpi2-bar"><div class="admin-kpi2-fill" id="kpi2-fill-hw" style="width:0%;background:#f59e0b"></div></div>
+      </div>
+      <div class="admin-kpi2">
+        <div class="admin-kpi2-label">Próximas clases</div>
+        <div class="admin-kpi2-value" id="kpi2-proximas">—</div>
+        <div class="admin-kpi2-sub" id="kpi2-sub-proximas">Esta semana</div>
+        <div class="admin-kpi2-bar"><div class="admin-kpi2-fill" id="kpi2-fill-proximas" style="width:0%;background:#8b5cf6"></div></div>
+      </div>
+    </div>
+
+    <!-- Row 3: breakdowns -->
+    <div class="admin-section-title">📋 Distribución</div>
+    <div class="admin-metrics-row3">
+      <!-- Estado de alumnos -->
+      <div class="admin-metric-panel">
+        <div class="admin-metric-panel-title">Estado de alumnos</div>
+        <div class="amp-row"><span class="amp-name"><span class="amp-dot" style="background:var(--green)"></span>Activos</span><span class="amp-badge green" id="amp-activos">—</span></div>
+        <div class="amp-row"><span class="amp-name"><span class="amp-dot" style="background:#f59e0b"></span>En pausa</span><span class="amp-badge amber" id="amp-pausa">—</span></div>
+        <div class="amp-row"><span class="amp-name"><span class="amp-dot" style="background:#ef4444"></span>Sin clases &gt;30 días</span><span class="amp-badge red" id="amp-inactivos">—</span></div>
+        <div class="amp-row"><span class="amp-name"><span class="amp-dot" style="background:var(--sky)"></span>Online</span><span class="amp-badge sky" id="amp-online">—</span></div>
+        <div class="amp-row"><span class="amp-name"><span class="amp-dot" style="background:#8b5cf6"></span>Presencial</span><span class="amp-badge purple" id="amp-presencial">—</span></div>
+      </div>
+
+      <!-- Nivel de alumnos -->
+      <div class="admin-metric-panel">
+        <div class="admin-metric-panel-title">Nivel MCER</div>
+        <div class="amp-row"><span class="amp-name">A1 / A2</span><div style="display:flex;align-items:center;gap:8px;"><div class="amp-bar-wrap"><div class="amp-bar-fill" id="amp-bar-a" style="width:0%"></div></div><span style="color:rgba(255,255,255,0.5);font-size:11px;" id="amp-cnt-a">—</span></div></div>
+        <div class="amp-row"><span class="amp-name">B1 / B2</span><div style="display:flex;align-items:center;gap:8px;"><div class="amp-bar-wrap"><div class="amp-bar-fill" id="amp-bar-b" style="width:0%"></div></div><span style="color:rgba(255,255,255,0.5);font-size:11px;" id="amp-cnt-b">—</span></div></div>
+        <div class="amp-row"><span class="amp-name">C1 / C2</span><div style="display:flex;align-items:center;gap:8px;"><div class="amp-bar-wrap"><div class="amp-bar-fill" id="amp-bar-c" style="width:0%"></div></div><span style="color:rgba(255,255,255,0.5);font-size:11px;" id="amp-cnt-c">—</span></div></div>
+        <div class="amp-row"><span class="amp-name">Sin test</span><div style="display:flex;align-items:center;gap:8px;"><div class="amp-bar-wrap"><div class="amp-bar-fill" id="amp-bar-st" style="width:0%;background:rgba(255,255,255,0.2)"></div></div><span style="color:rgba(255,255,255,0.5);font-size:11px;" id="amp-cnt-st">—</span></div></div>
+      </div>
+
+      <!-- Clases: online vs presencial trend -->
+      <div class="admin-metric-panel">
+        <div class="admin-metric-panel-title">Modalidad · este mes</div>
+        <div style="display:flex;gap:12px;margin-bottom:16px;">
+          <div style="flex:1;text-align:center;background:rgba(47,168,208,0.08);border-radius:10px;padding:12px 8px;">
+            <div style="font-size:22px;font-weight:700;color:var(--sky);font-family:'Playfair Display',serif;" id="amp-online-count">—</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Online</div>
+          </div>
+          <div style="flex:1;text-align:center;background:rgba(139,92,246,0.08);border-radius:10px;padding:12px 8px;">
+            <div style="font-size:22px;font-weight:700;color:#a78bfa;font-family:'Playfair Display',serif;" id="amp-presencial-count">—</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Presencial</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.3);text-align:center;" id="amp-modalidad-note">Basado en clases registradas</div>
+      </div>
+    </div>
+
+    <!-- Alertas -->
+    <div class="admin-section-title">⚠️ Alertas rápidas</div>
+    <div class="admin-alerts" id="admin-alerts-body">
+      <div class="admin-alert-row" style="color:rgba(255,255,255,0.3);justify-content:center;">Cargando alertas...</div>
     </div>
 
     <!-- Tabs -->
@@ -7106,27 +7225,46 @@ ${innerHtml}
   async function autoProcessPastClasses() {
     if (DEMO_MODE) return;
     try {
-      const { getFirestore, collection, getDocs, doc, updateDoc, getDoc, setDoc, serverTimestamp, query, where }
+      const { getFirestore, collection, getDocs, doc, updateDoc, setDoc, serverTimestamp, query, where }
         = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-      const db   = getFirestore(app);
-      const now  = new Date();
-      const snap = await getDocs(query(collection(db, 'classes'), where('status', '==', 'pending')));
-      for (const docSnap of snap.docs) {
+      const db  = getFirestore(app);
+      const now = new Date();
+
+      // 1. Procesar clases pendientes que ya pasaron
+      const pendingSnap = await getDocs(query(collection(db, 'classes'), where('status', '==', 'pending')));
+      const affectedUids = new Set();
+      for (const docSnap of pendingSnap.docs) {
         const cls = docSnap.data();
         const end = cls.endTime instanceof Date ? cls.endTime
           : new Date(cls.endTime?.seconds ? cls.endTime.seconds * 1000 : cls.endTime);
-        if (end > now) continue; // still in future
+        if (end > now) continue;
         const newStatus = (cls.durationMin || 0) >= MIN_CLASS_MINUTES ? 'done' : 'missed';
         await updateDoc(doc(db, 'classes', docSnap.id), { status: newStatus, processedAt: serverTimestamp() });
-        // If done and has student → increment classes counter
-        if (newStatus === 'done' && cls.studentUid) {
-          const perfRef  = doc(db, 'performance', cls.studentUid);
-          const perfSnap = await getDoc(perfRef);
-          const current  = perfSnap.exists() ? (perfSnap.data().classes || 0) : 0;
-          await setDoc(perfRef, { classes: current + 1 }, { merge: true });
-        }
+        if (cls.studentUid) affectedUids.add(cls.studentUid);
+      }
+
+      // 2. Recalcular asistencia real de cada alumno afectado
+      for (const uid of affectedUids) {
+        await recalcStudentAttendance(db, uid);
       }
     } catch(e) { console.warn('autoProcess:', e.message); }
+  }
+
+  // Recalcula asistencia % de un alumno: clases_realizadas / clases_pasadas * 100
+  async function recalcStudentAttendance(db, uid) {
+    try {
+      const { collection, getDocs, doc, setDoc, query, where }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const snap    = await getDocs(query(collection(db, 'classes'), where('studentUid', '==', uid)));
+      const pasadas = snap.docs.map(d => d.data()).filter(c => c.status === 'done' || c.status === 'missed');
+      const realizadas = pasadas.filter(c => c.status === 'done').length;
+      const total      = pasadas.length;
+      const pct        = total > 0 ? Math.round(realizadas / total * 100) : 0;
+      // Guardar en performance/{uid}
+      await setDoc(doc(db, 'performance', uid), { classes: realizadas, attendance: pct }, { merge: true });
+      // Guardar en users/{uid} para que el KPI del admin lo lea directo
+      await setDoc(doc(db, 'users', uid), { attendance: pct, classesTotal: total, classesDone: realizadas }, { merge: true });
+    } catch(e) { console.warn('recalcStudentAttendance:', uid, e.message); }
   }
 
   function renderClasesTable(classes, body) {
@@ -7164,15 +7302,13 @@ ${innerHtml}
   window.markClassDone = async (classId, studentUid) => {
     if (!classId) return;
     try {
-      const { getFirestore, doc, updateDoc, getDoc, setDoc, serverTimestamp }
+      const { getFirestore, doc, updateDoc, serverTimestamp }
         = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
       const db = getFirestore(app);
       await updateDoc(doc(db, 'classes', classId), { status: 'done', processedAt: serverTimestamp() });
+      // Recalcular asistencia real del alumno desde todas sus clases
       if (studentUid) {
-        const perfRef  = doc(db, 'performance', studentUid);
-        const perfSnap = await getDoc(perfRef);
-        const current  = perfSnap.exists() ? (perfSnap.data().classes || 0) : 0;
-        await setDoc(perfRef, { classes: current + 1 }, { merge: true });
+        await recalcStudentAttendance(db, studentUid);
       }
       loadCalendarClasses();
     } catch(e) { alert('Error: ' + e.message); }
@@ -7264,6 +7400,7 @@ ${innerHtml}
       allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderAdminTable(allUsers);
       updateAdminKpis(allUsers);
+      loadEngagementKpis();
     } catch(e) {
       document.getElementById('admin-table-body').innerHTML = `<div class="admin-empty">No se pudieron cargar los datos.<br><span style="font-size:11px;color:var(--muted);">${e.message}</span></div>`;
     }
@@ -7333,15 +7470,144 @@ ${innerHtml}
       const d = u.registeredAt.toDate();
       return (Date.now() - d.getTime()) < 7 * 24 * 60 * 60 * 1000;
     }).length;
-    const google  = users.filter(u => u.provider === 'google.com').length;
+
+    // Row 1
     document.getElementById('kpi-total').textContent  = total  || '0';
     document.getElementById('kpi-active').textContent = active || '0';
     document.getElementById('kpi-new').textContent    = week   || '0';
-    document.getElementById('kpi-google').textContent = google || '0';
+    const pctActive = total ? Math.round(active/total*100) : 0;
+    document.getElementById('kpi-sub-total').textContent  = `${active} activos · ${total - active} inactivos`;
+    document.getElementById('kpi-sub-active').textContent = pctActive + '% del total';
+    document.getElementById('kpi-sub-active').className   = 'admin-kpi-sub' + (pctActive >= 70 ? ' up' : ' warn');
+    document.getElementById('kpi-sub-new').textContent    = week > 0 ? `↑ ${week} esta semana` : 'Sin nuevos esta semana';
     if (total) {
-      document.getElementById('kpi-bar-total').style.width  = '80%';
-      document.getElementById('kpi-bar-active').style.width = Math.round(active/total*100) + '%';
-      document.getElementById('kpi-bar-google').style.width = Math.round(google/total*100) + '%';
+      document.getElementById('kpi-bar-total').style.width  = '85%';
+      document.getElementById('kpi-bar-active').style.width = pctActive + '%';
+      document.getElementById('kpi-bar-new').style.width    = Math.min(week * 15, 100) + '%';
+    }
+
+    // Row 2: asistencia — calculada automáticamente desde clases realizadas vs. pasadas
+    // users[].attendance es seteado por recalcStudentAttendance() cada vez que una clase se marca done
+    const usersWithClasses = users.filter(u => u.classesTotal > 0);
+    const avgAtt = usersWithClasses.length
+      ? Math.round(usersWithClasses.reduce((s, u) => s + (u.attendance || 0), 0) / usersWithClasses.length)
+      : 0;
+    const totalDone   = users.reduce((s, u) => s + (u.classesDone   || 0), 0);
+    const totalPasadas = users.reduce((s, u) => s + (u.classesTotal || 0), 0);
+    document.getElementById('kpi2-asistencia').textContent = usersWithClasses.length ? avgAtt + '%' : '—';
+    document.getElementById('kpi2-fill-asistencia').style.width = avgAtt + '%';
+    const attLabel = usersWithClasses.length
+      ? (avgAtt >= 80 ? '↑ Buen nivel' : '↓ Bajo promedio') + ` · ${totalDone}/${totalPasadas} clases`
+      : 'Se calcula automáticamente';
+    document.getElementById('kpi2-sub-asistencia').textContent = attLabel;
+    document.getElementById('kpi2-sub-asistencia').className = 'admin-kpi2-sub' + (avgAtt >= 80 ? ' up' : usersWithClasses.length ? ' warn' : '');
+
+    // Row 3 breakdowns: estado
+    const paused   = users.filter(u => u.status === 'paused').length;
+    const now = Date.now();
+    const inactive = users.filter(u => {
+      if (!u.lastLogin?.toDate) return false;
+      return (now - u.lastLogin.toDate().getTime()) > 30 * 24 * 60 * 60 * 1000;
+    }).length;
+    const online     = users.filter(u => u.modality === 'online' || !u.modality).length;
+    const presencial = users.filter(u => u.modality === 'presencial').length;
+
+    document.getElementById('amp-activos').textContent    = active;
+    document.getElementById('amp-pausa').textContent      = paused;
+    document.getElementById('amp-inactivos').textContent  = inactive;
+    document.getElementById('amp-online').textContent     = online;
+    document.getElementById('amp-presencial').textContent = presencial;
+    document.getElementById('amp-online-count').textContent     = online;
+    document.getElementById('amp-presencial-count').textContent = presencial;
+    document.getElementById('amp-modalidad-note').textContent = `${total} alumnos · ${online} online · ${presencial} presencial`;
+
+    // Niveles
+    const levels = { a:0, b:0, c:0, st:0 };
+    users.forEach(u => {
+      const lv = (u.level || '').toUpperCase();
+      if (lv.startsWith('A')) levels.a++;
+      else if (lv.startsWith('B')) levels.b++;
+      else if (lv.startsWith('C')) levels.c++;
+      else levels.st++;
+    });
+    const maxLv = Math.max(levels.a, levels.b, levels.c, levels.st, 1);
+    document.getElementById('amp-cnt-a').textContent  = levels.a;
+    document.getElementById('amp-cnt-b').textContent  = levels.b;
+    document.getElementById('amp-cnt-c').textContent  = levels.c;
+    document.getElementById('amp-cnt-st').textContent = levels.st;
+    document.getElementById('amp-bar-a').style.width  = Math.round(levels.a/maxLv*100) + '%';
+    document.getElementById('amp-bar-b').style.width  = Math.round(levels.b/maxLv*100) + '%';
+    document.getElementById('amp-bar-c').style.width  = Math.round(levels.c/maxLv*100) + '%';
+    document.getElementById('amp-bar-st').style.width = Math.round(levels.st/maxLv*100) + '%';
+
+    // Alertas
+    const alerts = [];
+    if (inactive > 0) alerts.push({ icon:'⚠️', text:`<strong>${inactive} alumno${inactive>1?'s':''}</strong> sin clases hace más de 30 días`, badge:'amber', label:'Inactivo' });
+    if (levels.st > 0) alerts.push({ icon:'📝', text:`<strong>${levels.st} alumno${levels.st>1?'s':''}</strong> sin test de nivel asignado`, badge:'sky', label:'Pendiente' });
+    if (paused > 0) alerts.push({ icon:'⏸️', text:`<strong>${paused} alumno${paused>1?'s':''}</strong> en pausa`, badge:'amber', label:'En pausa' });
+    const weekActive = users.filter(u => {
+      if (!u.lastLogin?.toDate) return false;
+      return (now - u.lastLogin.toDate().getTime()) < 7 * 24 * 60 * 60 * 1000;
+    }).length;
+    if (total > 0 && weekActive === 0) alerts.push({ icon:'📭', text:'Ningún alumno inició sesión esta semana', badge:'red', label:'Atención' });
+
+    const alertsBody = document.getElementById('admin-alerts-body');
+    if (alerts.length === 0) {
+      alertsBody.innerHTML = `<div class="admin-alert-row" style="justify-content:center;color:rgba(255,255,255,0.4);">✅ Todo en orden — sin alertas activas</div>`;
+    } else {
+      const badgeColors = { amber:'background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3)', sky:'background:rgba(47,168,208,0.15);color:var(--sky-light);border:1px solid rgba(47,168,208,0.3)', red:'background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)' };
+      alertsBody.innerHTML = alerts.map(a =>
+        `<div class="admin-alert-row">${a.icon} ${a.text}<span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:100px;white-space:nowrap;${badgeColors[a.badge]||''}">${a.label}</span></div>`
+      ).join('');
+    }
+  }
+
+  // ── Load engagement KPIs async (files + homeworks) ──────────────────
+  async function loadEngagementKpis() {
+    if (DEMO_MODE) {
+      document.getElementById('kpi2-hw').textContent           = '—';
+      document.getElementById('kpi2-proximas').textContent     = '—';
+      document.getElementById('kpi-clases-mes').textContent    = '—';
+      document.getElementById('kpi-sub-clases').textContent    = 'Disponible en modo Firebase';
+      return;
+    }
+    try {
+      const { getFirestore, collection, getDocs, query, where, orderBy, Timestamp }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const db  = getFirestore(app);
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      // Homeworks este mes
+      const hwSnap = await getDocs(collection(db, 'homeworks'));
+      const hwDocs = hwSnap.docs.map(d => d.data());
+      const hwMes  = hwDocs.filter(h => h.assignedAt?.toDate && h.assignedAt.toDate() >= startOfMonth);
+      const hwDone = hwMes.filter(h => h.status === 'done' || h.status === 'entregado').length;
+      const hwPct  = hwMes.length ? Math.round(hwDone / hwMes.length * 100) : 0;
+      document.getElementById('kpi2-hw').textContent      = hwMes.length ? hwPct + '%' : '—';
+      document.getElementById('kpi2-fill-hw').style.width = hwPct + '%';
+      const hwPending = hwMes.length - hwDone;
+      document.getElementById('kpi2-sub-hw').textContent  = hwPending > 0 ? `${hwPending} sin entregar` : hwMes.length > 0 ? '✓ Todos entregados' : 'Sin homeworks este mes';
+      document.getElementById('kpi2-sub-hw').className    = 'admin-kpi2-sub' + (hwPct >= 75 ? ' up' : ' warn');
+
+      // Clases este mes + próximas
+      const clasesSnap = await getDocs(collection(db, 'classes'));
+      const clasesDocs = clasesSnap.docs.map(d => d.data());
+      const clasesMes  = clasesDocs.filter(c => c.date?.toDate && c.date.toDate() >= startOfMonth && c.date.toDate() <= now);
+      const clasesFut  = clasesDocs.filter(c => c.date?.toDate && c.date.toDate() > now);
+      const onlineC    = clasesMes.filter(c => c.modality === 'online' || !c.modality).length;
+      const presC      = clasesMes.filter(c => c.modality === 'presencial').length;
+
+      document.getElementById('kpi-clases-mes').textContent  = clasesMes.length || '0';
+      document.getElementById('kpi-sub-clases').textContent  = `Online: ${onlineC} · Presencial: ${presC}`;
+      document.getElementById('kpi-bar-clases').style.width  = Math.min(clasesMes.length * 3, 100) + '%';
+
+      document.getElementById('kpi2-proximas').textContent       = clasesFut.length || '0';
+      document.getElementById('kpi2-sub-proximas').textContent   = `Esta semana: ${clasesFut.filter(c => c.date.toDate() - now < 7*24*3600*1000).length}`;
+      document.getElementById('kpi2-fill-proximas').style.width  = Math.min(clasesFut.length * 8, 100) + '%';
+
+    } catch(e) {
+      console.warn('loadEngagementKpis error:', e);
     }
   }
 
