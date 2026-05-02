@@ -6932,7 +6932,7 @@ Su cuenta de autenticación seguirá existiendo en Firebase Auth.`)) return;
       try { await deleteDoc(doc(db, 'performance', uid)); } catch(e) {}
 
       showToast(`✅ ${name} eliminado correctamente`);
-      loadAdminUsers(); // recargar tabla
+      loadAdminData(); // recargar tabla
     } catch(e) {
       showToast('❌ Error al eliminar: ' + e.message);
     }
