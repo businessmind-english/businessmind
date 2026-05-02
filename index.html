@@ -2089,6 +2089,15 @@
       align-items: center; justify-content: center; padding: 20px;
     }
     #placement-overlay.open { display: flex; }
+    @keyframes ptShake {
+      0%,100%{transform:translateX(0);}
+      15%{transform:translateX(-10px);}
+      30%{transform:translateX(10px);}
+      45%{transform:translateX(-8px);}
+      60%{transform:translateX(8px);}
+      75%{transform:translateX(-4px);}
+      90%{transform:translateX(4px);}
+    }
     .placement-modal {
       background: linear-gradient(160deg, #111d45 0%, #1B2B5E 100%);
       border: 1px solid rgba(47,168,208,0.25);
@@ -2785,6 +2794,8 @@
       <button class="admin-tab-btn" onclick="switchAdminTab('archivos')">📎 Archivos enviados</button>
       <button class="admin-tab-btn" onclick="switchAdminTab('performance')">📈 Performance</button>
       <button class="admin-tab-btn" onclick="switchAdminTab('clases')">📅 Clases</button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('homeworks')">✏️ Homeworks</button>
+      <button class="admin-tab-btn" onclick="switchAdminTab('cursos')">📚 Cursos</button>
     </div>
 
     <!-- Tabla alumnos (tab: alumnos) -->
@@ -2844,6 +2855,107 @@
         <div id="admin-clases-body">
           <div class="admin-loading">Hacé click en "Sincronizar Calendar" para cargar las clases...</div>
         </div>
+      </div>
+    </div>
+
+    <!-- Homeworks (tab: homeworks) -->
+    <div id="admin-tab-homeworks" style="display:none;">
+      <div class="admin-table-wrap">
+        <div class="admin-table-head" style="flex-wrap:wrap;gap:10px;">
+          <span class="admin-table-title">✏️ Homeworks asignados</span>
+          <button onclick="openAddHomeworkModal()" style="padding:8px 18px;background:var(--green);border:none;color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;">+ Asignar homework</button>
+        </div>
+        <div id="admin-hw-body">
+          <div class="admin-loading">Cargando homeworks...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cursos (tab: cursos) -->
+    <div id="admin-tab-cursos" style="display:none;">
+      <div class="admin-table-wrap">
+        <div class="admin-table-head" style="flex-wrap:wrap;gap:10px;">
+          <span class="admin-table-title">📚 Cursos asignados</span>
+          <button onclick="openAddCourseModal()" style="padding:8px 18px;background:var(--green);border:none;color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;">+ Asignar curso</button>
+        </div>
+        <div id="admin-courses-body">
+          <div class="admin-loading">Cargando cursos...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Homework Modal -->
+    <div id="add-hw-modal-overlay" style="display:none;position:fixed;inset:0;z-index:4000;background:rgba(10,15,40,0.9);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;">
+      <div style="background:linear-gradient(160deg,#111d45,#1B2B5E);border:1px solid rgba(47,168,208,0.25);border-radius:20px;width:100%;max-width:500px;padding:32px;position:relative;">
+        <button onclick="closeAddHwModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:18px;cursor:pointer;">✕</button>
+        <div style="font-size:16px;font-weight:700;color:white;margin-bottom:20px;">✏️ Asignar Homework</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <label style="font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:6px;">Alumno</label>
+            <select id="ahm-student" style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:white;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;">
+              <option value="">— Todos los alumnos —</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:6px;">Título del Homework</label>
+            <input id="ahm-title" type="text" placeholder="Ej: Write a formal email" style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:white;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:6px;">Tipo</label>
+              <select id="ahm-type" style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:white;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;">
+                <option value="writing">Writing</option>
+                <option value="speaking">Speaking</option>
+                <option value="grammar">Grammar</option>
+                <option value="listening">Listening</option>
+                <option value="reading">Reading</option>
+                <option value="vocab">Vocabulary</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:6px;">Fecha de entrega</label>
+              <input id="ahm-due" type="date" style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:white;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;">
+            </div>
+          </div>
+        </div>
+        <button onclick="saveHomework()" style="margin-top:20px;width:100%;padding:12px;background:var(--green);border:none;color:#fff;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">Asignar homework →</button>
+      </div>
+    </div>
+
+    <!-- Add Course Modal -->
+    <div id="add-course-modal-overlay" style="display:none;position:fixed;inset:0;z-index:4000;background:rgba(10,15,40,0.9);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;">
+      <div style="background:linear-gradient(160deg,#111d45,#1B2B5E);border:1px solid rgba(47,168,208,0.25);border-radius:20px;width:100%;max-width:500px;padding:32px;position:relative;">
+        <button onclick="closeAddCourseModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:18px;cursor:pointer;">✕</button>
+        <div style="font-size:16px;font-weight:700;color:white;margin-bottom:20px;">📚 Asignar Curso</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <label style="font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:6px;">Alumno</label>
+            <select id="acrs-student" style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:white;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;">
+              <option value="">— Seleccionar alumno —</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:6px;">Nombre del Curso</label>
+            <input id="acrs-name" type="text" placeholder="Ej: Business Communication Pro" style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:white;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:6px;">Nivel</label>
+              <select id="acrs-level" style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:white;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;">
+                <option>A1</option><option>A2</option><option>B1</option><option selected>B2</option><option>C1</option><option>C2</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:6px;">Semanas total</label>
+              <input id="acrs-total" type="number" value="16" min="1" style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:white;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;">
+            </div>
+            <div>
+              <label style="font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:6px;">Completadas</label>
+              <input id="acrs-done" type="number" value="0" min="0" style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:white;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;">
+            </div>
+          </div>
+        </div>
+        <button onclick="saveCourse()" style="margin-top:20px;width:100%;padding:12px;background:var(--green);border:none;color:#fff;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">Asignar curso →</button>
       </div>
     </div>
 
@@ -3158,7 +3270,7 @@
     <!-- Welcome -->
     <div class="db-welcome">
       <h2>¡Hola, <span id="db-firstname">Alumno</span>! 👋</h2>
-      <p>Jueves, 17 de abril · Semana 14 del módulo Business Communication</p>
+      <p id="db-welcome-date">Cargando...</p>
     </div>
 
     <!-- Tabs -->
@@ -3175,27 +3287,27 @@
     <div class="db-kpis" id="db-kpis">
       <div class="db-kpi">
         <span class="db-kpi-icon">📅</span>
-        <div class="db-kpi-value"><span>12</span></div>
+        <div class="db-kpi-value"><span id="kpi-classes-done">—</span></div>
         <div class="db-kpi-label">Clases completadas</div>
-        <div class="db-kpi-bar" style="width:75%;"></div>
+        <div class="db-kpi-bar" id="kpi-bar-classes" style="width:0%;"></div>
       </div>
       <div class="db-kpi sky">
         <span class="db-kpi-icon">🎯</span>
-        <div class="db-kpi-value"><span>B2</span></div>
+        <div class="db-kpi-value"><span id="kpi-level-val">—</span></div>
         <div class="db-kpi-label">Nivel actual</div>
-        <div class="db-kpi-bar" style="width:60%;"></div>
+        <div class="db-kpi-bar" id="kpi-bar-level" style="width:40%;"></div>
       </div>
       <div class="db-kpi">
         <span class="db-kpi-icon">✏️</span>
-        <div class="db-kpi-value"><span>3</span></div>
+        <div class="db-kpi-value"><span id="kpi-hw-pending">—</span></div>
         <div class="db-kpi-label">Homeworks pendientes</div>
-        <div class="db-kpi-bar" style="width:30%;"></div>
+        <div class="db-kpi-bar" id="kpi-bar-hw" style="width:0%;"></div>
       </div>
       <div class="db-kpi sky">
         <span class="db-kpi-icon">🏆</span>
-        <div class="db-kpi-value"><span>94<span style="font-size:18px">%</span></span></div>
+        <div class="db-kpi-value"><span id="kpi-attendance-val">—</span><span id="kpi-attendance-pct" style="font-size:18px"></span></div>
         <div class="db-kpi-label">Asistencia</div>
-        <div class="db-kpi-bar" style="width:94%;"></div>
+        <div class="db-kpi-bar" id="kpi-bar-attendance" style="width:0%;"></div>
       </div>
     </div>
 
@@ -3209,53 +3321,10 @@
         <div class="db-panel">
           <div class="db-panel-head">
             <span class="db-panel-title">📅 Próximas Clases</span>
-            <span class="db-panel-badge">4 este mes</span>
+            <span class="db-panel-badge" id="db-classes-badge">—</span>
           </div>
-          <div class="db-panel-body">
-            <div class="db-class-item">
-              <div class="db-class-date">
-                <div class="db-class-day">17</div>
-                <div class="db-class-month">ABR</div>
-              </div>
-              <div class="db-class-info">
-                <div class="db-class-name">Business Negotiations – Module 3</div>
-                <div class="db-class-meta">🕙 10:00 AM · Zoom · Prof. Alejandra R.</div>
-              </div>
-              <span class="db-class-status live">● EN VIVO</span>
-            </div>
-            <div class="db-class-item">
-              <div class="db-class-date">
-                <div class="db-class-day">19</div>
-                <div class="db-class-month">ABR</div>
-              </div>
-              <div class="db-class-info">
-                <div class="db-class-name">Presentations & Pitching Skills</div>
-                <div class="db-class-meta">🕙 10:00 AM · Zoom · Prof. Alejandra R.</div>
-              </div>
-              <span class="db-class-status upcoming">PRÓXIMA</span>
-            </div>
-            <div class="db-class-item">
-              <div class="db-class-date">
-                <div class="db-class-day">22</div>
-                <div class="db-class-month">ABR</div>
-              </div>
-              <div class="db-class-info">
-                <div class="db-class-name">Corporate Email Writing</div>
-                <div class="db-class-meta">🕙 10:00 AM · Zoom · Prof. Alejandra R.</div>
-              </div>
-              <span class="db-class-status upcoming">PRÓXIMA</span>
-            </div>
-            <div class="db-class-item">
-              <div class="db-class-date">
-                <div class="db-class-day">24</div>
-                <div class="db-class-month">ABR</div>
-              </div>
-              <div class="db-class-info">
-                <div class="db-class-name">Networking & Small Talk</div>
-                <div class="db-class-meta">🕙 10:00 AM · Zoom · Prof. Alejandra R.</div>
-              </div>
-              <span class="db-class-status upcoming">PRÓXIMA</span>
-            </div>
+          <div class="db-panel-body" id="db-classes-list">
+            <div style="text-align:center;padding:20px 0;color:var(--muted);font-size:13px;">Cargando clases...</div>
           </div>
         </div>
 
@@ -3263,25 +3332,10 @@
         <div class="db-panel">
           <div class="db-panel-head">
             <span class="db-panel-title">📚 Mis Cursos</span>
-            <span class="db-panel-badge">2 activos</span>
+            <span class="db-panel-badge" id="db-courses-badge">—</span>
           </div>
-          <div class="db-panel-body">
-            <div class="db-course-item">
-              <div class="db-course-top">
-                <span class="db-course-name">Business Communication Pro</span>
-                <span class="db-course-pct">75%</span>
-              </div>
-              <div class="db-progress-bar"><div class="db-progress-fill" style="width:75%;background:linear-gradient(90deg,var(--green),var(--sky));"></div></div>
-              <div class="db-course-level">Nivel B2 · 16 semanas · 12/16 completadas</div>
-            </div>
-            <div class="db-course-item">
-              <div class="db-course-top">
-                <span class="db-course-name">CV & LinkedIn in English</span>
-                <span class="db-course-pct" style="color:var(--sky);">40%</span>
-              </div>
-              <div class="db-progress-bar"><div class="db-progress-fill" style="width:40%;background:linear-gradient(90deg,var(--sky),#7b68ee);"></div></div>
-              <div class="db-course-level">Nivel B1 · 8 semanas · 3/8 completadas</div>
-            </div>
+          <div class="db-panel-body" id="db-courses-list">
+            <div style="text-align:center;padding:20px 0;color:var(--muted);font-size:13px;">Cargando cursos...</div>
           </div>
         </div>
       </div>
@@ -3293,41 +3347,10 @@
         <div class="db-panel">
           <div class="db-panel-head">
             <span class="db-panel-title">✏️ Homeworks</span>
-            <span class="db-panel-badge" style="background:rgba(217,58,90,0.10);color:#d93a5a;border-color:rgba(217,58,90,0.25);">3 pendientes</span>
+            <span class="db-panel-badge" id="db-hw-badge" style="background:rgba(217,58,90,0.10);color:#d93a5a;border-color:rgba(217,58,90,0.25);">—</span>
           </div>
-          <div class="db-panel-body">
-            <div class="db-hw-item">
-              <div class="db-hw-check pending" onclick="toggleHw(this)"></div>
-              <div class="db-hw-info">
-                <div class="db-hw-title">Write a follow-up email after a meeting</div>
-                <div class="db-hw-due overdue">⚠ Vencía: 15 abril</div>
-              </div>
-              <span class="db-hw-badge writing">Writing</span>
-            </div>
-            <div class="db-hw-item">
-              <div class="db-hw-check pending" onclick="toggleHw(this)"></div>
-              <div class="db-hw-info">
-                <div class="db-hw-title">Record a 2-min product pitch</div>
-                <div class="db-hw-due">Vence: 20 abril</div>
-              </div>
-              <span class="db-hw-badge speaking">Speaking</span>
-            </div>
-            <div class="db-hw-item">
-              <div class="db-hw-check pending" onclick="toggleHw(this)"></div>
-              <div class="db-hw-info">
-                <div class="db-hw-title">Grammar: Conditional sentences (B2)</div>
-                <div class="db-hw-due">Vence: 22 abril</div>
-              </div>
-              <span class="db-hw-badge grammar">Grammar</span>
-            </div>
-            <div class="db-hw-item">
-              <div class="db-hw-check done" onclick="toggleHw(this)">✓</div>
-              <div class="db-hw-info">
-                <div class="db-hw-title done-text">Listen: TED Talk "The Power of Vulnerability"</div>
-                <div class="db-hw-due">Entregado: 12 abril</div>
-              </div>
-              <span class="db-hw-badge listening">Listening</span>
-            </div>
+          <div class="db-panel-body" id="db-hw-list">
+            <div style="text-align:center;padding:20px 0;color:var(--muted);font-size:13px;">Cargando homeworks...</div>
           </div>
         </div>
 
@@ -6270,12 +6293,16 @@ ${innerHtml}
       document.getElementById('db-firstname').textContent = firstName;
       document.getElementById('student-dashboard').classList.add('open');
       document.body.style.overflow = 'hidden';
+      setWelcomeDate();
       // Cargar archivos y performance del alumno
       const uid = user.uid;
       if (uid) {
         setTimeout(() => {
           if (typeof loadStudentFiles === 'function') loadStudentFiles(uid);
           if (typeof loadStudentPerformance === 'function') loadStudentPerformance(uid);
+          if (typeof loadStudentClasses === 'function') loadStudentClasses(uid);
+          if (typeof loadStudentHomeworks === 'function') loadStudentHomeworks(uid);
+          if (typeof loadStudentCourses === 'function') loadStudentCourses(uid);
         }, 300);
         // Verificar si ya hizo el examen de nivelación
         checkAndShowPlacement(user);
@@ -6378,13 +6405,42 @@ ${innerHtml}
     ptCurrentUid = uid;
     ptCurrentUser = user;
     renderPTQuestion();
-    document.getElementById('placement-overlay').classList.add('open');
+    const overlay = document.getElementById('placement-overlay');
+    overlay.classList.add('open');
+    // Block closing by clicking outside
+    overlay.onclick = function(e) { if (e.target === overlay) { shakePTModal(); } };
     document.body.style.overflow = 'hidden';
   };
 
-  window.closePlacementTest = function() {
+  function shakePTModal() {
+    const modal = document.getElementById('placement-modal');
+    modal.style.animation = 'none';
+    modal.offsetHeight; // reflow
+    modal.style.animation = 'ptShake 0.4s ease';
+    // Show warning message
+    const existing = document.getElementById('pt-block-msg');
+    if (!existing) {
+      const msg = document.createElement('div');
+      msg.id = 'pt-block-msg';
+      msg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,calc(-50% + 260px));background:rgba(255,107,107,0.15);border:1px solid rgba(255,107,107,0.4);color:#ff8c8c;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:10001;pointer-events:none;';
+      msg.textContent = '⚠ Necesitás completar el examen para acceder al panel';
+      document.body.appendChild(msg);
+      setTimeout(() => { if (msg.parentNode) msg.parentNode.removeChild(msg); }, 2500);
+    }
+  }
+
+  window.closePlacementTest = function(force) {
+    if (!force) { shakePTModal(); return; }
     document.getElementById('placement-overlay').classList.remove('open');
     document.body.style.overflow = '';
+    // Refresh dashboard after placement
+    if (ptCurrentUser) {
+      if (typeof loadStudentFiles === 'function') loadStudentFiles(ptCurrentUser.uid);
+      if (typeof loadStudentPerformance === 'function') loadStudentPerformance(ptCurrentUser.uid);
+      if (typeof loadStudentClasses === 'function') loadStudentClasses(ptCurrentUser.uid);
+      if (typeof loadStudentHomeworks === 'function') loadStudentHomeworks(ptCurrentUser.uid);
+      if (typeof loadStudentCourses === 'function') loadStudentCourses(ptCurrentUser.uid);
+    }
   };
 
   function renderPTQuestion() {
@@ -6416,7 +6472,7 @@ ${innerHtml}
         </div>
       </div>
       <div class="pt-footer">
-        <button class="pt-btn-skip" onclick="skipPTQuestion()">Saltar pregunta</button>
+        <span style="font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.05em;">Todas las preguntas son obligatorias</span>
         <button class="pt-btn-next" id="pt-btn-next" onclick="nextPTQuestion()" disabled>
           ${ptCurrentQ < total - 1 ? 'Siguiente →' : 'Ver resultados →'}
         </button>
@@ -6482,7 +6538,7 @@ ${innerHtml}
           </div>
         </div>
         <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:24px;">Puntaje total: ${score} / ${PT_QUESTIONS.length}</div>
-        <button class="pt-result-btn" onclick="closePlacementTest()">Ir a mi dashboard →</button>
+        <button class="pt-result-btn" onclick="closePlacementTest(true)">Ir a mi dashboard →</button>
       </div>
     `;
 
@@ -6530,6 +6586,301 @@ ${innerHtml}
   }
 
   // ══ END PLACEMENT TEST ══
+
+  // ══════════════════════════════════════════
+  //  STUDENT DASHBOARD — Dynamic loaders
+  // ══════════════════════════════════════════
+
+  // Set current date in welcome bar
+  function setWelcomeDate() {
+    const el = document.getElementById('db-welcome-date');
+    if (!el) return;
+    const now = new Date();
+    const days   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    el.textContent = `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} ${now.getFullYear()}`;
+  }
+
+  // Load student's upcoming/recent classes from Firestore
+  window.loadStudentClasses = async (uid) => {
+    const list  = document.getElementById('db-classes-list');
+    const badge = document.getElementById('db-classes-badge');
+    if (!list) return;
+
+    if (DEMO_MODE) {
+      renderStudentClasses([
+        { title:'Business Negotiations – Module 3', startTime: new Date(Date.now() - 10*60000), durationMin:60, meetLink:'', status:'pending' },
+        { title:'Presentations & Pitching Skills',  startTime: new Date(Date.now() + 2*86400000), durationMin:60, meetLink:'', status:'pending' },
+        { title:'Corporate Email Writing',          startTime: new Date(Date.now() + 5*86400000), durationMin:60, meetLink:'', status:'pending' },
+      ], list, badge);
+      return;
+    }
+
+    try {
+      const { getFirestore, collection, getDocs, query, where, orderBy }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const db  = getFirestore(app);
+      const now = new Date();
+      const pastLimit = new Date(now.getTime() - 7*24*60*60*1000); // 7 days ago
+
+      // Get classes assigned to this student (pending or recent done)
+      let classes = [];
+      try {
+        const snap = await getDocs(query(
+          collection(db, 'classes'),
+          where('studentUid', '==', uid),
+          orderBy('startTime', 'asc')
+        ));
+        classes = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+          .filter(c => {
+            const st = c.startTime instanceof Date ? c.startTime : new Date(c.startTime?.seconds ? c.startTime.seconds*1000 : c.startTime);
+            return st >= pastLimit; // show classes from last 7 days forward
+          });
+      } catch(e) {
+        // Fallback: try without composite index by getting all and filtering
+        try {
+          const snap2 = await getDocs(collection(db, 'classes'));
+          classes = snap2.docs
+            .map(d => ({ id: d.id, ...d.data() }))
+            .filter(c => {
+              if (c.studentUid !== uid && c.studentUid !== '') return false;
+              const st = c.startTime instanceof Date ? c.startTime : new Date(c.startTime?.seconds ? c.startTime.seconds*1000 : c.startTime);
+              return st >= pastLimit;
+            })
+            .sort((a,b) => {
+              const ta = a.startTime instanceof Date ? a.startTime : new Date(a.startTime?.seconds ? a.startTime.seconds*1000 : a.startTime);
+              const tb = b.startTime instanceof Date ? b.startTime : new Date(b.startTime?.seconds ? b.startTime.seconds*1000 : b.startTime);
+              return ta - tb;
+            });
+        } catch(e2) { console.warn('loadStudentClasses fallback:', e2.message); }
+      }
+      renderStudentClasses(classes, list, badge);
+    } catch(e) {
+      list.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">No se pudieron cargar las clases.<br><span style="font-size:11px;">${e.message}</span></div>`;
+    }
+  };
+
+  function renderStudentClasses(classes, list, badge) {
+    const now = new Date();
+    const upcoming = classes.filter(c => {
+      const st = c.startTime instanceof Date ? c.startTime : new Date(c.startTime?.seconds ? c.startTime.seconds*1000 : c.startTime);
+      return st >= new Date(now.getTime() - 60*60000); // include classes started < 1h ago (live)
+    });
+
+    if (badge) badge.textContent = upcoming.length ? `${upcoming.length} próxima${upcoming.length>1?'s':''}` : '—';
+
+    if (!upcoming.length) {
+      list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">No tenés clases programadas próximamente.<br>Tu profesor las irá cargando.</div>';
+      return;
+    }
+    const months = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+    list.innerHTML = upcoming.slice(0,5).map(cls => {
+      const st = cls.startTime instanceof Date ? cls.startTime : new Date(cls.startTime?.seconds ? cls.startTime.seconds*1000 : cls.startTime);
+      const isLive = st <= now && st > new Date(now.getTime() - 90*60000);
+      const isToday = st.toDateString() === now.toDateString();
+      const timeStr = st.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
+      const meetHtml = cls.meetLink ? `· <a href="${cls.meetLink}" target="_blank" style="color:var(--sky-light);text-decoration:none;">Unirse</a>` : '';
+      const statusHtml = isLive
+        ? `<span class="db-class-status live">● EN VIVO</span>`
+        : isToday
+          ? `<span class="db-class-status" style="background:rgba(91,175,42,0.1);color:var(--green);border:1px solid rgba(91,175,42,0.3);padding:4px 10px;border-radius:100px;font-size:10px;font-weight:700;">HOY</span>`
+          : `<span class="db-class-status upcoming">PRÓXIMA</span>`;
+      return `<div class="db-class-item">
+        <div class="db-class-date">
+          <div class="db-class-day">${st.getDate()}</div>
+          <div class="db-class-month">${months[st.getMonth()]}</div>
+        </div>
+        <div class="db-class-info">
+          <div class="db-class-name">${cls.title || 'Clase'}</div>
+          <div class="db-class-meta">🕙 ${timeStr} · Zoom ${meetHtml}</div>
+        </div>
+        ${statusHtml}
+      </div>`;
+    }).join('');
+  }
+
+  // Load homeworks assigned to student from Firestore
+  window.loadStudentHomeworks = async (uid) => {
+    const list  = document.getElementById('db-hw-list');
+    const badge = document.getElementById('db-hw-badge');
+    if (!list) return;
+
+    if (DEMO_MODE) {
+      renderStudentHomeworks([
+        { title:'Write a follow-up email after a meeting', dueDate: new Date(Date.now() - 2*86400000), type:'writing', status:'pending' },
+        { title:'Record a 2-min product pitch',           dueDate: new Date(Date.now() + 3*86400000), type:'speaking', status:'pending' },
+        { title:'Grammar: Conditional sentences (B2)',    dueDate: new Date(Date.now() + 5*86400000), type:'grammar',  status:'pending' },
+        { title:'Listen: TED Talk "The Power of Vulnerability"', dueDate: new Date(Date.now() - 7*86400000), type:'listening', status:'done' },
+      ], list, badge);
+      return;
+    }
+
+    try {
+      const { getFirestore, collection, getDocs, query, where, orderBy }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const db = getFirestore(app);
+      let hws = [];
+      try {
+        const snap = await getDocs(query(collection(db,'homeworks'), where('studentUid','==',uid), orderBy('dueDate','asc')));
+        hws = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      } catch(e) {
+        // Fallback without index
+        try {
+          const snap2 = await getDocs(collection(db,'homeworks'));
+          hws = snap2.docs.map(d=>({id:d.id,...d.data()})).filter(h => h.studentUid === uid || !h.studentUid);
+        } catch(e2) {}
+      }
+      renderStudentHomeworks(hws, list, badge);
+    } catch(e) {
+      list.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">No se pudieron cargar los homeworks.</div>`;
+    }
+  };
+
+  function renderStudentHomeworks(hws, list, badge) {
+    const now = new Date();
+    const pending = hws.filter(h => h.status !== 'done').length;
+    if (badge) {
+      badge.textContent = pending ? `${pending} pendiente${pending>1?'s':''}` : 'Al día ✓';
+      badge.style.color = pending ? '#d93a5a' : 'var(--green)';
+      badge.style.background = pending ? 'rgba(217,58,90,0.10)' : 'rgba(91,175,42,0.1)';
+    }
+    if (!hws.length) {
+      list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">No tenés homeworks asignados aún.</div>';
+      return;
+    }
+    const typeColors = { writing:'writing', speaking:'speaking', grammar:'grammar', listening:'listening', reading:'reading', vocab:'vocab' };
+    list.innerHTML = hws.map((hw, idx) => {
+      const isDone = hw.status === 'done';
+      const due = hw.dueDate instanceof Date ? hw.dueDate : new Date(hw.dueDate?.seconds ? hw.dueDate.seconds*1000 : hw.dueDate);
+      const isOverdue = !isDone && due < now;
+      const dateStr = due && !isNaN(due) ? due.toLocaleDateString('es-AR', { day:'numeric', month:'long' }) : '';
+      const dueHtml = isDone
+        ? `<div class="db-hw-due">Entregado: ${dateStr}</div>`
+        : isOverdue
+          ? `<div class="db-hw-due overdue">⚠ Vencía: ${dateStr}</div>`
+          : `<div class="db-hw-due">Vence: ${dateStr}</div>`;
+      const typeClass = typeColors[hw.type] || 'writing';
+      const checkClass = isDone ? 'done' : 'pending';
+      const checkContent = isDone ? '✓' : '';
+      return `<div class="db-hw-item">
+        <div class="db-hw-check ${checkClass}" id="hw-check-${idx}" onclick="toggleStudentHw('${hw.id||''}','${idx}')">${checkContent}</div>
+        <div class="db-hw-info">
+          <div class="db-hw-title${isDone?' done-text':''}">${hw.title}</div>
+          ${dueHtml}
+        </div>
+        <span class="db-hw-badge ${typeClass}">${hw.type ? hw.type.charAt(0).toUpperCase()+hw.type.slice(1) : 'Task'}</span>
+      </div>`;
+    }).join('');
+    // Update pending KPI
+    const kpiEl = document.getElementById('kpi-hw-pending');
+    if (kpiEl) kpiEl.textContent = pending;
+    const barEl = document.getElementById('kpi-bar-hw');
+    if (barEl) barEl.style.width = hws.length ? Math.round(pending/hws.length*100)+'%' : '0%';
+  }
+
+  window.toggleStudentHw = async (hwId, idx) => {
+    const check = document.getElementById('hw-check-'+idx);
+    if (!check) return;
+    const isDone = check.classList.contains('done');
+    const newStatus = isDone ? 'pending' : 'done';
+    check.classList.toggle('done', !isDone);
+    check.classList.toggle('pending', isDone);
+    check.textContent = isDone ? '' : '✓';
+    if (!DEMO_MODE && hwId) {
+      try {
+        const { getFirestore, doc, updateDoc }
+          = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        await updateDoc(doc(getFirestore(app), 'homeworks', hwId), { status: newStatus });
+      } catch(e) { console.warn('toggleHw:', e.message); }
+    }
+  };
+
+  // Load courses assigned to student
+  window.loadStudentCourses = async (uid) => {
+    const list  = document.getElementById('db-courses-list');
+    const badge = document.getElementById('db-courses-badge');
+    if (!list) return;
+
+    if (DEMO_MODE) {
+      renderStudentCourses([
+        { name:'Business Communication Pro', level:'B2', totalWeeks:16, completedWeeks:12, color:'linear-gradient(90deg,var(--green),var(--sky))' },
+        { name:'CV & LinkedIn in English',   level:'B1', totalWeeks:8,  completedWeeks:3,  color:'linear-gradient(90deg,var(--sky),#7b68ee)' },
+      ], list, badge);
+      return;
+    }
+
+    try {
+      const { getFirestore, collection, getDocs, query, where }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const db = getFirestore(app);
+      let courses = [];
+      try {
+        const snap = await getDocs(query(collection(db,'courses'), where('studentUid','==',uid)));
+        courses = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      } catch(e) {
+        try {
+          const snap2 = await getDocs(collection(db,'courses'));
+          courses = snap2.docs.map(d=>({id:d.id,...d.data()})).filter(c => c.studentUid === uid || !c.studentUid);
+        } catch(e2) {}
+      }
+      renderStudentCourses(courses, list, badge);
+    } catch(e) {
+      list.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">No se pudieron cargar los cursos.</div>`;
+    }
+  };
+
+  function renderStudentCourses(courses, list, badge) {
+    const active = courses.length;
+    if (badge) badge.textContent = active ? `${active} activo${active>1?'s':''}` : '—';
+    if (!courses.length) {
+      list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">No tenés cursos asignados aún.<br>Tu profesor los irá cargando.</div>';
+      return;
+    }
+    const colors = [
+      'linear-gradient(90deg,var(--green),var(--sky))',
+      'linear-gradient(90deg,var(--sky),#7b68ee)',
+      'linear-gradient(90deg,#f59e0b,var(--green))',
+    ];
+    list.innerHTML = courses.map((c, i) => {
+      const total     = Number(c.totalWeeks)     || 1;
+      const completed = Number(c.completedWeeks) || 0;
+      const pct = Math.min(100, Math.round(completed / total * 100));
+      const color = c.color || colors[i % colors.length];
+      const pctColor = pct < 50 ? 'var(--sky)' : 'var(--green)';
+      return `<div class="db-course-item">
+        <div class="db-course-top">
+          <span class="db-course-name">${c.name || c.title || 'Curso'}</span>
+          <span class="db-course-pct" style="color:${pctColor};">${pct}%</span>
+        </div>
+        <div class="db-progress-bar"><div class="db-progress-fill" style="width:${pct}%;background:${color};"></div></div>
+        <div class="db-course-level">${c.level ? 'Nivel '+c.level+' · ' : ''}${total} semanas · ${completed}/${total} completadas</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Update KPIs from performance data
+  function updateStudentKPIs(perf) {
+    const classes = perf.classes ?? null;
+    const level   = perf.level   || null;
+    const attend  = perf.attendance ?? null;
+
+    const kpiClasses = document.getElementById('kpi-classes-done');
+    if (kpiClasses) kpiClasses.textContent = classes !== null ? classes : '—';
+    const barClasses = document.getElementById('kpi-bar-classes');
+    if (barClasses) barClasses.style.width = classes ? Math.min(100, classes * 6) + '%' : '0%';
+
+    const kpiLevel = document.getElementById('kpi-level-val');
+    if (kpiLevel) kpiLevel.textContent = level || '—';
+
+    const kpiAtt = document.getElementById('kpi-attendance-val');
+    const kpiAttPct = document.getElementById('kpi-attendance-pct');
+    if (kpiAtt) kpiAtt.textContent = attend !== null ? attend : '—';
+    if (kpiAttPct) kpiAttPct.textContent = attend !== null ? '%' : '';
+    const barAtt = document.getElementById('kpi-bar-attendance');
+    if (barAtt) barAtt.style.width = attend ? attend + '%' : '0%';
+  }
+
+  // ══ END STUDENT DASHBOARD LOADERS ══
 
   // ══════════════════════════════════════════
   //  CLASES — Google Calendar + Auto-tracking
@@ -6945,7 +7296,7 @@ Su cuenta de autenticación seguirá existiendo en Firebase Auth.`)) return;
   };
 
   window.switchAdminTab = (tab) => {
-    const tabs = ['alumnos','archivos','performance','clases'];
+    const tabs = ['alumnos','archivos','performance','clases','homeworks','cursos'];
     document.querySelectorAll('.admin-tab-btn').forEach((b,i) => {
       b.classList.toggle('active', tabs[i] === tab);
     });
@@ -6953,9 +7304,178 @@ Su cuenta de autenticación seguirá existiendo en Firebase Auth.`)) return;
     document.getElementById('admin-tab-archivos').style.display     = tab === 'archivos'    ? '' : 'none';
     document.getElementById('admin-tab-performance').style.display  = tab === 'performance' ? '' : 'none';
     document.getElementById('admin-tab-clases').style.display       = tab === 'clases'      ? '' : 'none';
+    document.getElementById('admin-tab-homeworks').style.display    = tab === 'homeworks'   ? '' : 'none';
+    document.getElementById('admin-tab-cursos').style.display       = tab === 'cursos'      ? '' : 'none';
     if (tab === 'performance') renderPerfStudentList();
-    if (tab === 'archivos')    loadAdminFiles();
+    if (tab === 'archivos')    loadAllSentFiles();
     if (tab === 'clases')      loadCalendarClasses();
+    if (tab === 'homeworks')   loadAdminHomeworks();
+    if (tab === 'cursos')      loadAdminCourses();
+  };
+
+  // ─────────────────────────────────────────────
+  //  ADMIN — Homework management
+  // ─────────────────────────────────────────────
+  window.openAddHomeworkModal = () => {
+    const sel = document.getElementById('ahm-student');
+    sel.innerHTML = '<option value="">— Todos los alumnos —</option>' +
+      allUsers.map(u => `<option value="${u.id}" data-name="${u.name||u.email}">${u.name || u.email}</option>`).join('');
+    // Default due date = 7 days from now
+    const d = new Date(); d.setDate(d.getDate()+7);
+    document.getElementById('ahm-due').value = d.toISOString().slice(0,10);
+    document.getElementById('ahm-title').value = '';
+    const overlay = document.getElementById('add-hw-modal-overlay');
+    overlay.style.display = 'flex';
+  };
+  window.closeAddHwModal = () => { document.getElementById('add-hw-modal-overlay').style.display = 'none'; };
+
+  window.saveHomework = async () => {
+    const studentSel  = document.getElementById('ahm-student');
+    const studentUid  = studentSel.value;
+    const studentName = studentSel.options[studentSel.selectedIndex]?.dataset?.name || '';
+    const title = document.getElementById('ahm-title').value.trim();
+    const type  = document.getElementById('ahm-type').value;
+    const dueVal = document.getElementById('ahm-due').value;
+    if (!title) { alert('Ingresá un título'); return; }
+    const dueDate = dueVal ? new Date(dueVal) : null;
+    if (DEMO_MODE) { closeAddHwModal(); showToast('✅ Homework guardado (demo)'); return; }
+    try {
+      const { getFirestore, collection, addDoc, serverTimestamp }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      await addDoc(collection(getFirestore(app), 'homeworks'), {
+        title, type, dueDate, status: 'pending',
+        studentUid: studentUid || '',
+        studentName: studentName || '',
+        createdAt: serverTimestamp(),
+      });
+      closeAddHwModal();
+      showToast('✅ Homework asignado correctamente');
+      loadAdminHomeworks();
+    } catch(e) { alert('Error: ' + e.message); }
+  };
+
+  window.loadAdminHomeworks = async () => {
+    const body = document.getElementById('admin-hw-body');
+    if (!body) return;
+    body.innerHTML = '<div class="admin-loading">Cargando homeworks...</div>';
+    if (DEMO_MODE) { body.innerHTML = '<div class="admin-empty">Función disponible en modo Firebase.</div>'; return; }
+    try {
+      const { getFirestore, collection, getDocs, orderBy, query }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const db   = getFirestore(app);
+      const snap = await getDocs(collection(db, 'homeworks'));
+      if (snap.empty) { body.innerHTML = '<div class="admin-empty">No hay homeworks asignados.</div>'; return; }
+      const hws = snap.docs.map(d=>({id:d.id,...d.data()}));
+      const rows = hws.map(hw => {
+        const due = hw.dueDate instanceof Date ? hw.dueDate : new Date(hw.dueDate?.seconds ? hw.dueDate.seconds*1000 : hw.dueDate);
+        const dueStr = due && !isNaN(due) ? due.toLocaleDateString('es-AR') : '—';
+        const student = allUsers.find(u => u.id === hw.studentUid);
+        const sName = hw.studentUid ? (student?.name || student?.email || hw.studentName || hw.studentUid) : 'Todos';
+        const isDone = hw.status === 'done';
+        return `<tr>
+          <td style="font-size:13px;font-weight:600;color:var(--navy);">${hw.title}</td>
+          <td><span style="font-size:10px;padding:3px 8px;border-radius:100px;background:rgba(47,168,208,0.1);color:var(--sky);border:1px solid rgba(47,168,208,0.2);">${hw.type||'task'}</span></td>
+          <td style="font-size:12px;color:var(--muted);">${sName}</td>
+          <td style="font-size:12px;color:var(--muted);">${dueStr}</td>
+          <td><span style="font-size:10px;padding:3px 8px;border-radius:100px;${isDone?'background:rgba(91,175,42,0.1);color:var(--green);border:1px solid rgba(91,175,42,0.2);':'background:rgba(255,160,0,0.1);color:#f59e0b;border:1px solid rgba(255,160,0,0.2);'}">${isDone?'✓ Entregado':'Pendiente'}</span></td>
+          <td><button onclick="deleteHomework('${hw.id}')" style="padding:5px 10px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(255,107,122,0.3);background:rgba(255,107,122,0.08);color:#ff8c94;font-family:'Plus Jakarta Sans',sans-serif;">🗑️</button></td>
+        </tr>`;
+      }).join('');
+      body.innerHTML = `<table class="admin-tbl"><thead><tr><th>Título</th><th>Tipo</th><th>Alumno</th><th>Vencimiento</th><th>Estado</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+    } catch(e) { body.innerHTML = `<div class="admin-empty">Error: ${e.message}</div>`; }
+  };
+
+  window.deleteHomework = async (id) => {
+    if (!confirm('¿Borrar este homework?')) return;
+    try {
+      const { getFirestore, doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      await deleteDoc(doc(getFirestore(app), 'homeworks', id));
+      showToast('✅ Homework eliminado');
+      loadAdminHomeworks();
+    } catch(e) { showToast('❌ ' + e.message); }
+  };
+
+  // ─────────────────────────────────────────────
+  //  ADMIN — Course management
+  // ─────────────────────────────────────────────
+  window.openAddCourseModal = () => {
+    const sel = document.getElementById('acrs-student');
+    sel.innerHTML = '<option value="">— Seleccionar alumno —</option>' +
+      allUsers.map(u => `<option value="${u.id}" data-name="${u.name||u.email}">${u.name || u.email}</option>`).join('');
+    document.getElementById('acrs-name').value  = '';
+    document.getElementById('acrs-total').value = '16';
+    document.getElementById('acrs-done').value  = '0';
+    const overlay = document.getElementById('add-course-modal-overlay');
+    overlay.style.display = 'flex';
+  };
+  window.closeAddCourseModal = () => { document.getElementById('add-course-modal-overlay').style.display = 'none'; };
+
+  window.saveCourse = async () => {
+    const studentSel  = document.getElementById('acrs-student');
+    const studentUid  = studentSel.value;
+    const studentName = studentSel.options[studentSel.selectedIndex]?.dataset?.name || '';
+    const name         = document.getElementById('acrs-name').value.trim();
+    const level        = document.getElementById('acrs-level').value;
+    const totalWeeks   = parseInt(document.getElementById('acrs-total').value) || 16;
+    const completedWeeks = parseInt(document.getElementById('acrs-done').value) || 0;
+    if (!name || !studentUid) { alert('Completá nombre y alumno'); return; }
+    if (DEMO_MODE) { closeAddCourseModal(); showToast('✅ Curso guardado (demo)'); return; }
+    try {
+      const { getFirestore, collection, addDoc, serverTimestamp }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      await addDoc(collection(getFirestore(app), 'courses'), {
+        name, level, totalWeeks, completedWeeks,
+        studentUid, studentName,
+        createdAt: serverTimestamp(),
+      });
+      closeAddCourseModal();
+      showToast('✅ Curso asignado correctamente');
+      loadAdminCourses();
+    } catch(e) { alert('Error: ' + e.message); }
+  };
+
+  window.loadAdminCourses = async () => {
+    const body = document.getElementById('admin-courses-body');
+    if (!body) return;
+    body.innerHTML = '<div class="admin-loading">Cargando cursos...</div>';
+    if (DEMO_MODE) { body.innerHTML = '<div class="admin-empty">Función disponible en modo Firebase.</div>'; return; }
+    try {
+      const { getFirestore, collection, getDocs }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const db   = getFirestore(app);
+      const snap = await getDocs(collection(db, 'courses'));
+      if (snap.empty) { body.innerHTML = '<div class="admin-empty">No hay cursos asignados.</div>'; return; }
+      const courses = snap.docs.map(d=>({id:d.id,...d.data()}));
+      const rows = courses.map(c => {
+        const pct = Math.min(100, Math.round((c.completedWeeks||0)/(c.totalWeeks||1)*100));
+        const student = allUsers.find(u => u.id === c.studentUid);
+        const sName = student?.name || student?.email || c.studentName || c.studentUid || '—';
+        return `<tr>
+          <td style="font-size:13px;font-weight:600;color:var(--navy);">${c.name||c.title||'—'}</td>
+          <td><span class="pt-badge">${c.level||'—'}</span></td>
+          <td style="font-size:12px;color:var(--muted);">${sName}</td>
+          <td style="font-size:12px;color:var(--muted);">${c.completedWeeks||0}/${c.totalWeeks||0} sem.</td>
+          <td>
+            <div style="background:rgba(255,255,255,0.08);border-radius:100px;height:6px;width:100px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--green),var(--sky));border-radius:100px;"></div>
+            </div>
+            <span style="font-size:11px;color:var(--muted);margin-left:6px;">${pct}%</span>
+          </td>
+          <td><button onclick="deleteCourse('${c.id}')" style="padding:5px 10px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(255,107,122,0.3);background:rgba(255,107,122,0.08);color:#ff8c94;font-family:'Plus Jakarta Sans',sans-serif;">🗑️</button></td>
+        </tr>`;
+      }).join('');
+      body.innerHTML = `<table class="admin-tbl"><thead><tr><th>Curso</th><th>Nivel</th><th>Alumno</th><th>Progreso</th><th>Avance</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+    } catch(e) { body.innerHTML = `<div class="admin-empty">Error: ${e.message}</div>`; }
+  };
+
+  window.deleteCourse = async (id) => {
+    if (!confirm('¿Borrar este curso?')) return;
+    try {
+      const { getFirestore, doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      await deleteDoc(doc(getFirestore(app), 'courses', id));
+      showToast('✅ Curso eliminado');
+      loadAdminCourses();
+    } catch(e) { showToast('❌ ' + e.message); }
   };
 
   function demoUsers() {
@@ -7322,6 +7842,7 @@ Su cuenta de autenticación seguirá existiendo en Firebase Auth.`)) return;
 
   function renderStudentPerf(body, badge, d) {
     if (badge && d.level) badge.textContent = d.level;
+    updateStudentKPIs(d);
     const bars = [
       { label:'Speaking',  key:'speaking',  color:'linear-gradient(90deg,var(--green),var(--sky))' },
       { label:'Writing',   key:'writing',   color:'linear-gradient(90deg,var(--sky),#7b68ee)' },
