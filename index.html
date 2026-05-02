@@ -2385,6 +2385,47 @@
     .sfm-btn-send:hover { background:var(--green-light); transform:translateY(-1px); }
     .sfm-btn-send:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
 
+    /* ── SFM source tabs (upload vs link) ── */
+    .sfm-source-tabs {
+      display:flex; gap:0; margin-bottom:20px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:10px; overflow:hidden;
+    }
+    .sfm-src-tab {
+      flex:1; padding:10px 14px; font-size:12px; font-weight:700;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      letter-spacing:0.04em; text-transform:uppercase;
+      background:none; border:none; color:rgba(255,255,255,0.4);
+      cursor:pointer; transition:background 0.2s, color 0.2s;
+    }
+    .sfm-src-tab:first-child { border-right:1px solid rgba(255,255,255,0.1); }
+    .sfm-src-tab.active {
+      background:rgba(91,175,42,0.15);
+      color:var(--green-light);
+    }
+    .sfm-src-panel { display:none; }
+    .sfm-src-panel.active { display:block; }
+    .sfm-drive-hint {
+      margin-top:8px; padding:10px 14px;
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.07);
+      border-radius:8px;
+      font-size:11px; color:rgba(255,255,255,0.45); line-height:1.7;
+    }
+    .sfm-drive-hint strong { color:rgba(255,255,255,0.65); }
+    .sfm-link-pills {
+      display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;
+    }
+    .sfm-link-pill {
+      padding:5px 12px; border-radius:100px; font-size:11px; font-weight:600;
+      background:rgba(47,168,208,0.12); border:1px solid rgba(47,168,208,0.25);
+      color:var(--sky-light); cursor:pointer; transition:background 0.2s;
+    }
+    .sfm-link-pill:hover { background:rgba(47,168,208,0.22); }
+    .sfm-upload-input { display:none; }
+    .sfm-upload-max { font-size:10px; color:rgba(255,255,255,0.3); margin-top:6px; text-align:center; }
+
     /* ══════════════════════════════════════════
        ADMIN – PERFORMANCE MODAL
     ══════════════════════════════════════════ */
@@ -2960,14 +3001,15 @@
     </div>
 
 <!-- ══════════════════════════════════════════
-     SEND FILE MODAL (Google Drive link)
+     SEND FILE MODAL (Upload + Drive link)
 ══════════════════════════════════════════ -->
 <div id="send-file-modal-overlay">
-  <div class="send-file-modal">
+  <div class="send-file-modal" style="max-height:92vh;overflow-y:auto;">
     <button class="sfm-close" onclick="closeSendFileModal()">&#x2715;</button>
     <div class="sfm-title">📎 Enviar material al alumno</div>
-    <div class="sfm-sub" id="sfm-subtitle">Compartí un link de Google Drive, YouTube o cualquier URL</div>
+    <div class="sfm-sub" id="sfm-subtitle">Adjuntá un archivo o compartí un link de Drive</div>
 
+    <!-- Alumno -->
     <div class="sfm-field">
       <label>Alumno destinatario</label>
       <select id="sfm-student-select">
@@ -2975,38 +3017,82 @@
       </select>
     </div>
 
+    <!-- Título -->
     <div class="sfm-field">
       <label>Título del material</label>
       <input type="text" id="sfm-title-input" placeholder="Ej: Homework Module 3 – Grammar">
     </div>
 
-    <div class="sfm-field">
-      <label>Link del archivo</label>
-      <input type="url" id="sfm-url-input" placeholder="https://drive.google.com/file/d/...">
-      <div style="margin-top:8px;padding:10px 14px;background:rgba(255,255,255,0.04);border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
-        <div style="font-size:11px;color:rgba(255,255,255,0.5);line-height:1.7;">
-          💡 <strong style="color:rgba(255,255,255,0.7);">Cómo compartir desde Google Drive:</strong><br>
+    <!-- Source tabs -->
+    <div class="sfm-source-tabs">
+      <button class="sfm-src-tab active" id="sfm-tab-upload" onclick="sfmSwitchTab('upload')">⬆️ Adjuntar archivo</button>
+      <button class="sfm-src-tab" id="sfm-tab-link" onclick="sfmSwitchTab('link')">🔗 Link de Drive / URL</button>
+    </div>
+
+    <!-- Panel: upload -->
+    <div class="sfm-src-panel active" id="sfm-panel-upload">
+      <input type="file" class="sfm-upload-input" id="sfm-file-input" accept="*/*" onchange="sfmHandleFile(this.files[0])">
+      <div class="sfm-drop" id="sfm-drop-zone" onclick="document.getElementById('sfm-file-input').click()"
+           ondragover="event.preventDefault();this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="event.preventDefault();this.classList.remove('drag-over');sfmHandleFile(event.dataTransfer.files[0])">
+        <div class="sfm-drop-icon">📂</div>
+        <p><strong>Hacé click</strong> o arrastrá el archivo aquí</p>
+        <p style="margin-top:4px;font-size:11px;">PDF, Word, PPT, Excel, MP3, MP4, imágenes y más</p>
+      </div>
+      <div class="sfm-upload-max">Máximo recomendado: 25 MB</div>
+      <div class="sfm-file-preview" id="sfm-file-preview">
+        <span class="sfm-file-icon" id="sfm-file-icon">📄</span>
+        <div style="flex:1;min-width:0;">
+          <div class="sfm-file-name" id="sfm-file-name">—</div>
+          <div class="sfm-file-size" id="sfm-file-size">—</div>
+        </div>
+        <button class="sfm-file-remove" onclick="sfmRemoveFile()" title="Quitar archivo">✕</button>
+      </div>
+      <div class="sfm-progress" id="sfm-progress">
+        <div class="sfm-progress-label" id="sfm-progress-label">Subiendo...</div>
+        <div class="sfm-progress-bar"><div class="sfm-progress-fill" id="sfm-progress-fill"></div></div>
+      </div>
+    </div>
+
+    <!-- Panel: link -->
+    <div class="sfm-src-panel" id="sfm-panel-link">
+      <div class="sfm-field" style="margin-bottom:0;">
+        <label>Link del archivo</label>
+        <input type="url" id="sfm-url-input" placeholder="https://drive.google.com/file/d/...">
+        <div class="sfm-drive-hint">
+          💡 <strong>Cómo compartir desde Google Drive:</strong><br>
           Click derecho en el archivo → <em>Compartir</em> → <em>Cualquier persona con el link</em> → Copiar link
+        </div>
+        <div class="sfm-link-pills">
+          <span class="sfm-link-pill" onclick="sfmSetUrlPrefix('https://drive.google.com/')">📁 Drive</span>
+          <span class="sfm-link-pill" onclick="sfmSetUrlPrefix('https://docs.google.com/')">📝 Docs</span>
+          <span class="sfm-link-pill" onclick="sfmSetUrlPrefix('https://youtube.com/')">▶️ YouTube</span>
+          <span class="sfm-link-pill" onclick="sfmSetUrlPrefix('https://youtu.be/')">▶️ YT corto</span>
+          <span class="sfm-link-pill" onclick="sfmSetUrlPrefix('https://')">🌐 Otro</span>
         </div>
       </div>
     </div>
 
-    <div class="sfm-field">
+    <!-- Tipo -->
+    <div class="sfm-field" style="margin-top:16px;">
       <label>Tipo de material</label>
       <select id="sfm-type-select">
         <option value="pdf">📄 PDF / Documento</option>
         <option value="pptx">📊 Presentación</option>
-        <option value="mp3">🎧 Audio</option>
-        <option value="mp4">🎬 Video</option>
-        <option value="link">🔗 Link / Recurso web</option>
         <option value="docx">📝 Word / Texto</option>
         <option value="xlsx">📊 Planilla</option>
+        <option value="mp3">🎧 Audio</option>
+        <option value="mp4">🎬 Video</option>
+        <option value="img">🖼️ Imagen</option>
+        <option value="link">🔗 Link / Recurso web</option>
       </select>
     </div>
 
+    <!-- Nota -->
     <div class="sfm-field">
       <label>Nota para el alumno (opcional)</label>
-      <textarea id="sfm-note-input" placeholder="Ej: Revisá las páginas 3 a 7 antes de la próxima clase..." style="min-height:64px;resize:vertical;width:100%;padding:10px 14px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;"></textarea>
+      <textarea id="sfm-note-input" placeholder="Ej: Revisá las páginas 3 a 7 antes de la próxima clase..."></textarea>
     </div>
 
     <div class="sfm-btn-row">
@@ -7499,16 +7585,80 @@ Su cuenta de autenticación seguirá existiendo en Firebase Auth.`)) return;
   // ─────────────────────────────────────────────
   let sfmTargetUid = null;
 
+  // ─── SFM helpers ───────────────────────────────────
+  let sfmActiveTab = 'upload';   // 'upload' | 'link'
+  let sfmSelectedFile = null;
+
+  window.sfmSwitchTab = (tab) => {
+    sfmActiveTab = tab;
+    document.getElementById('sfm-tab-upload').classList.toggle('active', tab === 'upload');
+    document.getElementById('sfm-tab-link').classList.toggle('active',   tab === 'link');
+    document.getElementById('sfm-panel-upload').classList.toggle('active', tab === 'upload');
+    document.getElementById('sfm-panel-link').classList.toggle('active',   tab === 'link');
+  };
+
+  window.sfmHandleFile = (file) => {
+    if (!file) return;
+    sfmSelectedFile = file;
+    const ext = file.name.split('.').pop().toLowerCase();
+    const icons = { pdf:'📄', doc:'📝', docx:'📝', pptx:'📊', ppt:'📊', xlsx:'📊',
+                    xls:'📊', mp3:'🎧', mp4:'🎬', mov:'🎬', png:'🖼️', jpg:'🖼️',
+                    jpeg:'🖼️', gif:'🖼️', webp:'🖼️', zip:'🗜️', rar:'🗜️' };
+    const typeMap = { pdf:'pdf', doc:'docx', docx:'docx', pptx:'pptx', ppt:'pptx',
+                      xlsx:'xlsx', xls:'xlsx', mp3:'mp3', mp4:'mp4', mov:'mp4',
+                      png:'img', jpg:'img', jpeg:'img', gif:'img', webp:'img' };
+
+    document.getElementById('sfm-file-icon').textContent = icons[ext] || '📁';
+    document.getElementById('sfm-file-name').textContent = file.name;
+    const mb = (file.size / 1048576).toFixed(1);
+    document.getElementById('sfm-file-size').textContent = mb + ' MB';
+    document.getElementById('sfm-file-preview').classList.add('show');
+    document.getElementById('sfm-drop-zone').style.display = 'none';
+    document.getElementById('sfm-upload-max') && (document.querySelector('.sfm-upload-max').style.display='none');
+
+    // Auto-fill type
+    if (typeMap[ext]) document.getElementById('sfm-type-select').value = typeMap[ext];
+    // Auto-fill title if empty
+    const titleEl = document.getElementById('sfm-title-input');
+    if (!titleEl.value) {
+      titleEl.value = file.name.replace(/\.[^.]+$/, '');
+    }
+  };
+
+  window.sfmRemoveFile = () => {
+    sfmSelectedFile = null;
+    document.getElementById('sfm-file-input').value = '';
+    document.getElementById('sfm-file-preview').classList.remove('show');
+    document.getElementById('sfm-drop-zone').style.display = '';
+    document.querySelector('.sfm-upload-max').style.display = '';
+  };
+
+  window.sfmSetUrlPrefix = (prefix) => {
+    const el = document.getElementById('sfm-url-input');
+    if (!el.value || el.value === 'https://') el.value = prefix;
+    el.focus();
+  };
+
+  // ─── open / close ───────────────────────────────────
   window.openSendFileModal = (uid, name) => {
     sfmTargetUid = uid;
+    sfmSelectedFile = null;
+    sfmActiveTab = 'upload';
     document.getElementById('sfm-title-input').value = '';
     document.getElementById('sfm-url-input').value   = '';
     document.getElementById('sfm-note-input').value  = '';
     document.getElementById('sfm-type-select').value = 'pdf';
     document.getElementById('sfm-send-btn').disabled = false;
+    document.getElementById('sfm-file-preview').classList.remove('show');
+    document.getElementById('sfm-drop-zone').style.display = '';
+    document.getElementById('sfm-file-input').value = '';
+    document.getElementById('sfm-progress').classList.remove('show');
+    document.querySelector('.sfm-upload-max') && (document.querySelector('.sfm-upload-max').style.display = '');
+    sfmSwitchTab('upload');
+
     document.getElementById('sfm-subtitle').textContent = name
       ? `Enviando material a: ${name}`
-      : 'Compartí un link de Google Drive, YouTube o cualquier URL';
+      : 'Adjuntá un archivo o compartí un link de Drive';
 
     const sel = document.getElementById('sfm-student-select');
     sel.innerHTML = '<option value="">— Seleccioná un alumno —</option>';
@@ -7525,42 +7675,90 @@ Su cuenta de autenticación seguirá existiendo en Firebase Auth.`)) return;
 
   window.closeSendFileModal = () => {
     document.getElementById('send-file-modal-overlay').classList.remove('open');
+    sfmSelectedFile = null;
   };
 
+  // ─── send ───────────────────────────────────────────
   window.sendFileToStudent = async () => {
     const studentUid = document.getElementById('sfm-student-select').value;
     const title      = document.getElementById('sfm-title-input').value.trim();
-    const url        = document.getElementById('sfm-url-input').value.trim();
     const note       = document.getElementById('sfm-note-input').value.trim();
     const type       = document.getElementById('sfm-type-select').value;
 
     if (!studentUid) { showToast('⚠ Seleccioná un alumno'); return; }
     if (!title)      { showToast('⚠ Ingresá un título'); return; }
-    if (!url)        { showToast('⚠ Pegá el link del archivo'); return; }
-    if (!url.startsWith('http')) { showToast('⚠ El link debe comenzar con http...'); return; }
+
+    // Validate source
+    let finalUrl = '';
+    if (sfmActiveTab === 'upload') {
+      if (!sfmSelectedFile) { showToast('⚠ Seleccioná un archivo para subir'); return; }
+    } else {
+      finalUrl = document.getElementById('sfm-url-input').value.trim();
+      if (!finalUrl)               { showToast('⚠ Pegá el link del archivo'); return; }
+      if (!finalUrl.startsWith('http')) { showToast('⚠ El link debe comenzar con http...'); return; }
+    }
 
     if (DEMO_MODE) { showToast('✅ Material enviado (demo)'); closeSendFileModal(); return; }
 
-    document.getElementById('sfm-send-btn').disabled = true;
+    const btn = document.getElementById('sfm-send-btn');
+    btn.disabled = true;
+
     try {
+      // ── Upload file to Firebase Storage ──
+      if (sfmActiveTab === 'upload' && sfmSelectedFile) {
+        const prog = document.getElementById('sfm-progress');
+        const fill = document.getElementById('sfm-progress-fill');
+        const lbl  = document.getElementById('sfm-progress-label');
+        prog.classList.add('show');
+        lbl.textContent = 'Subiendo archivo...';
+        fill.style.width = '0%';
+
+        const { getStorage, ref, uploadBytesResumable, getDownloadURL }
+          = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js');
+        const storage  = getStorage(app);
+        const filePath = `student_materials/${studentUid}/${Date.now()}_${sfmSelectedFile.name}`;
+        const storRef  = ref(storage, filePath);
+        const task     = uploadBytesResumable(storRef, sfmSelectedFile);
+
+        finalUrl = await new Promise((resolve, reject) => {
+          task.on('state_changed',
+            snap => {
+              const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+              fill.style.width = pct + '%';
+              lbl.textContent = `Subiendo... ${pct}%`;
+            },
+            reject,
+            async () => {
+              const url = await getDownloadURL(task.snapshot.ref);
+              fill.style.width = '100%';
+              lbl.textContent = '✅ Archivo subido';
+              resolve(url);
+            }
+          );
+        });
+      }
+
+      // ── Save to Firestore ──
       const { getFirestore, collection, addDoc, serverTimestamp }
         = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
       await addDoc(collection(getFirestore(app), 'student_files'), {
         studentUid,
         title,
-        url,
+        url: finalUrl,
         note,
         type,
-        filename: title,
+        filename: sfmSelectedFile ? sfmSelectedFile.name : title,
+        source: sfmActiveTab,   // 'upload' | 'link'
         sentAt: serverTimestamp(),
         seen: false
       });
+
       showToast('✅ Material enviado al alumno');
       closeSendFileModal();
       loadAllSentFiles();
     } catch(e) {
       showToast('❌ Error: ' + e.message);
-      document.getElementById('sfm-send-btn').disabled = false;
+      btn.disabled = false;
     }
   };
 
