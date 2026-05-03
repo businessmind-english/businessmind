@@ -2363,12 +2363,12 @@
     table.admin-tbl { width:100%; border-collapse:collapse; }
     table.admin-tbl th {
       padding:12px 20px; font-size:10px; font-weight:700; letter-spacing:0.15em;
-      text-transform:uppercase; color: var(--muted);
-      border-bottom:1px solid var(--border); text-align:left;
+      text-transform:uppercase; color: rgba(255,255,255,0.45);
+      border-bottom:1px solid rgba(255,255,255,0.08); text-align:left;
     }
-    table.admin-tbl td { padding:14px 20px; font-size:13px; color: var(--navy); border-bottom:1px solid var(--border); }
+    table.admin-tbl td { padding:14px 20px; font-size:13px; color: rgba(255,255,255,0.85); border-bottom:1px solid rgba(255,255,255,0.06); }
     table.admin-tbl tr:last-child td { border-bottom:none; }
-    table.admin-tbl tr:hover td { background: rgba(27,43,94,0.03); }
+    table.admin-tbl tr:hover td { background: rgba(255,255,255,0.04); }
     .tbl-avatar {
       width:34px; height:34px; border-radius:50%;
       background:linear-gradient(135deg,var(--green),var(--sky));
@@ -2844,7 +2844,7 @@
     .db-welcome p { color: var(--muted); font-size: 14px; }
 
     /* KPI Cards */
-    .db-kpis { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 36px; }
+    .db-kpis { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 36px; }
     .db-kpi {
       background: var(--white);
       border: 1.5px solid var(--border); border-radius: 16px;
@@ -8054,7 +8054,7 @@ ${innerHtml}
         <option value="presencial" ${modality==='presencial'?'selected':''}>🏢 Presencial</option>
       </select>`;
       return `<tr>
-        <td><div class="tbl-name"><div class="tbl-avatar">${u.photo ? `<img src="${u.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : initials}</div><div><div style="font-weight:600;color:var(--navy);">${u.name || '—'}</div><div style="font-size:11px;color:var(--muted);">${u.email}</div></div></div></td>
+        <td><div class="tbl-name"><div class="tbl-avatar">${u.photo ? `<img src="${u.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : initials}</div><div><div style="font-weight:600;color:rgba(255,255,255,0.9);">${u.name || '—'}</div><div style="font-size:11px;color:var(--muted);">${u.email}</div></div></div></td>
         <td>${provider}</td>
         <td><span class="tbl-badge ${u.status === 'active' ? 'active' : 'inactive'}">${u.status === 'active' ? 'Activo' : 'Inactivo'}</span></td>
         <td>${lvl}</td>
@@ -8358,7 +8358,7 @@ Su cuenta de autenticación seguirá existiendo en Firebase Auth.`)) return;
         const sName = hw.studentUid ? (student?.name || student?.email || hw.studentName || hw.studentUid) : 'Todos';
         const isDone = hw.status === 'done';
         return `<tr>
-          <td style="font-size:13px;font-weight:600;color:var(--navy);">${hw.title}</td>
+          <td style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.9);">${hw.title}</td>
           <td><span style="font-size:10px;padding:3px 8px;border-radius:100px;background:rgba(47,168,208,0.1);color:var(--sky);border:1px solid rgba(47,168,208,0.2);">${hw.type||'task'}</span></td>
           <td style="font-size:12px;color:var(--muted);">${sName}</td>
           <td style="font-size:12px;color:var(--muted);">${dueStr}</td>
@@ -8436,7 +8436,7 @@ Su cuenta de autenticación seguirá existiendo en Firebase Auth.`)) return;
         const student = allUsers.find(u => u.id === c.studentUid);
         const sName = student?.name || student?.email || c.studentName || c.studentUid || '—';
         return `<tr>
-          <td style="font-size:13px;font-weight:600;color:var(--navy);">${c.name||c.title||'—'}</td>
+          <td style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.9);">${c.name||c.title||'—'}</td>
           <td><span class="pt-badge">${c.level||'—'}</span></td>
           <td style="font-size:12px;color:var(--muted);">${sName}</td>
           <td style="font-size:12px;color:var(--muted);">${c.completedWeeks||0}/${c.totalWeeks||0} sem.</td>
@@ -8684,7 +8684,7 @@ Su cuenta de autenticación seguirá existiendo en Firebase Auth.`)) return;
         const icon    = icons[f.type] || '📁';
         return `<tr>
           <td style="color:var(--muted);font-size:20px;width:40px;">${icon}</td>
-          <td><div style="font-weight:600;color:var(--navy);font-size:13px;">${f.title}</div>${f.note?`<div style="font-size:11px;color:var(--sky);margin-top:2px;">💬 ${f.note}</div>`:''}</td>
+          <td><div style="font-weight:600;color:rgba(255,255,255,0.9);font-size:13px;">${f.title}</div>${f.note?`<div style="font-size:11px;color:var(--sky);margin-top:2px;">💬 ${f.note}</div>`:''}</td>
           <td><div style="font-weight:600;font-size:13px;color:var(--navy);">${sName}</div></td>
           <td style="font-size:12px;color:var(--muted);">${date}</td>
           <td><span style="font-size:10px;padding:3px 8px;border-radius:100px;${f.seen ? 'background:rgba(91,175,42,0.1);color:var(--green);border:1px solid rgba(91,175,42,0.2);' : 'background:rgba(47,168,208,0.1);color:var(--sky);border:1px solid rgba(47,168,208,0.2);'}">${f.seen ? '✓ Visto' : '⏳ No visto'}</span></td>
@@ -8904,7 +8904,7 @@ Su cuenta de autenticación seguirá existiendo en Firebase Auth.`)) return;
       <tr>
         <td><div class="tbl-name">
           <div class="tbl-avatar">${u.photo?`<img src="${u.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`:(u.name||u.email||'?')[0].toUpperCase()}</div>
-          <div><div style="font-weight:600;color:var(--navy);">${u.name||'—'}</div><div style="font-size:11px;color:var(--muted);">${u.email}</div></div>
+          <div><div style="font-weight:600;color:rgba(255,255,255,0.9);">${u.name||'—'}</div><div style="font-size:11px;color:var(--muted);">${u.email}</div></div>
         </div></td>
         <td><button class="tbl-action-btn perf" onclick="openPerfModal('${u.id}','${(u.name||u.email).replace(/'/g,'&apos;')}')">📈 Ver / editar performance</button></td>
       </tr>`).join('');
