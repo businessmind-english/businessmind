@@ -6619,6 +6619,25 @@ ${innerHtml}
       provider = new GoogleAuthProvider();
       provider.addScope('https://www.googleapis.com/auth/calendar');
       provider.addScope('https://www.googleapis.com/auth/calendar.events');
+
+      // Handle redirect result FIRST before onAuthStateChanged
+      getRedirectResult(auth).then(async result => {
+        if (result) {
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          if (credential?.accessToken) window._gCalToken = credential.accessToken;
+          await saveUserProfile(result.user);
+          window.closeAuthModal();
+          // If pending calendar sync, trigger it
+          if (sessionStorage.getItem('pendingCalendarSync')) {
+            sessionStorage.removeItem('pendingCalendarSync');
+            setTimeout(() => {
+              if (typeof switchAdminTab === 'function') switchAdminTab('clases');
+              if (typeof loadCalendarClasses === 'function') loadCalendarClasses();
+            }, 800);
+          }
+        }
+      }).catch(e => console.warn('redirectResult:', e.message));
+
       onAuthStateChanged(auth, user => {
         if (user) showDashboard(user);
         else      hideDashboard();
@@ -6639,28 +6658,6 @@ ${innerHtml}
 
   function setError(msg) { document.getElementById('auth-error-msg').textContent = msg; }
   function clearError()  { document.getElementById('auth-error-msg').textContent = ''; }
-
-  // Handle redirect result on page load (after Google redirects back)
-  if (!DEMO_MODE && auth) {
-    getRedirectResult(auth).then(async result => {
-      if (result) {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        if (credential?.accessToken) window._gCalToken = credential.accessToken;
-        await saveUserProfile(result.user);
-        showDashboard(result.user);
-        window.closeAuthModal();
-        // If user was redirected to authorize Calendar, auto-sync after login
-        if (sessionStorage.getItem('pendingCalendarSync')) {
-          sessionStorage.removeItem('pendingCalendarSync');
-          setTimeout(() => {
-            // Switch to clases tab and sync
-            if (typeof switchAdminTab === 'function') switchAdminTab('clases');
-            if (typeof loadCalendarClasses === 'function') loadCalendarClasses();
-          }, 800);
-        }
-      }
-    }).catch(e => console.warn('redirectResult:', e.message));
-  }
 
   window.signInWithGoogle = async () => {
     clearError();
