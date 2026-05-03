@@ -6595,7 +6595,7 @@ ${innerHtml}
   // 2. Creá un proyecto → Agregá una app web → Copiá la config abajo
   const firebaseConfig = {
     apiKey:            "AIzaSyAHvNDEWlts7XPEANop-ch1aeW-4U43TF4",
-    authDomain:        "businessmindenglish.netlify.app",
+    authDomain:        "business-mind-a7f42.firebaseapp.com",
     projectId:         "business-mind-a7f42",
     storageBucket:     "business-mind-a7f42.firebasestorage.app",
     messagingSenderId: "366993546930",
@@ -6663,8 +6663,12 @@ ${innerHtml}
     clearError();
     if (DEMO_MODE) { demoLogin({ name: 'Usuario Demo', email: 'demo@businessmind.com', photo: null }); return; }
     try {
-      // Always use redirect to avoid COOP popup issues
-      await signInWithRedirect(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      if (credential?.accessToken) window._gCalToken = credential.accessToken;
+      await saveUserProfile(result.user);
+      showDashboard(result.user);
+      window.closeAuthModal();
     } catch(e) {
       setError(friendlyError(e.code));
     }
@@ -7380,19 +7384,28 @@ ${innerHtml}
 
     // Try Calendar sync
     if (!window._gCalToken) {
-      // No token — redirect to Google to get Calendar permissions
-      const { GoogleAuthProvider, signInWithRedirect }
-        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-      const calProvider = new GoogleAuthProvider();
-      calProvider.addScope('https://www.googleapis.com/auth/calendar');
-      calProvider.addScope('https://www.googleapis.com/auth/calendar.events');
-      calProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
-      calProvider.setCustomParameters({ prompt: 'consent', access_type: 'offline' });
-      // Save flag so after redirect we auto-sync
-      sessionStorage.setItem('pendingCalendarSync', '1');
-      body.innerHTML = '<div class="admin-loading">Redirigiendo a Google para autorizar Calendar...</div>';
-      await signInWithRedirect(auth, calProvider);
-      return;
+      try {
+        const { GoogleAuthProvider, signInWithPopup }
+          = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+        const calProvider = new GoogleAuthProvider();
+        calProvider.addScope('https://www.googleapis.com/auth/calendar');
+        calProvider.addScope('https://www.googleapis.com/auth/calendar.events');
+        calProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+        calProvider.setCustomParameters({ prompt: 'consent' });
+        body.innerHTML = '<div class="admin-loading">Esperando autorización de Google Calendar...</div>';
+        const result = await signInWithPopup(auth, calProvider);
+        const cred = GoogleAuthProvider.credentialFromResult(result);
+        if (cred?.accessToken) window._gCalToken = cred.accessToken;
+      } catch(e) {
+        console.warn('Calendar auth:', e.message);
+        const info = document.createElement('div');
+        info.style.cssText = 'padding:16px 20px;font-size:12px;color:rgba(255,200,80,0.9);border-bottom:1px solid rgba(47,168,208,0.1);';
+        info.innerHTML = '⚠️ No se pudo autorizar Google Calendar. Intentá cerrar sesión y volver a entrar con Google.';
+        body.innerHTML = '';
+        body.before(info);
+        renderClasesTable(classes, body);
+        return;
+      }
     }
 
     if (window._gCalToken) {
