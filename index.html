@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
   <script>/* PDF.js y mammoth cargados como opcional — extracción interna como fallback */</script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     :root {
       --navy: #1B2B5E;
@@ -6663,6 +6664,17 @@ ${innerHtml}
   function setError(msg) { document.getElementById('auth-error-msg').textContent = msg; }
   function clearError()  { document.getElementById('auth-error-msg').textContent = ''; }
 
+  // GIS token client for Calendar access (avoids COOP popup issues)
+  let gisTokenClient = null;
+  function initGisClient(callback) {
+    if (!window.google?.accounts?.oauth2) { callback(null); return; }
+    gisTokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: '366993546930-o1maagffp5dtd9ofeousjnuc570msog8.apps.googleusercontent.com',
+      scope: 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.readonly',
+      callback,
+    });
+  }
+
   window.signInWithGoogle = async () => {
     clearError();
     if (DEMO_MODE) { demoLogin({ name: 'Usuario Demo', email: 'demo@businessmind.com', photo: null }); return; }
@@ -6673,10 +6685,29 @@ ${innerHtml}
       await saveUserProfile(result.user);
       showDashboard(result.user);
       window.closeAuthModal();
+      // After login, silently request calendar token via GIS
+      initGisClient(tokenResponse => {
+        if (tokenResponse?.access_token) window._gCalToken = tokenResponse.access_token;
+      });
+      if (gisTokenClient) gisTokenClient.requestAccessToken({ prompt: '' });
     } catch(e) {
       setError(friendlyError(e.code));
     }
   };
+
+  // Request Calendar token via GIS (no popup needed after first grant)
+  window.requestCalendarToken = () => new Promise((resolve) => {
+    initGisClient(tokenResponse => {
+      if (tokenResponse?.access_token) {
+        window._gCalToken = tokenResponse.access_token;
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    });
+    if (gisTokenClient) gisTokenClient.requestAccessToken({ prompt: '' });
+    else resolve(false);
+  });
 
   window.signInWithEmail = async () => {
     clearError();
@@ -7386,29 +7417,11 @@ ${innerHtml}
     // Load from Firestore first
     let classes = await loadClassesFromFirestore();
 
-    // Try Calendar sync
+    // Try Calendar sync — use GIS token client to avoid COOP issues
     if (!window._gCalToken) {
-      try {
-        const { GoogleAuthProvider, signInWithPopup }
-          = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-        const calProvider = new GoogleAuthProvider();
-        calProvider.addScope('https://www.googleapis.com/auth/calendar');
-        calProvider.addScope('https://www.googleapis.com/auth/calendar.events');
-        calProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
-        calProvider.setCustomParameters({ prompt: 'consent' });
-        body.innerHTML = '<div class="admin-loading">Esperando autorización de Google Calendar...</div>';
-        const result = await signInWithPopup(auth, calProvider);
-        const cred = GoogleAuthProvider.credentialFromResult(result);
-        if (cred?.accessToken) window._gCalToken = cred.accessToken;
-      } catch(e) {
-        console.warn('Calendar auth:', e.message);
-        const info = document.createElement('div');
-        info.style.cssText = 'padding:16px 20px;font-size:12px;color:rgba(255,200,80,0.9);border-bottom:1px solid rgba(47,168,208,0.1);';
-        info.innerHTML = '⚠️ No se pudo autorizar Google Calendar. Intentá cerrar sesión y volver a entrar con Google.';
-        body.innerHTML = '';
-        body.before(info);
-        renderClasesTable(classes, body);
-        return;
+      body.innerHTML = '<div class="admin-loading">Solicitando acceso a Google Calendar...</div>';
+      if (window.requestCalendarToken) {
+        await window.requestCalendarToken();
       }
     }
 
