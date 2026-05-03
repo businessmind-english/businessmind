@@ -7434,15 +7434,6 @@ ${innerHtml}
       }
     }
     window._skipCalendarSync = false;
-    } else {
-      const info = document.createElement('div');
-      info.style.cssText = 'padding:16px 20px;font-size:12px;color:rgba(255,200,80,0.9);border-bottom:1px solid rgba(47,168,208,0.1);display:flex;align-items:center;gap:12px;flex-wrap:wrap;';
-      info.innerHTML = `⚠️ Necesitás autorizar el acceso a Google Calendar.
-        <button onclick="loadCalendarClasses()" style="padding:6px 14px;background:rgba(47,168,208,0.2);border:1px solid rgba(47,168,208,0.4);color:var(--sky-light);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;">
-          🔑 Autorizar con Google
-        </button>`;
-      body.before(info);
-    }
 
     renderClasesTable(classes, body);
   };
