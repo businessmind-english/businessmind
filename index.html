@@ -7370,21 +7370,37 @@ ${innerHtml}
 
     // Try Calendar sync
     if (!window._gCalToken) {
-      // Try to get token via re-auth silently
+      // Try to get token via re-auth forcing consent to ensure Calendar scopes are granted
       try {
-        const { getAuth, GoogleAuthProvider, signInWithPopup } 
+        const { GoogleAuthProvider, signInWithPopup }
           = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-        const silentProvider = new GoogleAuthProvider();
-        silentProvider.addScope('https://www.googleapis.com/auth/calendar');
-        silentProvider.addScope('https://www.googleapis.com/auth/calendar.events');
-        silentProvider.setCustomParameters({ prompt: 'none' });
-        const result = await signInWithPopup(auth, silentProvider);
+        const calProvider = new GoogleAuthProvider();
+        calProvider.addScope('https://www.googleapis.com/auth/calendar');
+        calProvider.addScope('https://www.googleapis.com/auth/calendar.events');
+        calProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+        calProvider.setCustomParameters({ prompt: 'consent', access_type: 'offline' });
+        body.innerHTML = '<div class="admin-loading">Esperando autorización de Google Calendar...</div>';
+        const result = await signInWithPopup(auth, calProvider);
         const cred = GoogleAuthProvider.credentialFromResult(result);
         if (cred?.accessToken) window._gCalToken = cred.accessToken;
-      } catch(e) { console.warn('Silent auth:', e.message); }
+      } catch(e) {
+        console.warn('Calendar auth:', e.message);
+        // Show actionable button instead of static warning
+        const info = document.createElement('div');
+        info.style.cssText = 'padding:16px 20px;font-size:12px;color:rgba(255,200,80,0.9);border-bottom:1px solid rgba(47,168,208,0.1);display:flex;align-items:center;gap:12px;flex-wrap:wrap;';
+        info.innerHTML = `⚠️ No se pudo autorizar el acceso a Google Calendar.
+          <button onclick="loadCalendarClasses()" style="padding:6px 14px;background:rgba(47,168,208,0.2);border:1px solid rgba(47,168,208,0.4);color:var(--sky-light);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;">
+            🔄 Reintentar autorización
+          </button>`;
+        body.innerHTML = '';
+        body.before(info);
+        renderClasesTable(classes, body);
+        return;
+      }
     }
 
     if (window._gCalToken) {
+      body.innerHTML = '<div class="admin-loading">Sincronizando con Google Calendar...</div>';
       const calClasses = await fetchCalendarEvents();
       if (calClasses.length) {
         await syncCalendarClassesToFirestore(calClasses);
@@ -7392,8 +7408,11 @@ ${innerHtml}
       }
     } else {
       const info = document.createElement('div');
-      info.style.cssText = 'padding:12px 20px;font-size:11px;color:rgba(255,255,255,0.4);border-bottom:1px solid rgba(47,168,208,0.1);';
-      info.innerHTML = '⚠️ Para sincronizar con Google Calendar y crear clases con Meet, cerrá sesión y volvé a entrar con Google para autorizar el acceso al calendario.';
+      info.style.cssText = 'padding:16px 20px;font-size:12px;color:rgba(255,200,80,0.9);border-bottom:1px solid rgba(47,168,208,0.1);display:flex;align-items:center;gap:12px;flex-wrap:wrap;';
+      info.innerHTML = `⚠️ Necesitás autorizar el acceso a Google Calendar.
+        <button onclick="loadCalendarClasses()" style="padding:6px 14px;background:rgba(47,168,208,0.2);border:1px solid rgba(47,168,208,0.4);color:var(--sky-light);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;">
+          🔑 Autorizar con Google
+        </button>`;
       body.before(info);
     }
 
