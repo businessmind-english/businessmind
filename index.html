@@ -7433,7 +7433,8 @@ ${innerHtml}
         classes = await loadClassesFromFirestore();
       }
     }
-    window._skipCalendarSync = false; else {
+    window._skipCalendarSync = false;
+    } else {
       const info = document.createElement('div');
       info.style.cssText = 'padding:16px 20px;font-size:12px;color:rgba(255,200,80,0.9);border-bottom:1px solid rgba(47,168,208,0.1);display:flex;align-items:center;gap:12px;flex-wrap:wrap;';
       info.innerHTML = `⚠️ Necesitás autorizar el acceso a Google Calendar.
