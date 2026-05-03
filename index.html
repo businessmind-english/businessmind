@@ -6585,7 +6585,8 @@ ${innerHtml}
 ══════════════════════════════════════════ -->
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
+  import { getAuth, initializeAuth, browserPopupRedirectResolver, browserLocalPersistence,
+           GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
            createUserWithEmailAndPassword, signInWithEmailAndPassword,
            onAuthStateChanged, updateProfile,
            signOut as fbSignOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
@@ -6615,7 +6616,10 @@ ${innerHtml}
       if (apps.length > 0) { app = apps[0]; }
     }
     if (app) {
-      auth     = getAuth(app);
+      auth     = initializeAuth(app, {
+        persistence: browserLocalPersistence,
+        popupRedirectResolver: browserPopupRedirectResolver,
+      });
       provider = new GoogleAuthProvider();
       provider.addScope('https://www.googleapis.com/auth/calendar');
       provider.addScope('https://www.googleapis.com/auth/calendar.events');
