@@ -7430,19 +7430,49 @@ ${innerHtml}
     } catch(e) { console.warn('loadClasses:', e.message); return []; }
   }
 
+  // Detect the "Business Mind" calendar ID from the user's calendar list
+  async function getBusinessMindCalendarId() {
+    try {
+      const res = await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList',
+        { headers: { Authorization: `Bearer ${window._gCalToken}` } });
+      if (!res.ok) return null;
+      const data = await res.json();
+      const cal = (data.items || []).find(c =>
+        c.summary && c.summary.toLowerCase().includes('business mind'));
+      if (cal) window._bmCalendarId = cal.id;
+      return cal ? cal.id : null;
+    } catch(e) { return null; }
+  }
+
   async function fetchCalendarEvents() {
     try {
       const now      = new Date();
       const past30   = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000); // 60 días atrás
       const future14 = new Date(now.getTime() + 14  * 24 * 60 * 60 * 1000); // 14 días adelante
-      const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events?` +
-        `timeMin=${past30.toISOString()}&timeMax=${future14.toISOString()}` +
-        `&singleEvents=true&orderBy=startTime&maxResults=200`;
-      const res  = await fetch(url, { headers: { Authorization: `Bearer ${window._gCalToken}` } });
-      if (!res.ok) { console.warn('Calendar API error:', res.status); return []; }
-      const data = await res.json();
-      return (data.items || [])
-        .map(ev => {
+      const timeParams = `timeMin=${past30.toISOString()}&timeMax=${future14.toISOString()}&singleEvents=true&orderBy=startTime&maxResults=200`;
+
+      // Fetch from primary + Business Mind calendar in parallel
+      const bmCalId = await getBusinessMindCalendarId();
+      const calIds = ['primary'];
+      if (bmCalId && bmCalId !== 'primary') calIds.push(bmCalId);
+
+      const allItems = [];
+      await Promise.all(calIds.map(async calId => {
+        const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events?${timeParams}`;
+        const res = await fetch(url, { headers: { Authorization: `Bearer ${window._gCalToken}` } });
+        if (!res.ok) { console.warn('Calendar API error:', res.status, calId); return; }
+        const data = await res.json();
+        (data.items || []).forEach(ev => allItems.push(ev));
+      }));
+
+      // Deduplicate by event id
+      const seen = new Set();
+      const uniqueItems = allItems.filter(ev => {
+        if (seen.has(ev.id)) return false;
+        seen.add(ev.id); return true;
+      });
+
+      return uniqueItems.map(ev => {
           const start    = new Date(ev.start?.dateTime || ev.start?.date);
           const end      = new Date(ev.end?.dateTime   || ev.end?.date);
           const duration = Math.round((end - start) / 60000);
@@ -7655,8 +7685,10 @@ ${innerHtml}
         },
         attendees: studentEmail ? [{ email: studentEmail }] : [],
       };
+      // Use Business Mind calendar if available, fallback to primary
+      const targetCal = encodeURIComponent(window._bmCalendarId || 'primary');
       const res = await fetch(
-        'https://www.googleapis.com/calendar/v3/calendars/primary/events?conferenceDataVersion=1&sendUpdates=all',
+        `https://www.googleapis.com/calendar/v3/calendars/${targetCal}/events?conferenceDataVersion=1&sendUpdates=all`,
         { method: 'POST', headers: { Authorization: `Bearer ${window._gCalToken}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
       );
       if (!res.ok) { const err = await res.json(); console.warn('Calendar event create error:', err); return null; }
