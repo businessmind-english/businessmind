@@ -6640,23 +6640,36 @@ ${innerHtml}
   function setError(msg) { document.getElementById('auth-error-msg').textContent = msg; }
   function clearError()  { document.getElementById('auth-error-msg').textContent = ''; }
 
+  // Handle redirect result on page load (after Google redirects back)
+  if (!DEMO_MODE && auth) {
+    getRedirectResult(auth).then(async result => {
+      if (result) {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        if (credential?.accessToken) window._gCalToken = credential.accessToken;
+        await saveUserProfile(result.user);
+        showDashboard(result.user);
+        window.closeAuthModal();
+        // If user was redirected to authorize Calendar, auto-sync after login
+        if (sessionStorage.getItem('pendingCalendarSync')) {
+          sessionStorage.removeItem('pendingCalendarSync');
+          setTimeout(() => {
+            // Switch to clases tab and sync
+            if (typeof switchAdminTab === 'function') switchAdminTab('clases');
+            if (typeof loadCalendarClasses === 'function') loadCalendarClasses();
+          }, 800);
+        }
+      }
+    }).catch(e => console.warn('redirectResult:', e.message));
+  }
+
   window.signInWithGoogle = async () => {
     clearError();
     if (DEMO_MODE) { demoLogin({ name: 'Usuario Demo', email: 'demo@businessmind.com', photo: null }); return; }
     try {
-      const result = await signInWithPopup(auth, provider);
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      if (credential?.accessToken) window._gCalToken = credential.accessToken;
-      await saveUserProfile(result.user);
-      showDashboard(result.user);
-      window.closeAuthModal();
+      // Always use redirect to avoid COOP popup issues
+      await signInWithRedirect(auth, provider);
     } catch(e) {
-      if (e.code === 'auth/popup-blocked' || e.message?.includes('Cross-Origin')) {
-        // Fallback to redirect
-        await signInWithRedirect(auth, provider);
-      } else {
-        setError(friendlyError(e.code));
-      }
+      setError(friendlyError(e.code));
     }
   };
 
@@ -7370,33 +7383,19 @@ ${innerHtml}
 
     // Try Calendar sync
     if (!window._gCalToken) {
-      // Try to get token via re-auth forcing consent to ensure Calendar scopes are granted
-      try {
-        const { GoogleAuthProvider, signInWithPopup }
-          = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-        const calProvider = new GoogleAuthProvider();
-        calProvider.addScope('https://www.googleapis.com/auth/calendar');
-        calProvider.addScope('https://www.googleapis.com/auth/calendar.events');
-        calProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
-        calProvider.setCustomParameters({ prompt: 'consent', access_type: 'offline' });
-        body.innerHTML = '<div class="admin-loading">Esperando autorización de Google Calendar...</div>';
-        const result = await signInWithPopup(auth, calProvider);
-        const cred = GoogleAuthProvider.credentialFromResult(result);
-        if (cred?.accessToken) window._gCalToken = cred.accessToken;
-      } catch(e) {
-        console.warn('Calendar auth:', e.message);
-        // Show actionable button instead of static warning
-        const info = document.createElement('div');
-        info.style.cssText = 'padding:16px 20px;font-size:12px;color:rgba(255,200,80,0.9);border-bottom:1px solid rgba(47,168,208,0.1);display:flex;align-items:center;gap:12px;flex-wrap:wrap;';
-        info.innerHTML = `⚠️ No se pudo autorizar el acceso a Google Calendar.
-          <button onclick="loadCalendarClasses()" style="padding:6px 14px;background:rgba(47,168,208,0.2);border:1px solid rgba(47,168,208,0.4);color:var(--sky-light);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;">
-            🔄 Reintentar autorización
-          </button>`;
-        body.innerHTML = '';
-        body.before(info);
-        renderClasesTable(classes, body);
-        return;
-      }
+      // No token — redirect to Google to get Calendar permissions
+      const { GoogleAuthProvider, signInWithRedirect }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+      const calProvider = new GoogleAuthProvider();
+      calProvider.addScope('https://www.googleapis.com/auth/calendar');
+      calProvider.addScope('https://www.googleapis.com/auth/calendar.events');
+      calProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+      calProvider.setCustomParameters({ prompt: 'consent', access_type: 'offline' });
+      // Save flag so after redirect we auto-sync
+      sessionStorage.setItem('pendingCalendarSync', '1');
+      body.innerHTML = '<div class="admin-loading">Redirigiendo a Google para autorizar Calendar...</div>';
+      await signInWithRedirect(auth, calProvider);
+      return;
     }
 
     if (window._gCalToken) {
