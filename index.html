@@ -7425,14 +7425,15 @@ ${innerHtml}
       }
     }
 
-    if (window._gCalToken) {
+    if (window._gCalToken && !window._skipCalendarSync) {
       body.innerHTML = '<div class="admin-loading">Sincronizando con Google Calendar...</div>';
       const calClasses = await fetchCalendarEvents();
       if (calClasses.length) {
         await syncCalendarClassesToFirestore(calClasses);
         classes = await loadClassesFromFirestore();
       }
-    } else {
+    }
+    window._skipCalendarSync = false; else {
       const info = document.createElement('div');
       info.style.cssText = 'padding:16px 20px;font-size:12px;color:rgba(255,200,80,0.9);border-bottom:1px solid rgba(47,168,208,0.1);display:flex;align-items:center;gap:12px;flex-wrap:wrap;';
       info.innerHTML = `⚠️ Necesitás autorizar el acceso a Google Calendar.
@@ -7534,8 +7535,15 @@ ${innerHtml}
         if (data.calendarId) existingByCalId[data.calendarId] = d.id;
       });
 
+      // Load blacklist of deleted calendar IDs
+      const deletedSnap = await getDocs(collection(db, 'deleted_calendar_ids'));
+      const deletedCalIds = new Set(deletedSnap.docs.map(d => d.id));
+
       for (const cls of calClasses) {
         if (!cls.calendarId) continue;
+
+        // Skip if this calendar event was manually deleted
+        if (deletedCalIds.has(cls.calendarId)) continue;
 
         // Skip if a manual class already has this calendarId
         if (existingByCalId[cls.calendarId]) {
@@ -7870,9 +7878,25 @@ ${innerHtml}
     if (!classId || !confirm('¿Borrar esta clase?')) return;
     if (DEMO_MODE) { loadCalendarClasses(); return; }
     try {
-      const { getFirestore, doc, deleteDoc }
+      const { getFirestore, doc, deleteDoc, setDoc, getDoc }
         = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-      await deleteDoc(doc(getFirestore(app), 'classes', classId));
+      const db = getFirestore(app);
+
+      // Get the class data to save its calendarId to a blacklist
+      const classDoc = await getDoc(doc(db, 'classes', classId));
+      if (classDoc.exists()) {
+        const calId = classDoc.data().calendarId;
+        if (calId) {
+          // Save to deleted_calendar_ids so sync won't recreate it
+          await setDoc(doc(db, 'deleted_calendar_ids', calId), {
+            deletedAt: new Date(), calendarId: calId
+          });
+        }
+      }
+
+      await deleteDoc(doc(db, 'classes', classId));
+      // Reload without re-syncing Calendar to avoid token expiry issues
+      window._skipCalendarSync = true;
       loadCalendarClasses();
     } catch(e) { alert('Error al borrar: ' + e.message); }
   };
