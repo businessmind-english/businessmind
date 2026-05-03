@@ -2612,6 +2612,121 @@
     .tbl-action-btn.perf:hover  { background:rgba(91,175,42,0.2); }
     .tbl-action-btn.del   { color:#e05555; border-color:rgba(220,50,50,0.3); background:rgba(220,50,50,0.08); }
     .tbl-action-btn.del:hover   { background:rgba(220,50,50,0.22); }
+    .tbl-action-btn.sched { color:#f59e0b; border-color:rgba(245,158,11,0.3); background:rgba(245,158,11,0.08); }
+    .tbl-action-btn.sched:hover { background:rgba(245,158,11,0.2); }
+    .tbl-modality-sel {
+      padding:5px 10px; border-radius:8px; font-size:12px; font-weight:600;
+      border:1.5px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.05);
+      color:white; font-family:'Plus Jakarta Sans',sans-serif; cursor:pointer;
+      outline:none; transition:border-color 0.2s, background 0.2s;
+    }
+    .tbl-modality-sel:hover { border-color:rgba(47,168,208,0.4); background:rgba(47,168,208,0.08); }
+    .tbl-modality-sel option { background:#1b2b5e; color:white; }
+
+    /* ── SCHEDULE MODAL ── */
+    #schedule-modal-overlay {
+      display:none; position:fixed; inset:0; z-index:2100;
+      background:rgba(0,0,0,0.7); backdrop-filter:blur(8px);
+      align-items:center; justify-content:center;
+    }
+    #schedule-modal-overlay.open { display:flex; }
+    .sched-modal {
+      background:linear-gradient(145deg,#1b2b5e,#192558);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:20px; padding:36px 32px;
+      width:min(96vw,620px); max-height:90vh; overflow-y:auto;
+      box-shadow:0 40px 100px rgba(0,0,0,0.6); position:relative;
+    }
+    .sched-modal-title { font-family:'Playfair Display',serif; font-size:22px; font-weight:900; color:white; margin-bottom:4px; }
+    .sched-modal-sub { font-size:12px; color:rgba(255,255,255,0.45); margin-bottom:28px; }
+    .sched-section-label {
+      font-size:10px; letter-spacing:0.2em; text-transform:uppercase;
+      color:var(--sky); font-weight:700; margin-bottom:12px;
+    }
+    .sched-field { margin-bottom:16px; }
+    .sched-field label { display:block; font-size:12px; color:rgba(255,255,255,0.6); margin-bottom:6px; font-weight:500; }
+    .sched-field input, .sched-field select {
+      width:100%; padding:10px 14px; border-radius:10px;
+      background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
+      color:white; font-family:'Plus Jakarta Sans',sans-serif; font-size:13px;
+      outline:none; transition:border-color 0.2s;
+    }
+    .sched-field input:focus, .sched-field select:focus { border-color:rgba(47,168,208,0.5); }
+    .sched-field select option { background:#1b2b5e; }
+    .sched-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .sched-days { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+    .sched-day-btn {
+      padding:8px 14px; border-radius:8px; font-size:12px; font-weight:700;
+      cursor:pointer; border:1.5px solid rgba(255,255,255,0.15);
+      color:rgba(255,255,255,0.5); background:rgba(255,255,255,0.04);
+      font-family:'Plus Jakarta Sans',sans-serif; transition:all 0.18s;
+    }
+    .sched-day-btn.sel {
+      border-color:var(--sky); color:var(--sky-light);
+      background:rgba(47,168,208,0.15);
+    }
+    .sched-classes-list { display:flex; flex-direction:column; gap:8px; margin-bottom:20px; max-height:220px; overflow-y:auto; }
+    .sched-class-item {
+      display:flex; align-items:center; gap:12px; padding:12px 14px;
+      background:rgba(255,255,255,0.04); border-radius:10px;
+      border:1px solid rgba(255,255,255,0.08); cursor:pointer;
+      transition:background 0.18s;
+    }
+    .sched-class-item:hover { background:rgba(255,255,255,0.08); }
+    .sched-class-date { min-width:44px; text-align:center; }
+    .sched-class-day-num { font-size:18px; font-weight:700; color:white; line-height:1; }
+    .sched-class-month { font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); }
+    .sched-class-info { flex:1; }
+    .sched-class-title { font-size:13px; font-weight:600; color:white; }
+    .sched-class-meta { font-size:11px; color:var(--muted); margin-top:2px; }
+    .sched-meet-btn {
+      display:inline-flex; align-items:center; gap:6px; padding:6px 14px;
+      background:linear-gradient(135deg,#34A853,#1a8a3a);
+      border:none; border-radius:8px; color:white; font-size:11px; font-weight:700;
+      cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif;
+      text-decoration:none; transition:transform 0.15s,box-shadow 0.15s;
+      flex-shrink:0;
+    }
+    .sched-meet-btn:hover { transform:scale(1.05); box-shadow:0 4px 16px rgba(52,168,83,0.4); }
+    .sched-status-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .sched-status-dot.pending { background:#f59e0b; box-shadow:0 0 6px #f59e0b; }
+    .sched-status-dot.done { background:var(--green); }
+    .sched-status-dot.live { background:#ff4d6d; box-shadow:0 0 8px #ff4d6d; animation:pulse 1.5s infinite; }
+    .sched-save-btn {
+      width:100%; padding:14px; background:linear-gradient(135deg,var(--green),var(--sky));
+      border:none; border-radius:12px; color:white;
+      font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; font-weight:700;
+      cursor:pointer; letter-spacing:0.03em; transition:opacity 0.2s,transform 0.2s;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .sched-save-btn:hover { opacity:0.9; transform:translateY(-1px); }
+    .sched-meet-status { font-size:12px; padding:10px 14px; border-radius:8px; margin-bottom:14px;
+      background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.55); }
+    .sched-tabs { display:flex; gap:6px; margin-bottom:24px; }
+    .sched-tab { padding:8px 18px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer;
+      border:1.5px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.45);
+      background:rgba(255,255,255,0.04); font-family:'Plus Jakarta Sans',sans-serif; transition:all 0.18s; }
+    .sched-tab.active { border-color:var(--sky); color:var(--sky-light); background:rgba(47,168,208,0.12); }
+
+    /* ── STUDENT MEET BUTTON ── */
+    .db-meet-join-btn {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 22px; background:linear-gradient(135deg,#34A853,#1a8a3a);
+      border:none; border-radius:10px; color:white; font-size:13px; font-weight:700;
+      cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif;
+      text-decoration:none; transition:transform 0.15s,box-shadow 0.2s;
+      box-shadow:0 4px 18px rgba(52,168,83,0.3);
+    }
+    .db-meet-join-btn:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(52,168,83,0.45); }
+    .db-next-class-banner {
+      background:linear-gradient(135deg,rgba(52,168,83,0.12),rgba(47,168,208,0.1));
+      border:1px solid rgba(52,168,83,0.3); border-radius:14px; padding:18px 20px;
+      display:flex; align-items:center; gap:16px; margin-bottom:0; flex-wrap:wrap; gap:12px;
+    }
+    .db-next-class-banner .banner-icon { font-size:28px; flex-shrink:0; }
+    .db-next-class-banner .banner-info { flex:1; min-width:160px; }
+    .db-next-class-banner .banner-title { font-size:14px; font-weight:700; color:white; }
+    .db-next-class-banner .banner-time { font-size:12px; color:rgba(255,255,255,0.55); margin-top:3px; }
 
     /* ══════════════════════════════════════════
        STUDENT – Files & Performance from Firestore
@@ -3619,12 +3734,6 @@
         <div class="db-kpi-label">Nivel actual</div>
         <div class="db-kpi-bar" id="kpi-bar-level" style="width:40%;"></div>
       </div>
-      <div class="db-kpi">
-        <span class="db-kpi-icon">✏️</span>
-        <div class="db-kpi-value"><span id="kpi-hw-pending">—</span></div>
-        <div class="db-kpi-label">Homeworks pendientes</div>
-        <div class="db-kpi-bar" id="kpi-bar-hw" style="width:0%;"></div>
-      </div>
       <div class="db-kpi sky">
         <span class="db-kpi-icon">🏆</span>
         <div class="db-kpi-value"><span id="kpi-attendance-val">—</span><span id="kpi-attendance-pct" style="font-size:18px"></span></div>
@@ -3638,6 +3747,19 @@
 
       <!-- Left: Próximas clases + Cursos -->
       <div style="display:flex;flex-direction:column;gap:24px;">
+
+        <!-- Banner próxima clase con Meet -->
+        <div id="db-next-meet-banner" style="display:none;" class="db-next-class-banner">
+          <div class="banner-icon">📹</div>
+          <div class="banner-info">
+            <div class="banner-title" id="banner-class-title">Próxima clase</div>
+            <div class="banner-time" id="banner-class-time">—</div>
+          </div>
+          <a id="banner-meet-link" href="#" target="_blank" class="db-meet-join-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 10l4.553-2.069A1 1 0 0121 8.81v6.38a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+            Unirse a la clase
+          </a>
+        </div>
 
         <!-- Próximas clases -->
         <div class="db-panel">
@@ -6992,6 +7114,24 @@ ${innerHtml}
 
     if (badge) badge.textContent = upcoming.length ? `${upcoming.length} próxima${upcoming.length>1?'s':''}` : '—';
 
+    // Update next class Meet banner
+    const nextWithMeet = upcoming.find(c => c.meetLink);
+    const banner = document.getElementById('db-next-meet-banner');
+    if (banner && nextWithMeet) {
+      const st = nextWithMeet.startTime instanceof Date ? nextWithMeet.startTime : new Date(nextWithMeet.startTime?.seconds ? nextWithMeet.startTime.seconds*1000 : nextWithMeet.startTime);
+      const isLive = st <= now && st > new Date(now.getTime() - 90*60000);
+      const timeStr = st.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
+      const dateStr = st.toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long' });
+      document.getElementById('banner-class-title').textContent = nextWithMeet.title || 'Próxima clase';
+      document.getElementById('banner-class-time').textContent = isLive ? '🔴 EN VIVO ahora' : `📅 ${dateStr} · 🕙 ${timeStr}`;
+      const link = document.getElementById('banner-meet-link');
+      link.href = nextWithMeet.meetLink;
+      link.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 10l4.553-2.069A1 1 0 0121 8.81v6.38a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>${isLive ? '🔴 UNIRSE AHORA' : 'Unirse a la clase'}`;
+      banner.style.display = 'flex';
+    } else if (banner) {
+      banner.style.display = 'none';
+    }
+
     if (!upcoming.length) {
       list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">No tenés clases programadas próximamente.<br>Tu profesor las irá cargando.</div>';
       return;
@@ -7001,23 +7141,33 @@ ${innerHtml}
       const st = cls.startTime instanceof Date ? cls.startTime : new Date(cls.startTime?.seconds ? cls.startTime.seconds*1000 : cls.startTime);
       const isLive = st <= now && st > new Date(now.getTime() - 90*60000);
       const isToday = st.toDateString() === now.toDateString();
+      const isSoon = st > now && st < new Date(now.getTime() + 60*60000); // within 1h
       const timeStr = st.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
-      const meetHtml = cls.meetLink ? `· <a href="${cls.meetLink}" target="_blank" style="color:var(--sky-light);text-decoration:none;">Unirse</a>` : '';
+      const dateStr = st.toLocaleDateString('es-AR', { weekday:'short', day:'numeric', month:'short' });
+      const meetHtml = cls.meetLink
+        ? `<a href="${cls.meetLink}" target="_blank" class="db-meet-join-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 10l4.553-2.069A1 1 0 0121 8.81v6.38a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+            ${isLive ? '🔴 UNIRSE AHORA' : 'Unirse a Meet'}
+           </a>`
+        : '';
       const statusHtml = isLive
         ? `<span class="db-class-status live">● EN VIVO</span>`
-        : isToday
-          ? `<span class="db-class-status" style="background:rgba(91,175,42,0.1);color:var(--green);border:1px solid rgba(91,175,42,0.3);padding:4px 10px;border-radius:100px;font-size:10px;font-weight:700;">HOY</span>`
+        : (isSoon || isToday)
+          ? `<span class="db-class-status" style="background:rgba(91,175,42,0.1);color:var(--green);border:1px solid rgba(91,175,42,0.3);padding:4px 10px;border-radius:100px;font-size:10px;font-weight:700;">${isToday ? 'HOY' : 'PRONTO'}</span>`
           : `<span class="db-class-status upcoming">PRÓXIMA</span>`;
-      return `<div class="db-class-item">
+      return `<div class="db-class-item" style="${isLive ? 'border:1px solid rgba(255,77,109,0.3);background:rgba(255,77,109,0.05);' : isSoon ? 'border:1px solid rgba(91,175,42,0.25);' : ''}">
         <div class="db-class-date">
           <div class="db-class-day">${st.getDate()}</div>
           <div class="db-class-month">${months[st.getMonth()]}</div>
         </div>
         <div class="db-class-info">
           <div class="db-class-name">${cls.title || 'Clase'}</div>
-          <div class="db-class-meta">🕙 ${timeStr} · Zoom ${meetHtml}</div>
+          <div class="db-class-meta">🕙 ${timeStr} · ${dateStr}</div>
         </div>
-        ${statusHtml}
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+          ${statusHtml}
+          ${meetHtml}
+        </div>
       </div>`;
     }).join('');
   }
@@ -7094,11 +7244,6 @@ ${innerHtml}
         <span class="db-hw-badge ${typeClass}">${hw.type ? hw.type.charAt(0).toUpperCase()+hw.type.slice(1) : 'Task'}</span>
       </div>`;
     }).join('');
-    // Update pending KPI
-    const kpiEl = document.getElementById('kpi-hw-pending');
-    if (kpiEl) kpiEl.textContent = pending;
-    const barEl = document.getElementById('kpi-bar-hw');
-    if (barEl) barEl.style.width = hws.length ? Math.round(pending/hws.length*100)+'%' : '0%';
   }
 
   window.toggleStudentHw = async (hwId, idx) => {
@@ -7634,6 +7779,226 @@ ${innerHtml}
   };
 
   // ══ END CLASES SYSTEM ══
+
+  // ══════════════════════════════════════════
+  //  SCHEDULE MODAL — Horario por alumno
+  // ══════════════════════════════════════════
+
+  let schedCurrentUid = null;
+  let schedCurrentName = '';
+  let schedCurrentEmail = '';
+
+  window.openScheduleModal = async (uid, name, email) => {
+    schedCurrentUid   = uid;
+    schedCurrentName  = name;
+    schedCurrentEmail = email;
+    document.getElementById('sched-modal-sub').textContent = `Alumno: ${name}`;
+    // Reset tabs
+    switchSchedTab('clases');
+    // Reset form
+    const now = new Date();
+    now.setMinutes(0,0,0); now.setHours(now.getHours()+1);
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    const todayStr = new Date(); todayStr.setMinutes(todayStr.getMinutes()-todayStr.getTimezoneOffset());
+    const el = document.getElementById('sched-start');
+    if (el) el.value = now.toISOString().slice(0,16);
+    const fromEl = document.getElementById('sched-weekly-from');
+    if (fromEl) fromEl.value = todayStr.toISOString().slice(0,10);
+    document.getElementById('sched-mode').value = 'single';
+    document.getElementById('sched-single-mode').style.display = '';
+    document.getElementById('sched-weekly-mode').style.display = 'none';
+    document.querySelectorAll('.sched-day-btn').forEach(b => b.classList.remove('sel'));
+    document.getElementById('sched-meet-status').textContent = '⏳ El link de Meet se generará al guardar';
+    document.getElementById('sched-title').value = '';
+    document.getElementById('schedule-modal-overlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    // Load classes for this student
+    await loadSchedClasses(uid);
+  };
+
+  window.closeScheduleModal = () => {
+    document.getElementById('schedule-modal-overlay').style.display = 'none';
+    document.body.style.overflow = '';
+  };
+
+  window.switchSchedTab = (tab) => {
+    document.getElementById('sched-tab-clases').classList.toggle('active', tab==='clases');
+    document.getElementById('sched-tab-nueva').classList.toggle('active', tab==='nueva');
+    document.getElementById('sched-panel-clases').style.display = tab==='clases' ? '' : 'none';
+    document.getElementById('sched-panel-nueva').style.display  = tab==='nueva'  ? '' : 'none';
+  };
+
+  window.toggleSchedMode = () => {
+    const mode = document.getElementById('sched-mode').value;
+    document.getElementById('sched-single-mode').style.display  = mode==='single' ? '' : 'none';
+    document.getElementById('sched-weekly-mode').style.display  = mode==='weekly' ? '' : 'none';
+  };
+
+  async function loadSchedClasses(uid) {
+    const list = document.getElementById('sched-classes-list');
+    if (!list) return;
+    list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--muted);font-size:13px;">Cargando...</div>';
+    if (DEMO_MODE) {
+      const now = new Date();
+      renderSchedClasses([
+        { id:'d1', title:'Business Grammar – Conditionals', startTime: new Date(now.getTime() + 2*86400000), durationMin:60, meetLink:'https://meet.google.com/demo-link', status:'pending' },
+        { id:'d2', title:'Speaking Practice – Presentations', startTime: new Date(now.getTime() + 9*86400000), durationMin:60, meetLink:'', status:'pending' },
+      ], list);
+      return;
+    }
+    try {
+      const { getFirestore, collection, getDocs, query, where, orderBy }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const db = getFirestore(app);
+      let classes = [];
+      try {
+        const snap = await getDocs(query(collection(db,'classes'), where('studentUid','==',uid), orderBy('startTime','asc')));
+        classes = snap.docs.map(d=>({id:d.id,...d.data()}));
+      } catch(e) {
+        const snap2 = await getDocs(collection(db,'classes'));
+        classes = snap2.docs.map(d=>({id:d.id,...d.data()})).filter(c=>c.studentUid===uid).sort((a,b)=>{
+          const ta = a.startTime?.seconds ? a.startTime.seconds*1000 : new Date(a.startTime).getTime();
+          const tb = b.startTime?.seconds ? b.startTime.seconds*1000 : new Date(b.startTime).getTime();
+          return ta-tb;
+        });
+      }
+      renderSchedClasses(classes, list);
+    } catch(e) {
+      list.innerHTML = `<div style="padding:16px;color:#ff8c94;font-size:13px;">Error: ${e.message}</div>`;
+    }
+  }
+
+  function renderSchedClasses(classes, list) {
+    const months = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+    const now = new Date();
+    if (!classes.length) {
+      list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">No hay clases asignadas a este alumno.<br>Usá la pestaña "Agregar clase" para crear una.</div>';
+      return;
+    }
+    list.innerHTML = classes.map(cls => {
+      const st = cls.startTime instanceof Date ? cls.startTime : new Date(cls.startTime?.seconds ? cls.startTime.seconds*1000 : cls.startTime);
+      const isLive = st <= now && st > new Date(now.getTime()-90*60000);
+      const statusDot = isLive ? 'live' : cls.status === 'done' ? 'done' : 'pending';
+      const timeStr = st.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
+      const dateStr = st.toLocaleDateString('es-AR', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+      const meetHtml = cls.meetLink
+        ? `<a href="${cls.meetLink}" target="_blank" class="sched-meet-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 10l4.553-2.069A1 1 0 0121 8.81v6.38a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+            Meet
+           </a>`
+        : `<span style="font-size:11px;color:rgba(255,255,255,0.2);">Sin Meet</span>`;
+      return `<div class="sched-class-item">
+        <div class="sched-status-dot ${statusDot}"></div>
+        <div class="sched-class-date">
+          <div class="sched-class-day-num">${st.getDate()}</div>
+          <div class="sched-class-month">${months[st.getMonth()]}</div>
+        </div>
+        <div class="sched-class-info">
+          <div class="sched-class-title">${cls.title || 'Clase'}</div>
+          <div class="sched-class-meta">🕙 ${timeStr} · ${dateStr} · ${cls.durationMin||60} min</div>
+        </div>
+        ${meetHtml}
+      </div>`;
+    }).join('');
+  }
+
+  window.saveScheduleClass = async () => {
+    const uid   = schedCurrentUid;
+    const name  = schedCurrentName;
+    const email = schedCurrentEmail;
+    const title    = document.getElementById('sched-title').value.trim() || 'Clase';
+    const duration = parseInt(document.getElementById('sched-duration').value) || 60;
+    const mode     = document.getElementById('sched-mode').value;
+    const createMeet = document.getElementById('sched-create-meet').checked;
+    const statusEl = document.getElementById('sched-meet-status');
+    const saveBtn  = document.getElementById('sched-save-label');
+
+    if (!uid) { alert('No hay alumno seleccionado'); return; }
+    if (DEMO_MODE) { switchSchedTab('clases'); return; }
+
+    saveBtn.textContent = 'Guardando...';
+
+    try {
+      const { getFirestore, collection, addDoc, serverTimestamp }
+        = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const db = getFirestore(app);
+
+      if (mode === 'weekly') {
+        const days = [...document.querySelectorAll('.sched-day-btn.sel')].map(b => parseInt(b.dataset.day));
+        if (!days.length) { alert('Seleccioná al menos un día'); saveBtn.textContent='Guardar clase'; return; }
+        const fromVal  = document.getElementById('sched-weekly-from').value;
+        const untilVal = document.getElementById('sched-weekly-until').value;
+        const timeVal  = document.getElementById('sched-weekly-time').value;
+        if (!fromVal) { alert('Ingresá la fecha de inicio'); saveBtn.textContent='Guardar clase'; return; }
+        const [hh, mm] = timeVal.split(':').map(Number);
+        const fromDate = new Date(fromVal+'T00:00:00');
+        const untilDate = untilVal ? new Date(untilVal+'T23:59:59') : new Date(fromDate.getTime()+365*24*60*60*1000);
+        statusEl.textContent = '⏳ Creando clases recurrentes...';
+        let saved = 0;
+        for (const day of days) {
+          let cursor = nextWeekday(fromDate, day);
+          while (cursor <= untilDate) {
+            const startTime = new Date(cursor); startTime.setHours(hh, mm, 0, 0);
+            const endTime   = new Date(startTime.getTime() + duration*60000);
+            let calendarId='', meetLink='';
+            if (createMeet && window._gCalToken) {
+              const ev = await createCalendarEventWithMeet(title, startTime, endTime, email);
+              if (ev) { calendarId=ev.calendarId; meetLink=ev.meetLink; }
+            }
+            await addDoc(collection(db,'classes'), {
+              title, startTime, endTime, durationMin:duration,
+              studentUid:uid, studentName:name, studentEmail:email,
+              source:'manual', status:computeClassStatus(startTime,endTime,duration),
+              createdAt:serverTimestamp(), recurring:true, recurringDay:day, calendarId, meetLink,
+            });
+            saved++;
+            cursor.setDate(cursor.getDate()+7);
+          }
+        }
+        statusEl.textContent = `✅ ${saved} clase${saved!==1?'s':''} creada${saved!==1?'s':''}${createMeet&&window._gCalToken?' con Meet':''}`;
+      } else {
+        const startVal = document.getElementById('sched-start').value;
+        if (!startVal) { alert('Ingresá la fecha y hora'); saveBtn.textContent='Guardar clase'; return; }
+        const startTime = new Date(startVal);
+        const endTime   = new Date(startTime.getTime() + duration*60000);
+        let calendarId='', meetLink='';
+        if (createMeet && window._gCalToken) {
+          statusEl.textContent = '⏳ Creando evento en Google Calendar con Meet...';
+          const ev = await createCalendarEventWithMeet(title, startTime, endTime, email);
+          if (ev) {
+            calendarId=ev.calendarId; meetLink=ev.meetLink;
+            statusEl.textContent = meetLink ? '✅ Link de Meet generado — el alumno recibirá invitación' : '⚠️ Evento creado sin Meet';
+          } else {
+            statusEl.textContent = '⚠️ No se pudo crear en Calendar (guardando igual)';
+          }
+        } else if (createMeet && !window._gCalToken) {
+          statusEl.textContent = '⚠️ Sin token de Google — iniciá sesión con Google para generar Meet';
+        }
+        await addDoc(collection(db,'classes'), {
+          title, startTime, endTime, durationMin:duration,
+          studentUid:uid, studentName:name, studentEmail:email,
+          source:'manual', status:computeClassStatus(startTime,endTime,duration),
+          createdAt:serverTimestamp(), recurring:false, calendarId, meetLink,
+        });
+        statusEl.textContent = statusEl.textContent.includes('✅') ? statusEl.textContent : '✅ Clase guardada';
+      }
+
+      saveBtn.textContent = '✅ Guardado';
+      setTimeout(async () => {
+        saveBtn.textContent = 'Guardar clase';
+        switchSchedTab('clases');
+        await loadSchedClasses(uid);
+        // Also refresh admin classes table if open
+        if (typeof loadCalendarClasses === 'function') loadCalendarClasses();
+      }, 1400);
+    } catch(e) {
+      alert('Error: ' + e.message);
+      saveBtn.textContent = 'Guardar clase';
+    }
+  };
+
+  // ══ END SCHEDULE MODAL ══
+
   let allUsers = [];
 
   window.loadAdminData = async () => {
@@ -7683,16 +8048,23 @@ ${innerHtml}
       const date = u.registeredAt?.toDate ? u.registeredAt.toDate().toLocaleDateString('es-AR') : '—';
       const provider = u.provider === 'google.com' ? '🔵 Google' : '📧 Email';
       const lvl = u.placementLevel ? `<span class="pt-badge">${u.placementLevel}</span>` : `<span style="color:var(--muted);font-size:11px;">Sin test</span>`;
+      const modality = u.modality || 'online';
+      const modalityHtml = `<select class="tbl-modality-sel" onchange="setStudentModality('${u.id}',this.value)" title="Modalidad">
+        <option value="online" ${modality==='online'?'selected':''}>🌐 Online</option>
+        <option value="presencial" ${modality==='presencial'?'selected':''}>🏢 Presencial</option>
+      </select>`;
       return `<tr>
         <td><div class="tbl-name"><div class="tbl-avatar">${u.photo ? `<img src="${u.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : initials}</div><div><div style="font-weight:600;color:var(--navy);">${u.name || '—'}</div><div style="font-size:11px;color:var(--muted);">${u.email}</div></div></div></td>
         <td>${provider}</td>
         <td><span class="tbl-badge ${u.status === 'active' ? 'active' : 'inactive'}">${u.status === 'active' ? 'Activo' : 'Inactivo'}</span></td>
         <td>${lvl}</td>
+        <td>${modalityHtml}</td>
         <td style="color:var(--muted);font-size:12px;">${date}</td>
         <td style="color:var(--muted);font-size:12px;">${u.lastLogin?.toDate ? u.lastLogin.toDate().toLocaleDateString('es-AR') : '—'}</td>
         <td>
           <div class="tbl-actions">
             <button class="tbl-action-btn file" onclick="openSendFileModal('${u.id}','${(u.name||u.email).replace(/'/g,'&apos;')}')">📎 Archivo</button>
+            <button class="tbl-action-btn sched" onclick="openScheduleModal('${u.id}','${(u.name||u.email).replace(/'/g,'&apos;')}','${(u.email||'').replace(/'/g,'&apos;')}')">📅 Horario</button>
             <button class="tbl-action-btn perf" onclick="openPerfModal('${u.id}','${(u.name||u.email).replace(/'/g,'&apos;')}')">📈 Performance</button>
             <button class="tbl-action-btn del" onclick="confirmDeleteAlumno('${u.id}','${(u.name||u.email).replace(/'/g,'&apos;')}')">🗑️ Eliminar</button>
           </div>
@@ -7703,7 +8075,7 @@ ${innerHtml}
     document.getElementById('admin-table-body').innerHTML = `
       <table class="admin-tbl">
         <thead><tr>
-          <th>Alumno</th><th>Método</th><th>Estado</th><th>Nivel</th><th>Registro</th><th>Último acceso</th><th>Acciones</th>
+          <th>Alumno</th><th>Método</th><th>Estado</th><th>Nivel</th><th>Modalidad</th><th>Registro</th><th>Último acceso</th><th>Acciones</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>`;
@@ -7857,6 +8229,20 @@ ${innerHtml}
       console.warn('loadEngagementKpis error:', e);
     }
   }
+
+  // ── Asignar modalidad a alumno ─────────────────────────────────────────────
+  window.setStudentModality = async (uid, modality) => {
+    // Update allUsers cache immediately so stats refresh is instant
+    const u = allUsers.find(x => x.id === uid);
+    if (u) u.modality = modality;
+    updateAdminKpis(allUsers);
+
+    if (DEMO_MODE) return;
+    try {
+      const { getFirestore, doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      await updateDoc(doc(getFirestore(app), 'users', uid), { modality });
+    } catch(e) { console.warn('setModality:', e.message); }
+  };
 
   window.confirmDeleteAlumno = (uid, name) => {
     if (!confirm(`¿Eliminar a ${name} del sistema?
@@ -8698,6 +9084,98 @@ service firebase.storage {
   }
 }
 --><!-- BIO MODAL - Mariana Alvarez (movido al DOM real) -->
+
+<!-- ══════════════════════════════════════════
+     SCHEDULE MODAL — Configurar Horario por Alumno
+══════════════════════════════════════════ -->
+<div id="schedule-modal-overlay" style="display:none;position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;">
+  <div class="sched-modal">
+    <button onclick="closeScheduleModal()" style="position:absolute;top:16px;right:20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">&#x2715;</button>
+    <div class="sched-modal-title">📅 Horario del alumno</div>
+    <div class="sched-modal-sub" id="sched-modal-sub">Configurar clases y meet links</div>
+
+    <div class="sched-tabs">
+      <button class="sched-tab active" id="sched-tab-clases" onclick="switchSchedTab('clases')">📋 Clases programadas</button>
+      <button class="sched-tab" id="sched-tab-nueva" onclick="switchSchedTab('nueva')">➕ Agregar clase</button>
+    </div>
+
+    <!-- PANEL: Clases programadas del alumno -->
+    <div id="sched-panel-clases">
+      <div class="sched-section-label">Clases de este alumno</div>
+      <div class="sched-classes-list" id="sched-classes-list">
+        <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Cargando clases...</div>
+      </div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:4px;">El alumno verá estas clases en su dashboard con el botón de unirse a Meet</div>
+    </div>
+
+    <!-- PANEL: Nueva clase -->
+    <div id="sched-panel-nueva" style="display:none;">
+      <div class="sched-section-label">Detalles de la clase</div>
+      <div class="sched-field">
+        <label>Título de la clase</label>
+        <input type="text" id="sched-title" placeholder="Ej: Business Grammar – Conditionals">
+      </div>
+      <div class="sched-row">
+        <div class="sched-field">
+          <label>Duración (min)</label>
+          <input type="number" id="sched-duration" value="60" min="15" max="180">
+        </div>
+        <div class="sched-field">
+          <label>Tipo</label>
+          <select id="sched-mode" onchange="toggleSchedMode()">
+            <option value="single">Una sola clase</option>
+            <option value="weekly">Semanal / recurrente</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="sched-single-mode">
+        <div class="sched-field">
+          <label>Fecha y hora</label>
+          <input type="datetime-local" id="sched-start">
+        </div>
+      </div>
+
+      <div id="sched-weekly-mode" style="display:none;">
+        <div class="sched-section-label" style="margin-top:4px;">Días de la semana</div>
+        <div class="sched-days">
+          <button class="sched-day-btn" data-day="1" onclick="this.classList.toggle('sel')">Lun</button>
+          <button class="sched-day-btn" data-day="2" onclick="this.classList.toggle('sel')">Mar</button>
+          <button class="sched-day-btn" data-day="3" onclick="this.classList.toggle('sel')">Mié</button>
+          <button class="sched-day-btn" data-day="4" onclick="this.classList.toggle('sel')">Jue</button>
+          <button class="sched-day-btn" data-day="5" onclick="this.classList.toggle('sel')">Vie</button>
+          <button class="sched-day-btn" data-day="6" onclick="this.classList.toggle('sel')">Sáb</button>
+          <button class="sched-day-btn" data-day="0" onclick="this.classList.toggle('sel')">Dom</button>
+        </div>
+        <div class="sched-row">
+          <div class="sched-field">
+            <label>Hora fija</label>
+            <input type="time" id="sched-weekly-time" value="10:00">
+          </div>
+          <div class="sched-field">
+            <label>Desde</label>
+            <input type="date" id="sched-weekly-from">
+          </div>
+        </div>
+        <div class="sched-field">
+          <label>Hasta (vacío = 1 año)</label>
+          <input type="date" id="sched-weekly-until">
+        </div>
+      </div>
+
+      <div class="sched-section-label" style="margin-top:8px;">Google Meet</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <input type="checkbox" id="sched-create-meet" checked style="width:16px;height:16px;accent-color:var(--green);">
+        <label for="sched-create-meet" style="font-size:13px;color:rgba(255,255,255,0.7);cursor:pointer;">Crear link de Google Meet y enviar invitación al alumno</label>
+      </div>
+      <div class="sched-meet-status" id="sched-meet-status">⏳ El link de Meet se generará al guardar</div>
+      <button class="sched-save-btn" onclick="saveScheduleClass()">
+        <span>💾</span> <span id="sched-save-label">Guardar clase</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="bio-modal-overlay" id="bio-modal-overlay" onclick="if(event.target===this)closeBioModal()">
   <div class="bio-modal">
     <button class="bio-modal-close" onclick="closeBioModal()">✕</button>
