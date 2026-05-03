@@ -2065,8 +2065,9 @@
     .add-class-modal {
       background: linear-gradient(160deg, #111d45 0%, #1B2B5E 100%);
       border: 1px solid rgba(47,168,208,0.25); border-radius: 20px;
-      width: 100%; max-width: 460px; padding: 28px 28px 24px;
+      width: 100%; max-width: 520px; padding: 28px 28px 24px;
       box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+      max-height: 90vh; overflow-y: auto;
     }
     .add-class-modal h3 { font-family:'Playfair Display',serif; font-size:18px; font-weight:900; color:white; margin-bottom:20px; }
     .acm-field { margin-bottom: 14px; }
@@ -2078,6 +2079,56 @@
     }
     .acm-field input:focus, .acm-field select:focus { outline:none; border-color:var(--sky); }
     .acm-field select option { background:#1B2B5E; }
+    /* Two-column row */
+    .acm-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    /* Day-of-week picker */
+    .acm-days { display:flex; gap:6px; flex-wrap:wrap; }
+    .acm-day-btn {
+      width:38px; height:38px; border-radius:9px;
+      border:1px solid rgba(255,255,255,0.12);
+      background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.5);
+      font-size:11px; font-weight:700; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif;
+      transition: all 0.18s;
+    }
+    .acm-day-btn.sel { background:rgba(47,168,208,0.2); border-color:var(--sky); color:var(--sky-light); }
+    /* Recurring toggle */
+    .acm-toggle-row { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+    .acm-toggle { position:relative; width:40px; height:22px; flex-shrink:0; }
+    .acm-toggle input { opacity:0; width:0; height:0; }
+    .acm-toggle-slider {
+      position:absolute; inset:0; border-radius:100px;
+      background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15);
+      cursor:pointer; transition:background 0.2s;
+    }
+    .acm-toggle-slider::before {
+      content:''; position:absolute; left:3px; top:3px;
+      width:14px; height:14px; border-radius:50%;
+      background:rgba(255,255,255,0.4); transition:transform 0.2s, background 0.2s;
+    }
+    .acm-toggle input:checked + .acm-toggle-slider { background:rgba(47,168,208,0.3); border-color:var(--sky); }
+    .acm-toggle input:checked + .acm-toggle-slider::before { transform:translateX(18px); background:var(--sky); }
+    .acm-toggle-label { font-size:13px; color:rgba(255,255,255,0.7); }
+    /* Meet badge */
+    .acm-meet-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 12px; border-radius:8px;
+      background:rgba(0,150,70,0.12); border:1px solid rgba(0,200,80,0.25);
+      color:#4ade80; font-size:11px; font-weight:700; margin-top:6px;
+    }
+    .acm-meet-pending {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 12px; border-radius:8px;
+      background:rgba(47,168,208,0.08); border:1px solid rgba(47,168,208,0.2);
+      color:rgba(255,255,255,0.4); font-size:11px;
+    }
+    .acm-section-sep {
+      border:none; border-top:1px solid rgba(255,255,255,0.07);
+      margin:18px 0 16px;
+    }
+    .acm-section-label {
+      font-size:10px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase;
+      color:rgba(255,255,255,0.3); margin-bottom:12px;
+    }
     .acm-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
     .acm-btn-cancel { padding:10px 20px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.6); border-radius:9px; cursor:pointer; font-size:13px; font-family:'Plus Jakarta Sans',sans-serif; }
     .acm-btn-save   { padding:10px 22px; background:var(--green); border:none; color:white; border-radius:9px; cursor:pointer; font-size:13px; font-weight:700; font-family:'Plus Jakarta Sans',sans-serif; }
@@ -3341,22 +3392,88 @@
 <div id="add-class-modal-overlay" onclick="if(event.target===this)closeAddClassModal()">
   <div class="add-class-modal">
     <h3>📅 Agregar clase</h3>
+
+    <!-- Alumno -->
     <div class="acm-field">
       <label>Alumno</label>
       <select id="acm-student"></select>
     </div>
+
+    <!-- Título -->
     <div class="acm-field">
       <label>Título / tema</label>
       <input type="text" id="acm-title" placeholder="Ej: Clase de Grammar — Condicionales">
     </div>
-    <div class="acm-field">
-      <label>Fecha y hora de inicio</label>
-      <input type="datetime-local" id="acm-start">
+
+    <hr class="acm-section-sep">
+    <div class="acm-section-label">📆 Horario</div>
+
+    <!-- Modo: única vs semanal -->
+    <div class="acm-toggle-row">
+      <label class="acm-toggle">
+        <input type="checkbox" id="acm-recurring" onchange="toggleRecurringMode()">
+        <span class="acm-toggle-slider"></span>
+      </label>
+      <span class="acm-toggle-label">Se repite cada semana</span>
     </div>
-    <div class="acm-field">
+
+    <!-- Modo ÚNICA: fecha + hora -->
+    <div id="acm-single-mode">
+      <div class="acm-field">
+        <label>Fecha y hora de inicio</label>
+        <input type="datetime-local" id="acm-start">
+      </div>
+    </div>
+
+    <!-- Modo SEMANAL: días + hora -->
+    <div id="acm-weekly-mode" style="display:none;">
+      <div class="acm-field">
+        <label>Días de la semana</label>
+        <div class="acm-days">
+          <button type="button" class="acm-day-btn" data-day="1" onclick="toggleDay(this)">Lun</button>
+          <button type="button" class="acm-day-btn" data-day="2" onclick="toggleDay(this)">Mar</button>
+          <button type="button" class="acm-day-btn" data-day="3" onclick="toggleDay(this)">Mié</button>
+          <button type="button" class="acm-day-btn" data-day="4" onclick="toggleDay(this)">Jue</button>
+          <button type="button" class="acm-day-btn" data-day="5" onclick="toggleDay(this)">Vie</button>
+          <button type="button" class="acm-day-btn" data-day="6" onclick="toggleDay(this)">Sáb</button>
+          <button type="button" class="acm-day-btn" data-day="0" onclick="toggleDay(this)">Dom</button>
+        </div>
+      </div>
+      <div class="acm-row">
+        <div class="acm-field">
+          <label>Hora de inicio</label>
+          <input type="time" id="acm-weekly-time" value="10:00">
+        </div>
+        <div class="acm-field">
+          <label>Desde fecha</label>
+          <input type="date" id="acm-weekly-from">
+        </div>
+      </div>
+      <div class="acm-field">
+        <label>Hasta fecha (opcional)</label>
+        <input type="date" id="acm-weekly-until" placeholder="Dejar vacío = sin fin">
+      </div>
+    </div>
+
+    <!-- Duración -->
+    <div class="acm-field" style="margin-top:4px;">
       <label>Duración (minutos)</label>
       <input type="number" id="acm-duration" value="60" min="15" max="180">
     </div>
+
+    <hr class="acm-section-sep">
+    <div class="acm-section-label">🎥 Google Meet & Calendar</div>
+
+    <!-- Google Meet toggle -->
+    <div class="acm-toggle-row">
+      <label class="acm-toggle">
+        <input type="checkbox" id="acm-create-meet" checked>
+        <span class="acm-toggle-slider"></span>
+      </label>
+      <span class="acm-toggle-label">Crear evento en Google Calendar con Meet</span>
+    </div>
+    <div id="acm-meet-status" class="acm-meet-pending">⏳ El link de Meet se generará al guardar</div>
+
     <div class="acm-footer">
       <button class="acm-btn-cancel" onclick="closeAddClassModal()">Cancelar</button>
       <button class="acm-btn-save" onclick="saveManualClass()">Guardar clase →</button>
@@ -6378,7 +6495,8 @@ ${innerHtml}
     if (app) {
       auth     = getAuth(app);
       provider = new GoogleAuthProvider();
-      provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+      provider.addScope('https://www.googleapis.com/auth/calendar');
+      provider.addScope('https://www.googleapis.com/auth/calendar.events');
       onAuthStateChanged(auth, user => {
         if (user) showDashboard(user);
         else      hideDashboard();
@@ -7112,7 +7230,8 @@ ${innerHtml}
         const { getAuth, GoogleAuthProvider, signInWithPopup } 
           = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
         const silentProvider = new GoogleAuthProvider();
-        silentProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+        silentProvider.addScope('https://www.googleapis.com/auth/calendar');
+        silentProvider.addScope('https://www.googleapis.com/auth/calendar.events');
         silentProvider.setCustomParameters({ prompt: 'none' });
         const result = await signInWithPopup(auth, silentProvider);
         const cred = GoogleAuthProvider.credentialFromResult(result);
@@ -7129,7 +7248,7 @@ ${innerHtml}
     } else {
       const info = document.createElement('div');
       info.style.cssText = 'padding:12px 20px;font-size:11px;color:rgba(255,255,255,0.4);border-bottom:1px solid rgba(47,168,208,0.1);';
-      info.innerHTML = '⚠️ Para sincronizar con Google Calendar, cerrá sesión y volvé a entrar con Google para autorizar el acceso.';
+      info.innerHTML = '⚠️ Para sincronizar con Google Calendar y crear clases con Meet, cerrá sesión y volvé a entrar con Google para autorizar el acceso al calendario.';
       body.before(info);
     }
 
@@ -7154,13 +7273,11 @@ ${innerHtml}
       const future14 = new Date(now.getTime() + 14  * 24 * 60 * 60 * 1000); // 14 días adelante
       const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events?` +
         `timeMin=${past30.toISOString()}&timeMax=${future14.toISOString()}` +
-        `&singleEvents=true&orderBy=startTime&maxResults=100` +
-        `&q=meet`;
+        `&singleEvents=true&orderBy=startTime&maxResults=200`;
       const res  = await fetch(url, { headers: { Authorization: `Bearer ${window._gCalToken}` } });
       if (!res.ok) { console.warn('Calendar API error:', res.status); return []; }
       const data = await res.json();
       return (data.items || [])
-        .filter(ev => ev.hangoutLink || ev.conferenceData) // solo eventos con Meet
         .map(ev => {
           const start    = new Date(ev.start?.dateTime || ev.start?.date);
           const end      = new Date(ev.end?.dateTime   || ev.end?.date);
@@ -7314,18 +7431,43 @@ ${innerHtml}
     } catch(e) { alert('Error: ' + e.message); }
   };
 
+  // ─── Add class modal helpers ───────────────────────────────────────────────
+  window.toggleRecurringMode = () => {
+    const rec = document.getElementById('acm-recurring').checked;
+    document.getElementById('acm-single-mode').style.display  = rec ? 'none'  : '';
+    document.getElementById('acm-weekly-mode').style.display  = rec ? ''      : 'none';
+  };
+
+  window.toggleDay = (btn) => {
+    btn.classList.toggle('sel');
+  };
+
   // Add class modal
   window.openAddClassModal = () => {
     // Populate student selector
     const sel = document.getElementById('acm-student');
     sel.innerHTML = '<option value="">— Seleccionar alumno —</option>' +
       allUsers.map(u => `<option value="${u.id}" data-name="${u.name||u.email}">${u.name || u.email}</option>`).join('');
-    // Default datetime to now
+    // Reset form
+    document.getElementById('acm-title').value      = '';
+    document.getElementById('acm-duration').value   = '60';
+    document.getElementById('acm-recurring').checked = false;
+    document.getElementById('acm-create-meet').checked = true;
+    document.getElementById('acm-single-mode').style.display = '';
+    document.getElementById('acm-weekly-mode').style.display  = 'none';
+    document.querySelectorAll('.acm-day-btn').forEach(b => b.classList.remove('sel'));
+    document.getElementById('acm-meet-status').className = 'acm-meet-pending';
+    document.getElementById('acm-meet-status').textContent = '⏳ El link de Meet se generará al guardar';
+    // Default datetime to next hour
     const now = new Date();
+    now.setMinutes(0,0,0); now.setHours(now.getHours()+1);
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     document.getElementById('acm-start').value = now.toISOString().slice(0,16);
-    document.getElementById('acm-title').value = '';
-    document.getElementById('acm-duration').value = '60';
+    // Default dates for weekly
+    const today = new Date(); today.setMinutes(today.getMinutes()-today.getTimezoneOffset());
+    document.getElementById('acm-weekly-from').value  = today.toISOString().slice(0,10);
+    document.getElementById('acm-weekly-until').value = '';
+    document.getElementById('acm-weekly-time').value  = '10:00';
     document.getElementById('add-class-modal-overlay').classList.add('open');
   };
 
@@ -7333,35 +7475,140 @@ ${innerHtml}
     document.getElementById('add-class-modal-overlay').classList.remove('open');
   };
 
+  // Create a Google Calendar event with Meet link
+  async function createCalendarEventWithMeet(title, startTime, endTime, studentEmail) {
+    if (!window._gCalToken) return null;
+    try {
+      const body = {
+        summary: title,
+        start:   { dateTime: startTime.toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+        end:     { dateTime: endTime.toISOString(),   timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+        conferenceData: {
+          createRequest: {
+            requestId: 'bm-' + Date.now() + '-' + Math.random().toString(36).slice(2),
+            conferenceSolutionKey: { type: 'hangoutsMeet' }
+          }
+        },
+        attendees: studentEmail ? [{ email: studentEmail }] : [],
+      };
+      const res = await fetch(
+        'https://www.googleapis.com/calendar/v3/calendars/primary/events?conferenceDataVersion=1&sendUpdates=all',
+        { method: 'POST', headers: { Authorization: `Bearer ${window._gCalToken}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+      );
+      if (!res.ok) { const err = await res.json(); console.warn('Calendar event create error:', err); return null; }
+      const data = await res.json();
+      return { calendarId: data.id, meetLink: data.hangoutLink || data.conferenceData?.entryPoints?.[0]?.uri || '' };
+    } catch(e) { console.warn('createCalendarEvent:', e.message); return null; }
+  }
+
+  // Get next occurrence of a given weekday (0=Sun..6=Sat) on or after a date
+  function nextWeekday(fromDate, day) {
+    const d = new Date(fromDate);
+    const diff = (day - d.getDay() + 7) % 7;
+    d.setDate(d.getDate() + diff);
+    return d;
+  }
+
   window.saveManualClass = async () => {
-    const studentSel  = document.getElementById('acm-student');
-    const studentUid  = studentSel.value;
-    const studentName = studentSel.options[studentSel.selectedIndex]?.dataset?.name || '';
-    const title       = document.getElementById('acm-title').value.trim() || 'Clase';
-    const startVal    = document.getElementById('acm-start').value;
-    const duration    = parseInt(document.getElementById('acm-duration').value) || 60;
-    if (!startVal) { alert('Ingresá la fecha y hora'); return; }
-    const startTime = new Date(startVal);
-    const endTime   = new Date(startTime.getTime() + duration * 60000);
-    const status    = computeClassStatus(startTime, endTime, duration);
+    const studentSel   = document.getElementById('acm-student');
+    const studentUid   = studentSel.value;
+    const studentName  = studentSel.options[studentSel.selectedIndex]?.dataset?.name || '';
+    const studentEmail = allUsers.find(u => u.id === studentUid)?.email || '';
+    const title        = document.getElementById('acm-title').value.trim() || 'Clase';
+    const duration     = parseInt(document.getElementById('acm-duration').value) || 60;
+    const isRecurring  = document.getElementById('acm-recurring').checked;
+    const createMeet   = document.getElementById('acm-create-meet').checked;
+
+    const meetStatus = document.getElementById('acm-meet-status');
+
     if (DEMO_MODE) { closeAddClassModal(); loadCalendarClasses(); return; }
+
     try {
       const { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc, setDoc }
         = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
       const db = getFirestore(app);
+
+      if (isRecurring) {
+        // Weekly recurring: generate occurrences for each selected day
+        const selectedDays = [...document.querySelectorAll('.acm-day-btn.sel')].map(b => parseInt(b.dataset.day));
+        if (!selectedDays.length) { alert('Seleccioná al menos un día de la semana'); return; }
+        const fromVal  = document.getElementById('acm-weekly-from').value;
+        const untilVal = document.getElementById('acm-weekly-until').value;
+        const timeVal  = document.getElementById('acm-weekly-time').value;
+        if (!fromVal) { alert('Ingresá la fecha de inicio'); return; }
+        const [hh, mm]   = timeVal.split(':').map(Number);
+        const fromDate   = new Date(fromVal + 'T00:00:00');
+        const untilDate  = untilVal ? new Date(untilVal + 'T23:59:59') : new Date(fromDate.getTime() + 365*24*60*60*1000);
+
+        meetStatus.textContent = createMeet && window._gCalToken ? '⏳ Creando eventos en Google Calendar...' : '⏳ Guardando clases...';
+
+        let saved = 0;
+        for (const day of selectedDays) {
+          let cursor = nextWeekday(fromDate, day);
+          while (cursor <= untilDate) {
+            const startTime = new Date(cursor);
+            startTime.setHours(hh, mm, 0, 0);
+            const endTime = new Date(startTime.getTime() + duration * 60000);
+            const status  = computeClassStatus(startTime, endTime, duration);
+            let calendarId = ''; let meetLink = '';
+            if (createMeet && window._gCalToken) {
+              const ev = await createCalendarEventWithMeet(title, startTime, endTime, studentEmail);
+              if (ev) { calendarId = ev.calendarId; meetLink = ev.meetLink; }
+            }
+            await addDoc(collection(db, 'classes'), {
+              title, startTime, endTime, durationMin: duration,
+              studentUid, studentName, studentEmail,
+              source: 'manual', status, createdAt: serverTimestamp(),
+              recurring: true, recurringDay: day,
+              calendarId, meetLink,
+            });
+            saved++;
+            cursor.setDate(cursor.getDate() + 7);
+          }
+        }
+        meetStatus.className  = 'acm-meet-badge';
+        meetStatus.textContent = `✅ ${saved} clase${saved!==1?'s':''} creada${saved!==1?'s':''}${createMeet && window._gCalToken ? ' con Meet' : ''}`;
+        setTimeout(() => closeAddClassModal(), 1200);
+        loadCalendarClasses();
+        return;
+      }
+
+      // Single class
+      const startVal = document.getElementById('acm-start').value;
+      if (!startVal) { alert('Ingresá la fecha y hora'); return; }
+      const startTime = new Date(startVal);
+      const endTime   = new Date(startTime.getTime() + duration * 60000);
+      const status    = computeClassStatus(startTime, endTime, duration);
+
+      let calendarId = ''; let meetLink = '';
+      if (createMeet && window._gCalToken) {
+        meetStatus.textContent = '⏳ Creando evento en Google Calendar...';
+        const ev = await createCalendarEventWithMeet(title, startTime, endTime, studentEmail);
+        if (ev) {
+          calendarId = ev.calendarId; meetLink = ev.meetLink;
+          meetStatus.className  = 'acm-meet-badge';
+          meetStatus.textContent = meetLink ? '✅ Link de Meet generado' : '⚠️ Evento creado sin Meet';
+        } else {
+          meetStatus.textContent = '⚠️ No se pudo crear en Calendar (guardando igual)';
+        }
+      } else if (createMeet && !window._gCalToken) {
+        meetStatus.textContent = '⚠️ Sin token de Google — iniciá sesión con Google para generar Meet';
+      }
+
       await addDoc(collection(db, 'classes'), {
         title, startTime, endTime, durationMin: duration,
-        studentUid, studentName, studentEmail: '',
+        studentUid, studentName, studentEmail,
         source: 'manual', status, createdAt: serverTimestamp(),
+        recurring: false, calendarId, meetLink,
       });
-      // If class already done and has student → increment counter
+
       if (status === 'done' && studentUid) {
         const perfRef  = doc(db, 'performance', studentUid);
         const perfSnap = await getDoc(perfRef);
         const current  = perfSnap.exists() ? (perfSnap.data().classes || 0) : 0;
         await setDoc(perfRef, { classes: current + 1 }, { merge: true });
       }
-      closeAddClassModal();
+      setTimeout(() => closeAddClassModal(), meetLink ? 1000 : 0);
       loadCalendarClasses();
     } catch(e) { alert('Error al guardar: ' + e.message); }
   };
